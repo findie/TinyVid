@@ -1,4 +1,5 @@
 import React, {forwardRef, VideoHTMLAttributes} from "react";
+import css from './style.css'
 
 export interface DisplayProps extends VideoHTMLAttributes<HTMLVideoElement> {
   file: string
@@ -6,13 +7,17 @@ export interface DisplayProps extends VideoHTMLAttributes<HTMLVideoElement> {
 
 export const Display = forwardRef<HTMLVideoElement, DisplayProps>((props: DisplayProps, ref) => {
 
-  return <video
-    ref={ref}
-    src={props.file ? 'video://' + props.file : undefined}
-    controls={false}
-    style={{ width: '100%', height: '100%' }}
-  >
-    {props.children}
-  </video>
+  const { file,className, ...p } = props;
+
+  return <div className={className}>
+    <video className={css.video}
+           ref={ref}
+           src={props.file ? 'video://' + props.file : undefined}
+           controls={false}
+           {...p}
+    >
+      {props.children}
+    </video>
+  </div>;
 
 });

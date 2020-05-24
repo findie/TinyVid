@@ -1,8 +1,18 @@
 import {app, BrowserWindow, protocol} from 'electron';
 import * as path from 'path';
 import * as url from 'url';
+import {check, trim} from "./trim";
 
 let mainWindow: Electron.BrowserWindow | null;
+
+protocol.registerSchemesAsPrivileged([
+  {
+    scheme: 'trim',
+    privileges: {
+      supportFetchAPI: true
+    }
+  }
+])
 
 function createProtocols() {
   protocol.registerFileProtocol('video', (request, callback) => {
@@ -14,6 +24,35 @@ function createProtocols() {
   }, (error) => {
     if (error) console.error('Failed to register video:// protocol')
   });
+
+  protocol.registerStringProtocol('trim', (req, cb) => {
+
+    if (req.method === 'POST') {
+      const payload: { start: number, end: number, out: string | undefined } = JSON.parse(req.uploadData[0].bytes.toString())
+
+      trim(req.url.replace('trim://', ''), payload.start, payload.end, payload.out);
+
+      return cb({
+        data: JSON.stringify({}),
+        mimeType: 'application/json'
+      })
+    }
+    if (req.method === 'GET') {
+
+      return cb({
+        data: JSON.stringify(check(req.url.replace('trim://', ''))),
+        mimeType: 'application/json'
+      })
+    }
+
+    cb({
+      data: JSON.stringify({ req }),
+      mimeType: 'application/json'
+    })
+
+  }, (error) => {
+    if (error) console.error('Failed to register trim:// protocol')
+  })
 }
 
 function createWindow() {
@@ -23,7 +62,7 @@ function createWindow() {
     webPreferences: {
       nodeIntegration: true,
       enableRemoteModule: true,
-      webSecurity: false,
+      // webSecurity: false,
     },
   });
 
