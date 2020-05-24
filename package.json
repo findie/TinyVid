@@ -1,6 +1,6 @@
 {
   "name": "QuickTrim",
-  "version": "1.0.0",
+  "version": "0.1.0",
   "main": "./dist/main.js",
   "scripts": {
     "dev:electron": "NODE_ENV=development webpack --config webpack.electron.config.js --mode development && electron .",
