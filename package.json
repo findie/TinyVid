@@ -5,7 +5,9 @@
   "scripts": {
     "dev:electron": "NODE_ENV=development webpack --config webpack.electron.config.js --mode development && electron .",
     "dev:react": "NODE_ENV=development webpack-dev-server --config webpack.react.config.js --mode development",
-    "ffbin": "ffbinaries ffmpeg -p linux-64 -o bin/linux-64 && ffbinaries ffmpeg -p windows-64 -o bin/windows-64"
+    "ffbin": "ffbinaries ffmpeg -p linux-64 -o bin/linux-64 && ffbinaries ffmpeg -p windows-64 -o bin/windows-64",
+    "pkg:linux": "electron-packager . QuickTrim --platform=linux --arc=amb64 --ignore bin/windows-64 --out out",
+    "pkg:win": "electron-packager . QuickTrim --platform=win32 --arc=amb64 --ignore bin/linux-64 --out out"
   },
   "license": "MIT",
   "devDependencies": {
@@ -16,6 +18,7 @@
     "babel-loader": "^8.1.0",
     "css-loader": "^3.5.3",
     "electron": "^9.0.0",
+    "electron-packager": "^14.2.1",
     "ffbinaries": "^1.1.4",
     "html-webpack-plugin": "^4.3.0",
     "mini-css-extract-plugin": "^0.9.0",
