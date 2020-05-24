@@ -69,9 +69,10 @@ function createWindow() {
   if (process.env.NODE_ENV === 'development') {
     mainWindow.loadURL(`http://localhost:4000`);
   } else {
+    console.log('loading', path.join(app.getAppPath(), 'renderer/index.html'))
     mainWindow.loadURL(
       url.format({
-        pathname: path.join(__dirname, '../index.html'),
+        pathname: path.join(app.getAppPath(), 'renderer/index.html'),
         protocol: 'file:',
         slashes: true
       })
