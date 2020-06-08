@@ -32,7 +32,7 @@ function createProtocols() {
       const payload: {
         start: number,
         end: number,
-        out: string | undefined  ,
+        out: string | undefined,
         strategy: FFHelpers.RenderStrategy,
         settings: FFHelpers.VideoSettings
       } = JSON.parse(req.uploadData[0].bytes.toString())
@@ -79,6 +79,7 @@ function createWindow() {
     },
   });
 
+  console.log('NODE_ENV', process.env.NODE_ENV);
   if (process.env.NODE_ENV === 'development') {
     mainWindow.loadURL(`http://localhost:4000`);
   } else {
