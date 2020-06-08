@@ -1,24 +1,48 @@
-:local .process-btn {
-    margin-top: 20px;
-    width: 100%;
-    height: 30px;
-    z-index: 1;
-}
 
 :local .display {
     flex-grow: 2;
     display: flex;
-    max-height: calc(100% - 120px);
+    max-height: calc(100% - 150px);
 }
 
 :local .header {
     flex-grow: 1;
     max-height: 45px;
 }
+
 :local .footer {
     flex-grow: 1;
     padding: 0 10px;
-    max-height: 75px;
+    max-height: 150px;
+}
+
+:local .footer .controls {
+    display: flex;
+    align-items: center;
+}
+
+:local .controls .process-btn {
+    width: 80px;
+    z-index: 1;
+}
+
+:local .controls .settings {
+    display: flex;
+}
+
+:local .controls .settings .left, .controls .settings .right {
+    display: flex;
+}
+
+:local .controls .settings .left {
+    flex-grow: 1;
+}
+
+:local .controls .settings .right {
+}
+
+:local .controls .speed-slider {
+    flex-grow: 1;
 }
 
 :local .app {
@@ -34,4 +58,24 @@ body {
     margin: 0;
     border: 0;
     box-sizing: border-box;
+}
+
+.rows {
+    display: flex;
+    flex-flow: column;
+    align-items: stretch;
+}
+
+.rows > * {
+    width: 100%;
+}
+
+.flex-grow {
+    flex-grow: 1;
+}
+
+.vertical-divider {
+    width: 2px;
+    background: #2b2b2b;
+    margin: 0 2px;
 }

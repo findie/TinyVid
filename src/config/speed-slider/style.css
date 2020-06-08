@@ -1,0 +1,17 @@
+.container {
+    display: flex;
+    min-width: 150px;
+}
+
+.slider {
+    flex-grow: 1;
+    margin: 0 28px;
+}
+
+
+:global .noUi-tooltip {
+    display: none;
+}
+:global .noUi-active .noUi-tooltip {
+    display: block;
+}

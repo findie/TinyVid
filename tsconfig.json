@@ -13,6 +13,9 @@
     "sourceMap": true,
     "outDir": "./dist",
     "strict": true,
-    "esModuleInterop": true,
-  }
+    "esModuleInterop": true
+  },
+  "include": [
+    "src/types.d.ts"
+  ]
 }

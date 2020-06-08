@@ -2,6 +2,7 @@ import {app, BrowserWindow, protocol} from 'electron';
 import * as path from 'path';
 import * as url from 'url';
 import {check, trim} from "./trim";
+import {FFHelpers} from "./ffhelpers";
 
 let mainWindow: Electron.BrowserWindow | null;
 
@@ -28,9 +29,15 @@ function createProtocols() {
   protocol.registerStringProtocol('trim', (req, cb) => {
 
     if (req.method === 'POST') {
-      const payload: { start: number, end: number, out: string | undefined } = JSON.parse(req.uploadData[0].bytes.toString())
+      const payload: {
+        start: number,
+        end: number,
+        out: string | undefined  ,
+        strategy: FFHelpers.RenderStrategy,
+        settings: FFHelpers.VideoSettings
+      } = JSON.parse(req.uploadData[0].bytes.toString())
 
-      trim(req.url.replace('trim://', ''), payload.start, payload.end, payload.out);
+      trim(req.url.replace('trim://', ''), payload.start, payload.end, payload.out, payload.strategy, payload.settings);
 
       return cb({
         data: JSON.stringify({}),
@@ -59,6 +66,8 @@ function createWindow() {
   mainWindow = new BrowserWindow({
     width: 800,
     height: 600,
+    minHeight: 600,
+    minWidth: 800,
     webPreferences: {
       nodeIntegration: true,
       enableRemoteModule: true,
