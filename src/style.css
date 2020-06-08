@@ -7,7 +7,7 @@
 
 :local .header {
     flex-grow: 1;
-    max-height: 45px;
+    max-height: 38px;
 }
 
 :local .footer {
@@ -24,6 +24,8 @@
 :local .controls .process-btn {
     width: 80px;
     z-index: 1;
+    margin-left: 8px;
+    height: 64px;
 }
 
 :local .controls .settings {
@@ -78,4 +80,20 @@ body {
     width: 2px;
     background: #2b2b2b;
     margin: 0 2px;
+}
+
+:global .noUi-tooltip {
+    display: none;
+}
+
+:global .noUi-active .noUi-tooltip {
+    display: block;
+}
+
+:global .noUi-handle:focus .noUi-tooltip {
+    display: block;
+}
+
+:global .noUi-touch-area:focus + .noUi-tooltip {
+    display: block;
 }

@@ -64,10 +64,14 @@ function createProtocols() {
 
 function createWindow() {
   mainWindow = new BrowserWindow({
-    width: 800,
-    height: 600,
+    icon: path.join(app.getAppPath(), 'icon.png'),
+    title: 'QuickTrim',
+    center: true,
+    autoHideMenuBar: true,
+    width: 900,
+    height: 656,
     minHeight: 600,
-    minWidth: 800,
+    minWidth: 900,
     webPreferences: {
       nodeIntegration: true,
       enableRemoteModule: true,

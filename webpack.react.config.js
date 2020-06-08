@@ -56,7 +56,10 @@ module.exports = {
     publicPath: './',
   },
   plugins: [
-    new HtmlWebpackPlugin(),
+    new HtmlWebpackPlugin({
+      minify: false,
+      title: "QuickTrim"
+    }),
     new MiniCssExtractPlugin({
       filename: '[name].css',
       chunkFilename: '[id].css',

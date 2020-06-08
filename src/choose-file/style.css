@@ -11,8 +11,8 @@
     border: 2px solid #dce4ec;
     color: #34495e;
     cursor: pointer;
-    height: 40px;
-    line-height: 40px;
+    height: 32px;
+    line-height: 32px;
     text-align: left;
     background: #FFFFFF;
     overflow: hidden;
@@ -23,12 +23,12 @@
     background: #dce4ec;
     padding: 0 10px;
     display: inline-block;
-    height: 40px;
-    line-height: 40px;
+    height: 32px;
+    line-height: 32px;
 }
 
 :local .file-upload .file-select .file-select-name {
-    line-height: 40px;
+    line-height: 32px;
     display: inline-block;
     padding: 0 10px;
 }
@@ -89,8 +89,8 @@
     border: 2px solid #dce4ec;
     color: #34495e;
     cursor: pointer;
-    height: 40px;
-    line-height: 40px;
+    height: 32px;
+    line-height: 32px;
     margin-top: 5px;
     text-align: left;
     background: #FFFFFF;
@@ -103,12 +103,12 @@
     color: #666666;
     padding: 0 10px;
     display: inline-block;
-    height: 40px;
-    line-height: 40px;
+    height: 32px;
+    line-height: 32px;
 }
 
 :local .file-upload .file-select.file-select-disabled:hover .file-select-name {
-    line-height: 40px;
+    line-height: 32px;
     display: inline-block;
     padding: 0 10px;
 }

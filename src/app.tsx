@@ -97,20 +97,18 @@ const App = () => {
         <TrimSlider
           disabled={!file}
           duration={duration || 100}
-          onSlide={(values, handle, unencodedValues) => {
-            const val = unencodedValues[handle];
+          onChange={(begin, end, current) => {
             if (videoElementRef.current) {
-              videoElementRef.current.currentTime = val;
+              videoElementRef.current.currentTime = current;
             }
+            setRange({
+              start: begin,
+              end: end
+            });
           }}
-          onSet={(values, handle, unencodedValues) => setRange({
-            start: unencodedValues[0],
-            end: unencodedValues[1]
-          })}
         />
 
         <hr/>
-
 
         <div className={css.controls}>
           <div className={css.rows + ' ' + css.flexGrow}>
@@ -155,7 +153,6 @@ const App = () => {
               }
             />
           </div>
-
 
           <button
             className={css.processBtn}
