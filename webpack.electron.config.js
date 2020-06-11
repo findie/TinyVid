@@ -16,10 +16,16 @@ module.exports = {
           loader: 'babel-loader',
         },
       },
+      {
+        test: /\.(js|ts|tsx)$/,
+        enforce: 'pre',
+        use: ['source-map-loader'],
+      },
     ],
   },
   output: {
     path: path.resolve(__dirname, './dist'),
-    filename: '[name].js',
+    filename: '[name].js'
   },
+
 };

@@ -5,6 +5,7 @@ module.exports = {
       {
         targets: {
           esmodules: true,
+          electron: "9"
         },
       },
     ],

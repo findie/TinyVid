@@ -1,19 +1,21 @@
 {
   "compilerOptions": {
-    "target": "es6",
+    "target": "es2019",
     "module": "commonjs",
     "lib": [
       "dom",
       "es2015",
       "es2016",
-      "es2017"
+      "es2017",
+      "esnext"
     ],
     "allowJs": false,
     "jsx": "react",
     "sourceMap": true,
     "outDir": "./dist",
     "strict": true,
-    "esModuleInterop": true
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true
   },
   "include": [
     "src/types.d.ts"

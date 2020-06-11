@@ -1,66 +1,12 @@
-import {app, BrowserWindow, protocol} from 'electron';
+import "source-map-support/register"
+
+import {app, BrowserWindow, session} from 'electron';
 import * as path from 'path';
 import * as url from 'url';
-import {check, trim} from "./trim";
-import {FFHelpers} from "./ffhelpers";
+import * as os from 'os';
+import {Protocols} from "./protocols";
 
 let mainWindow: Electron.BrowserWindow | null;
-
-protocol.registerSchemesAsPrivileged([
-  {
-    scheme: 'trim',
-    privileges: {
-      supportFetchAPI: true
-    }
-  }
-])
-
-function createProtocols() {
-  protocol.registerFileProtocol('video', (request, callback) => {
-    const url = request.url.substr('video://'.length)
-    callback({
-      path: url,
-      headers: {}
-    });
-  }, (error) => {
-    if (error) console.error('Failed to register video:// protocol')
-  });
-
-  protocol.registerStringProtocol('trim', (req, cb) => {
-
-    if (req.method === 'POST') {
-      const payload: {
-        start: number,
-        end: number,
-        out: string | undefined,
-        strategy: FFHelpers.RenderStrategy,
-        settings: FFHelpers.VideoSettings
-      } = JSON.parse(req.uploadData[0].bytes.toString())
-
-      trim(req.url.replace('trim://', ''), payload.start, payload.end, payload.out, payload.strategy, payload.settings);
-
-      return cb({
-        data: JSON.stringify({}),
-        mimeType: 'application/json'
-      })
-    }
-    if (req.method === 'GET') {
-
-      return cb({
-        data: JSON.stringify(check(req.url.replace('trim://', ''))),
-        mimeType: 'application/json'
-      })
-    }
-
-    cb({
-      data: JSON.stringify({ req }),
-      mimeType: 'application/json'
-    })
-
-  }, (error) => {
-    if (error) console.error('Failed to register trim:// protocol')
-  })
-}
 
 function createWindow() {
   mainWindow = new BrowserWindow({
@@ -98,8 +44,12 @@ function createWindow() {
   });
 }
 
+Protocols.grantPrivileges();
 app.on('ready', () => {
-  createProtocols();
+  Protocols.register();
   createWindow();
+  session.defaultSession.loadExtension(
+    path.join(os.homedir(), '.config/google-chrome/Default/Extensions/fmkadmapgofadopljbjfkapdkoienihi/4.7.0_0/')
+  ).then(console.log)
 });
 app.allowRendererProcessReuse = true;
