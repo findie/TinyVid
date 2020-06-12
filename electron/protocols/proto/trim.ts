@@ -1,6 +1,6 @@
 import {JSONProtocol} from "../base-protocols";
 import {TrimPostData} from "../../types";
-import {FFMpegError} from "ffmpeg-progress-wrapper";
+import {FFMpegError, FFMpegProgress} from "ffmpeg-progress-wrapper";
 import {IFFMpegProgressData} from "ffmpeg-progress-wrapper/src/index";
 import {v4 as uuid} from 'uuid'
 import {VideoProcess} from "../../helpers/ff/process";
@@ -9,10 +9,12 @@ export namespace TrimProtocol {
 
   type Task = {
     id: string
+    process: FFMpegProgress | null
     progress: IFFMpegProgressData | null
     done: boolean
     error: FFMpegError | null
-    promise: Promise<void>
+    cancelled: boolean
+    promise: Promise<string> | null
   }
 
   export type TrimCheckResponse = Task | null;
@@ -35,6 +37,8 @@ export namespace TrimProtocol {
           return this.startTrim(pathname, payload);
         case 'GET':
           return this.checkTrim(pathname);
+        case 'DELETE':
+          return this.cancelTrim(pathname);
       }
       return {};
     }
@@ -44,13 +48,15 @@ export namespace TrimProtocol {
 
       const task: Task = {
         id,
-        promise: Promise.resolve(),
+        process: null,
+        promise: Promise.resolve(''),
         progress: null,
         error: null,
-        done: false
+        done: false,
+        cancelled: false
       }
 
-      task.promise = VideoProcess.process(
+      task.process = VideoProcess.process(
         path,
         data.start,
         data.end,
@@ -59,6 +65,7 @@ export namespace TrimProtocol {
         data.settings,
         p => task.progress = p
       );
+      task.promise = task.process.onDone();
 
       task.promise
         .catch((e) => {
@@ -77,7 +84,26 @@ export namespace TrimProtocol {
       const task = this.tasks.find(t => t.id === id);
 
       if (!task) return null;
-      return task;
+      return {
+        ...task,
+        process: null,
+        promise: null
+      };
+    }
+
+    cancelTrim(id: string) {
+      const task = this.tasks.find(t => t.id === id);
+
+      if (!task) return null;
+
+      if (!task.process) return null;
+
+      if (task.cancelled) return null;
+
+      task.cancelled = true;
+      task.process.kill('SIGINT');
+
+      return {};
     }
   }
 

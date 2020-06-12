@@ -1,6 +1,4 @@
-import * as path from 'path'
 import {FFMpegProgress, IFFMpegProgressData} from "ffmpeg-progress-wrapper";
-import {app} from 'electron';
 import {FFHelpers} from "./index";
 import {RenderStrategy, VideoSettings} from "../../types";
 
@@ -54,13 +52,13 @@ export namespace VideoProcess {
     return filters;
   }
 
-  export async function process(file: string,
-                                start: number,
-                                end: number,
-                                out: string,
-                                strategy: RenderStrategy,
-                                settings: VideoSettings,
-                                progress: (p: IFFMpegProgressData) => void
+  export function process(file: string,
+                          start: number,
+                          end: number,
+                          out: string,
+                          strategy: RenderStrategy,
+                          settings: VideoSettings,
+                          progress: (p: IFFMpegProgressData) => void
   ) {
 
     const ffmpeg = FFHelpers.ffmpeg;
@@ -92,7 +90,7 @@ export namespace VideoProcess {
 
     p.on('raw', console.error);
 
-    await p.onDone();
+    return p;
   }
 
 }

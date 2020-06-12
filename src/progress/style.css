@@ -15,6 +15,9 @@
     position: relative;
 }
 
+:local .progress-container .progress {
+    height: 120px;
+}
 :local .progress-container .info {
     color: white;
     position: absolute;
@@ -23,4 +26,9 @@
     transform: translate(-50%, -50%);
     text-shadow: 0px 0px 6px #000000;
     font-size: 1.2rem;
+    text-align: center;
+}
+:local .progress-container .cancel-btn {
+    margin-top: 12px;
+    width: 140px;
 }

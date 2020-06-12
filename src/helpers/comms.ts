@@ -34,6 +34,16 @@ export namespace TrimComms {
     return data;
   }
 
+  export async function cancelProcess(id: string) {
+    const f = await fetch('trim://' + id, {
+      method: 'delete'
+    });
+
+    const data = await f.json();
+
+    return data;
+  }
+
 }
 
 export namespace DetailsComms {

@@ -182,6 +182,7 @@ const App = () => {
           fileOut={fileOut || ''}
           id={processingID}
           onDone={() => setProcessingID(null)}
+          onCancelRequest={() => TrimComms.cancelProcess(processingID)}
         /> :
         null
       }
