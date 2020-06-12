@@ -976,6 +976,11 @@
   dependencies:
     source-map "^0.6.1"
 
+"@types/uuid@^8.0.0":
+  version "8.0.0"
+  resolved "https://registry.yarnpkg.com/@types/uuid/-/uuid-8.0.0.tgz#165aae4819ad2174a17476dbe66feebd549556c0"
+  integrity sha512-xSQfNcvOiE5f9dyd4Kzxbof1aTrLobL278pGLKOZI6esGfZ7ts9Ka16CzIN6Y8hFHE1C7jIBZokULhK1bOgjRw==
+
 "@types/webpack-sources@*":
   version "0.1.7"
   resolved "https://registry.yarnpkg.com/@types/webpack-sources/-/webpack-sources-0.1.7.tgz#0a330a9456113410c74a5d64180af0cbca007141"
@@ -2828,15 +2833,14 @@ ffbinaries@^1.1.4:
     lodash "^4.17.15"
     request "^2.88.0"
 
-ffmpeg-progress-wrapper@^1.1.6:
-  version "1.1.6"
-  resolved "https://registry.yarnpkg.com/ffmpeg-progress-wrapper/-/ffmpeg-progress-wrapper-1.1.6.tgz#8db82deabb1a28d790b425ea2371d434bb9df1a8"
-  integrity sha512-FC1rk6T1Aqh/rJdrP+uimHsF2OtPE3aomVUyjdVjSEqNGWTnbHw3opIDD/7pzyyZouzPkG3vRntQ8Ds+K62XEw==
+ffmpeg-progress-wrapper@^2.0.0:
+  version "2.0.0"
+  resolved "https://registry.yarnpkg.com/ffmpeg-progress-wrapper/-/ffmpeg-progress-wrapper-2.0.0.tgz#6384b490806ac08e49ff697db7ece45973dda40e"
+  integrity sha512-lRjwiAdCQrztkz4L+YhqP7Ptf5lxQ/410DCwqDkmD2kRu0MTE7IY/Trpg63udPg5t63AnEQlrI9VO9LDXNYi9A==
   dependencies:
     "@types/node" "^11.11.5"
     "@types/pidusage" "^2.0.1"
     pidusage "^2.0.17"
-    typescript "^3.3.4000"
 
 figgy-pudding@^3.5.1:
   version "3.5.2"
@@ -6174,11 +6178,6 @@ typedarray@^0.0.6:
   resolved "https://registry.yarnpkg.com/typedarray/-/typedarray-0.0.6.tgz#867ac74e3864187b1d3d47d996a78ec5c8830777"
   integrity sha1-hnrHTjhkGHsdPUfZlqeOxciDB3c=
 
-typescript@^3.3.4000:
-  version "3.9.3"
-  resolved "https://registry.yarnpkg.com/typescript/-/typescript-3.9.3.tgz#d3ac8883a97c26139e42df5e93eeece33d610b8a"
-  integrity sha512-D/wqnB2xzNFIcoBG9FG8cXRDjiqSTbG2wd8DMZeQyJlP1vfTkIxH4GKveWaEBYySKIg+USu+E+EDIR47SqnaMQ==
-
 unicode-canonical-property-names-ecmascript@^1.0.4:
   version "1.0.4"
   resolved "https://registry.yarnpkg.com/unicode-canonical-property-names-ecmascript/-/unicode-canonical-property-names-ecmascript-1.0.4.tgz#2619800c4c825800efdd8343af7dd9933cbe2818"
@@ -6340,6 +6339,11 @@ uuid@^3.3.2, uuid@^3.4.0:
   version "3.4.0"
   resolved "https://registry.yarnpkg.com/uuid/-/uuid-3.4.0.tgz#b23e4358afa8a202fe7a100af1f5f883f02007ee"
   integrity sha512-HjSDRw6gZE5JMggctHBcjVak08+KEVhSIiDzFnT9S9aegmp85S/bReBVTb4QTFaRNptJ9kuYaNhnbNEOkbKb/A==
+
+uuid@^8.1.0:
+  version "8.1.0"
+  resolved "https://registry.yarnpkg.com/uuid/-/uuid-8.1.0.tgz#6f1536eb43249f473abc6bd58ff983da1ca30d8d"
+  integrity sha512-CI18flHDznR0lq54xBycOVmphdCYnQLKn8abKn7PXUiKUGdEd+/l9LWNJmugXel4hXq7S+RMNl34ecyC9TntWg==
 
 v8-compile-cache@2.0.3:
   version "2.0.3"

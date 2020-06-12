@@ -1,7 +1,7 @@
 import React, {useEffect, useState} from "react";
 import * as css from './style.css';
 import {clip} from "../../helpers/math";
-import {FFHelpers} from "../../../electron/ffhelpers";
+import {FFHelpers} from "../../../electron/helpers/ff";
 
 export interface ConfigMaxFileSizeProps {
   onChange: (size: number) => void

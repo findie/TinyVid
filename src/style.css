@@ -97,3 +97,7 @@ body {
 :global .noUi-touch-area:focus + .noUi-tooltip {
     display: block;
 }
+
+:global .noUi-horizontal .noUi-handle {
+    /*width: 14px;*/
+}

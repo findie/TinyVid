@@ -1,13 +1,13 @@
 import React, {useState} from "react";
 import * as css from './style.css';
 import {range} from "../../helpers/math";
-import {FFHelpers} from "../../../electron/ffhelpers";
+import {FFHelpers} from "../../../electron/helpers/ff";
 
 export interface ConfigConstantQualityProps {
   onChange: (quality: number) => void
 }
 
-export const ConfigConstantQualityDefaultQuality = 8;
+export const ConfigConstantQualityDefaultQuality = 18;
 export const ConfigConstantQualityDefaultSpeedOrQuality = FFHelpers.encodingSpeedPresets.indexOf('medium');
 
 function quality2name(q: number) {

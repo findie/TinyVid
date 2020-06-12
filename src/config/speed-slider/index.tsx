@@ -1,9 +1,9 @@
 import React from "react";
-import {FFHelpers} from "../../../electron/ffhelpers";
 import * as css from './style.css'
 
 import Nouislider from "nouislider-react";
 import "nouislider/distribute/nouislider.css";
+import {FFHelpers} from "../../../electron/helpers/ff";
 
 
 interface SpeedSliderProps {

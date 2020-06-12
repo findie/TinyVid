@@ -1,10 +1,10 @@
-import React, {useRef, useState} from 'react';
+import './types'
+import React, {useCallback, useRef, useState} from 'react';
 import ReactDom from 'react-dom';
 import {ChooseFile} from "./choose-file";
 import {Display} from "./display";
 import {TrimSlider} from "./trim-select";
-import {Done, Progress} from "./progress";
-import {IFFMpegProgressData} from "ffmpeg-progress-wrapper";
+import {ProcessingOverlay} from "./progress";
 import css from './style.css';
 import {
   ConfigMaxFileSize,
@@ -12,23 +12,28 @@ import {
   ConfigMaxFileSizeDefaultSpeedOrQuality
 } from "./config/max-file-size";
 import {SpeedSlider} from "./config/speed-slider";
-import {FFHelpers} from "../electron/ffhelpers";
-import {ConfigConstantQuality} from "./config/constant-quality";
+import {
+  ConfigConstantQuality,
+  ConfigConstantQualityDefaultQuality,
+  ConfigConstantQualityDefaultSpeedOrQuality
+} from "./config/constant-quality";
 import {ConfigVideoSettings, ConfigVideoSettingsData, ConfigVideoSettingsDefault} from "./config/video-settings";
+import {RenderStrategy} from "../electron/types";
+import {TrimComms} from "./helpers/comms";
 
 const mainElement = document.createElement('div');
 document.body.appendChild(mainElement);
 
 
-const defaultMaxFileSizeStrategy: FFHelpers.RenderStrategy = {
+const defaultMaxFileSizeStrategy: RenderStrategy = {
   type: 'max-file-size',
-  size: ConfigMaxFileSizeDefaultSize,
-  speed_or_quality: ConfigMaxFileSizeDefaultSpeedOrQuality
+  tune: ConfigMaxFileSizeDefaultSize,
+  speed: ConfigMaxFileSizeDefaultSpeedOrQuality
 }
-const defaultConstantQuality: FFHelpers.RenderStrategy = {
+const defaultConstantQuality: RenderStrategy = {
   type: 'constant-quality',
-  quality: undefined,
-  speed_or_file_size: undefined
+  tune: ConfigConstantQualityDefaultQuality,
+  speed: ConfigConstantQualityDefaultSpeedOrQuality
 }
 
 const App = () => {
@@ -38,46 +43,28 @@ const App = () => {
   const [duration, setDuration] = useState<number>(0);
   const [range, setRange] = useState<{ start: number, end: number }>({ start: 0, end: 0 })
 
-  const [processing, setProcessing] = useState<IFFMpegProgressData | null>(null);
-  const [isDone, setDone] = useState(false);
-
   const [fileOut, setFileOut] = useState<string>();
 
-  const [strategy, setStrategy] = useState<FFHelpers.RenderStrategy>(defaultMaxFileSizeStrategy);
+  const [strategy, setStrategy] = useState<RenderStrategy>({ ...defaultMaxFileSizeStrategy });
+  const strategyRef = useRef(strategy);
+
   const [videoSettings, setVideoSettings] = useState<ConfigVideoSettingsData>(ConfigVideoSettingsDefault);
 
-  let checkInterval: NodeJS.Timeout;
+  const [processingID, setProcessingID] = useState<string | null>(null);
 
-  async function checkProgress() {
-    const f = await fetch('trim://' + file, {
-      method: 'get'
-    });
-    const json: IFFMpegProgressData = await f.json();
+  async function startProcessing() {
+    const fout = `${file}.${range.start.toFixed(2)}-${range.end.toFixed(2)}.mp4`
 
-    setProcessing(json);
-    if (!json) {
-      clearInterval(checkInterval);
-      setDone(true);
-    }
-  }
+    const data = await TrimComms.startProcess(
+      file,
+      fout,
+      range,
+      strategy,
+      videoSettings
+    );
 
-  async function startProcess() {
-    setProcessing({ speed: 0, progress: 0, eta: 0 });
-    const fileOut = `${file}.${range.start.toFixed(2)}-${range.end.toFixed(2)}.mp4`
-    setFileOut(fileOut);
-
-    const f = await fetch('trim://' + file, {
-      method: 'post',
-      body: JSON.stringify({
-        start: range.start,
-        end: range.end,
-        out: fileOut,
-        strategy: strategy,
-        settings: videoSettings
-      }),
-      headers: { 'content-type': 'application/json' }
-    });
-    checkInterval = setInterval(checkProgress, 500);
+    setFileOut(fout);
+    setProcessingID(data.id);
   }
 
   return (
@@ -118,9 +105,13 @@ const App = () => {
                 Output must &nbsp;
                 <select
                   onChange={
-                    e => e.target.value === 'max-file-size' ?
-                      setStrategy(defaultMaxFileSizeStrategy) :
-                      setStrategy(defaultConstantQuality)
+                    e => {
+                      if (e.target.value === 'max-file-size') {
+                        setStrategy({ ...defaultMaxFileSizeStrategy });
+                      } else {
+                        setStrategy({ ...defaultConstantQuality });
+                      }
+                    }
                   }
                   value={strategy.type}
                 >
@@ -129,8 +120,12 @@ const App = () => {
                 </select>
 
                 {strategy.type === 'max-file-size' ?
-                  <ConfigMaxFileSize onChange={size => setStrategy({ ...strategy, size })}/> :
-                  <ConfigConstantQuality onChange={quality => setStrategy({ ...strategy, quality })}/>
+                  <ConfigMaxFileSize onChange={size => {
+                    setStrategy({ ...strategy, tune: size })
+                  }}/> :
+                  <ConfigConstantQuality onChange={quality => {
+                    setStrategy({ ...strategy, tune: quality })
+                  }}/>
                 }
               </div>
               <div className={css.right}>
@@ -143,13 +138,16 @@ const App = () => {
               highSpeedText={strategy.type === 'max-file-size' ? 'High Speed' : 'High Speed'}
               lowSpeedText={strategy.type === 'max-file-size' ? 'High Quality' : 'Small File Size'}
               onChange={
-                speedIndex => {
-                  if (strategy.type === 'max-file-size') {
-                    setStrategy({ ...strategy, speed_or_quality: speedIndex })
-                  } else if (strategy.type === 'constant-quality') {
-                    setStrategy({ ...strategy, speed_or_file_size: speedIndex })
-                  }
-                }
+                useCallback(
+                  speedIndex => {
+                    if (strategy.type === 'max-file-size') {
+                      setStrategy({ ...strategy, speed: speedIndex })
+                    } else if (strategy.type === 'constant-quality') {
+                      setStrategy({ ...strategy, speed: speedIndex })
+                    }
+                  },
+                  [strategy, strategy.type, setStrategy]
+                )
               }
             />
           </div>
@@ -157,25 +155,22 @@ const App = () => {
           <button
             className={css.processBtn}
             disabled={!file}
-            onClick={startProcess}
+            onClick={startProcessing}
           >Process
           </button>
         </div>
 
       </div>
 
-      {/*<Progress progress={{*/}
-      {/*  processing: {*/}
-      {/*    speed: 1,*/}
-      {/*    eta: 10000,*/}
-      {/*    progress: 0.32*/}
-      {/*  }*/}
-      {/*}}/>*/}
-
-      {/*<Done onOk={console.log} file={'file out'}/>*/}
-
-      {processing ? <Progress progress={processing}/> : null}
-      {isDone ? <Done onOk={() => setDone(false)} file={fileOut}/> : null}
+      {processingID ?
+        <ProcessingOverlay
+          fileIn={file}
+          fileOut={fileOut || ''}
+          id={processingID}
+          onDone={() => setProcessingID(null)}
+        /> :
+        null
+      }
     </div>
   )
 }

@@ -50,6 +50,6 @@ app.on('ready', () => {
   createWindow();
   session.defaultSession.loadExtension(
     path.join(os.homedir(), '.config/google-chrome/Default/Extensions/fmkadmapgofadopljbjfkapdkoienihi/4.7.0_0/')
-  ).then(console.log)
+  ).then(ex => console.log('Registered extension ' + ex.name))
 });
 app.allowRendererProcessReuse = true;
