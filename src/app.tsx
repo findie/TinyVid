@@ -73,6 +73,8 @@ const App = () => {
   useEffect(function getVideoDetails() {
     if (!file) return console.warn('refusing to start process with empty video field');
 
+    setVideoDetails(null);
+
     DetailsComms.getDetails(file)
       .then(details => {
         setVideoDetails(DetailsComms.simplifyMediaDetails(details));
