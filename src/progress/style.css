@@ -1,28 +1,26 @@
-:local .overlay {
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: rgba(0, 0, 0, 0.5);
-    z-index: 9999;
-
-    display: flex;
-    align-items: center;
+:local .title {
+    padding: 10px;
     text-align: center;
-
-    box-sizing: border-box;
 }
 
-:local .dialog {
-    padding: 10px;
-    background: white;
-    border-radius: 2px;
-    margin: 0 auto;
+:local .container {
+    min-width: 450px;
+}
 
-    min-width: 200px;
-    display: flex;
-    flex-flow: column;
-    align-items: center;
-    text-align: center;
+:local .inner-container {
+    padding: 10px;
+}
+
+:local .progress-container {
+    position: relative;
+}
+
+:local .progress-container .info {
+    color: white;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    text-shadow: 0px 0px 6px #000000;
+    font-size: 1.2rem;
 }

@@ -20,6 +20,7 @@ import {
 import {ConfigVideoSettings, ConfigVideoSettingsData, ConfigVideoSettingsDefault} from "./config/video-settings";
 import {RenderStrategy} from "../electron/types";
 import {DetailsComms, TrimComms} from "./helpers/comms";
+import {Loading} from "./components/loading";
 
 const mainElement = document.createElement('div');
 document.body.appendChild(mainElement);
@@ -183,6 +184,10 @@ const App = () => {
           onDone={() => setProcessingID(null)}
         /> :
         null
+      }
+
+      {
+        file && !videoDetails ? <Loading/> : null
       }
     </div>
   )
