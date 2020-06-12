@@ -1,29 +1,36 @@
-import {FilePathWithHeaders, protocol, Request} from 'electron';
+import {CustomScheme, FilePathWithHeaders, protocol, Request} from 'electron';
 
 abstract class Protocol {
-  protected readonly protocolName: string
+  readonly protocolName: string
 
   protected constructor(protocolName: string) {
     this.protocolName = protocolName;
-    console.log('Registering protocol ' + protocolName);
+    console.log('Creating protocol ' + protocolName);
   }
 
-  abstract register(): void;
+  protected abstract _register(): void;
 
-  grantPrivileges() {
-    protocol.registerSchemesAsPrivileged([{
+  register(): void {
+    console.log('Registering protocol ' + this.protocolName);
+    this._register();
+  }
+
+  get privileges(): CustomScheme {
+    return {
       scheme: this.protocolName,
       privileges: {
-        supportFetchAPI: true
+        standard: false,
+        supportFetchAPI: true,
+        corsEnabled: true
       }
-    }]);
+    };
   }
 
   abstract async onRequest(req: Request, ...data: any[]): Promise<any>
 }
 
 export abstract class FileProtocol extends Protocol {
-  register() {
+  _register() {
     protocol.registerFileProtocol(this.protocolName, async (request, callback) => {
       const data = await this.onRequest(request);
       callback(data);
@@ -36,7 +43,7 @@ export abstract class FileProtocol extends Protocol {
 }
 
 export abstract class StringProtocol extends Protocol {
-  register() {
+  _register() {
     protocol.registerStringProtocol(this.protocolName, async (request, callback) => {
       const data = await this.onRequest(request);
       callback({
@@ -53,7 +60,7 @@ export abstract class StringProtocol extends Protocol {
 
 
 export abstract class JSONProtocol extends Protocol {
-  register() {
+  _register() {
     protocol.registerStringProtocol(this.protocolName, async (request, callback) => {
       const jsonData = request?.uploadData?.length > 0 ? JSON.parse(request.uploadData[0].bytes.toString()) : null;
 

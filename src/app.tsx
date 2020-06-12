@@ -1,5 +1,5 @@
 import './types'
-import React, {useCallback, useRef, useState} from 'react';
+import React, {useCallback, useEffect, useRef, useState} from 'react';
 import ReactDom from 'react-dom';
 import {ChooseFile} from "./choose-file";
 import {Display} from "./display";
@@ -19,7 +19,7 @@ import {
 } from "./config/constant-quality";
 import {ConfigVideoSettings, ConfigVideoSettingsData, ConfigVideoSettingsDefault} from "./config/video-settings";
 import {RenderStrategy} from "../electron/types";
-import {TrimComms} from "./helpers/comms";
+import {DetailsComms, TrimComms} from "./helpers/comms";
 
 const mainElement = document.createElement('div');
 document.body.appendChild(mainElement);
@@ -40,32 +40,47 @@ const App = () => {
 
   const videoElementRef = useRef<HTMLVideoElement>(null)
   const [file, setFile] = useState<string>('');
-  const [duration, setDuration] = useState<number>(0);
+  const [videoDetails, setVideoDetails] = useState<null | DetailsComms.SimpleVideoDetails>(null);
   const [range, setRange] = useState<{ start: number, end: number }>({ start: 0, end: 0 })
 
   const [fileOut, setFileOut] = useState<string>();
 
-  const [strategy, setStrategy] = useState<RenderStrategy>({ ...defaultMaxFileSizeStrategy });
-  const strategyRef = useRef(strategy);
+  const [strategyType, setStrategyType] = useState<RenderStrategy['type']>(defaultMaxFileSizeStrategy.type);
+  const [strategyTune, setStrategyTune] = useState<RenderStrategy['tune']>(defaultMaxFileSizeStrategy.tune);
+  const [strategySpeed, setStrategySpeed] = useState<RenderStrategy['speed']>(defaultMaxFileSizeStrategy.speed);
 
   const [videoSettings, setVideoSettings] = useState<ConfigVideoSettingsData>(ConfigVideoSettingsDefault);
 
   const [processingID, setProcessingID] = useState<string | null>(null);
 
   async function startProcessing() {
+    if (!file) return console.warn('refusing to start process with empty video field');
+
     const fout = `${file}.${range.start.toFixed(2)}-${range.end.toFixed(2)}.mp4`
 
     const data = await TrimComms.startProcess(
       file,
       fout,
       range,
-      strategy,
+      { type: strategyType, tune: strategyTune, speed: strategySpeed },
       videoSettings
     );
 
     setFileOut(fout);
     setProcessingID(data.id);
   }
+
+  useEffect(function getVideoDetails() {
+    if (!file) return console.warn('refusing to start process with empty video field');
+
+    DetailsComms.getDetails(file)
+      .then(details => {
+        setVideoDetails(DetailsComms.simplifyMediaDetails(details));
+        console.log(details);
+      })
+      .catch(console.error);
+
+  }, [file]);
 
   return (
     <div className={css.app}>
@@ -76,14 +91,11 @@ const App = () => {
         className={css.display}
         file={file}
         ref={videoElementRef}
-        onLoadedMetadata={(e) => {
-          setDuration(e.currentTarget.duration)
-        }}
       />
       <div className={css.footer}>
         <TrimSlider
           disabled={!file}
-          duration={duration || 100}
+          duration={videoDetails ? videoDetails.duration : 100}
           onChange={(begin, end, current) => {
             if (videoElementRef.current) {
               videoElementRef.current.currentTime = current;
@@ -107,46 +119,45 @@ const App = () => {
                   onChange={
                     e => {
                       if (e.target.value === 'max-file-size') {
-                        setStrategy({ ...defaultMaxFileSizeStrategy });
+                        setStrategyType('max-file-size');
+                        setStrategyTune(defaultMaxFileSizeStrategy.tune);
                       } else {
-                        setStrategy({ ...defaultConstantQuality });
+                        setStrategyType('constant-quality');
+                        setStrategyTune(defaultConstantQuality.tune);
                       }
                     }
                   }
-                  value={strategy.type}
+                  value={strategyType}
                 >
                   <option value={'max-file-size'}>have max file size of</option>
                   <option value={'constant-quality'}>be of constant quality</option>
                 </select>
 
-                {strategy.type === 'max-file-size' ?
+                {strategyType === 'max-file-size' ?
                   <ConfigMaxFileSize onChange={size => {
-                    setStrategy({ ...strategy, tune: size })
+                    setStrategyTune(size)
                   }}/> :
                   <ConfigConstantQuality onChange={quality => {
-                    setStrategy({ ...strategy, tune: quality })
+                    setStrategyTune(quality)
                   }}/>
                 }
               </div>
               <div className={css.right}>
-                <ConfigVideoSettings onChange={setVideoSettings}/>
+                <ConfigVideoSettings
+                  onChange={setVideoSettings}
+                  details={videoDetails}
+                />
               </div>
             </div>
             <hr/>
             <SpeedSlider
               className={css.speedSlider}
-              highSpeedText={strategy.type === 'max-file-size' ? 'High Speed' : 'High Speed'}
-              lowSpeedText={strategy.type === 'max-file-size' ? 'High Quality' : 'Small File Size'}
+              highSpeedText={strategyType === 'max-file-size' ? 'High Speed' : 'High Speed'}
+              lowSpeedText={strategyType === 'max-file-size' ? 'High Quality' : 'Small File Size'}
               onChange={
                 useCallback(
-                  speedIndex => {
-                    if (strategy.type === 'max-file-size') {
-                      setStrategy({ ...strategy, speed: speedIndex })
-                    } else if (strategy.type === 'constant-quality') {
-                      setStrategy({ ...strategy, speed: speedIndex })
-                    }
-                  },
-                  [strategy, strategy.type, setStrategy]
+                  speedIndex => setStrategySpeed(speedIndex),
+                  [strategySpeed, setStrategySpeed]
                 )
               }
             />

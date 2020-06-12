@@ -23,10 +23,14 @@ export namespace ProcessHelpers {
     let stderr = '';
 
     if (p.stdout) {
-      p.stdout.on('data', d => stdout += d.toString());
+      p.stdout.on('data', d => {
+        stdout += d.toString();
+      });
     }
     if (p.stderr) {
-      p.stderr.on('data', d => stderr += d.toString());
+      p.stderr.on('data', d => {
+        stderr += d.toString()
+      });
     }
 
     await new Promise((res, rej) => {

@@ -15,16 +15,6 @@ export const TrimSlider = (props: TrimSliderProps) => {
   let end = props.duration * .66;
   let current = props.duration * .5;
 
-  useEffect(() => {
-    // on mount
-
-    setTimeout(() => {
-      const sliders = document.querySelectorAll(`.${css.slider} .noUi-touch-area`);
-      console.log(sliders[0]);
-      sliders[0].focus();
-    }, 1000);
-  }, [props])
-
   function update(values: any[], handle: number, unencodedValues: number[], tap: boolean, positions: number[]) {
     const val = unencodedValues[handle];
     current = val;

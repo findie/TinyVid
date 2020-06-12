@@ -11,3 +11,8 @@ export function range(start: number, end: number, step: number): number[] {
   }
   return arr;
 }
+
+export function round(n: number, decimals: number): number {
+  const p = 10 ** decimals;
+  return Math.round(n * p) / p;
+}

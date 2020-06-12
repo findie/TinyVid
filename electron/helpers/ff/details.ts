@@ -115,11 +115,11 @@ export namespace VideoDetails {
     return JSON.parse(data.stdout);
   }
 
-  function parseStringFraction(f: StringNumber): number {
+  export function parseStringFraction(f: StringNumber): number {
     const atoms = f.split('/');
     assert.strictEqual(atoms.length, 2, 'cannot parse fraction with atoms len !== 2');
 
-    return parseFloat(f[0]) / parseFloat(f[1]);
+    return parseFloat(atoms[0]) / parseFloat(atoms[1]);
   }
 
 }
