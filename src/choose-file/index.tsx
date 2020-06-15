@@ -2,6 +2,8 @@ import React, {useState} from "react";
 import css from './style.css'
 import {remote} from 'electron'
 
+import {Box, Button, Typography} from "@material-ui/core";
+
 export interface ChooseFileProps {
   fileCB: (path: string) => void
 }
@@ -28,14 +30,23 @@ export const ChooseFile = (props: ChooseFileProps) => {
   }
 
   return (
-    <div>
-      <div className={css.fileUpload} onClick={chooseFileCallback}>
-        <div className={css.fileSelect}>
-          <div className={css.fileSelectButton} id="fileName">Choose File</div>
-          <div className={css.fileSelectName} id="noFile">{file || 'No file chosen...'}</div>
-        </div>
-      </div>
-    </div>
+    <Box
+      padding={1}
+      className={css.main}
+      onClick={chooseFileCallback}
+    >
+      <Button
+        variant="contained"
+        className={css.button}
+      >
+        Select File
+      </Button>
+      <Box marginLeft={2}>
+        <Typography>
+          {file ? file : 'No file chosen...'}
+        </Typography>
+      </Box>
+    </Box>
   )
 
 }

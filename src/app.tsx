@@ -3,7 +3,7 @@ import React, {useCallback, useEffect, useRef, useState} from 'react';
 import ReactDom from 'react-dom';
 import {ChooseFile} from "./choose-file";
 import {Display} from "./display";
-import {TrimSlider} from "./trim-select";
+import {TrimSlider} from "./components/trim-select";
 import {ProcessingOverlay} from "./progress";
 import css from './style.css';
 import {
@@ -22,9 +22,8 @@ import {RenderStrategy} from "../electron/types";
 import {DetailsComms, TrimComms} from "./helpers/comms";
 import {Loading} from "./components/loading";
 
-const mainElement = document.createElement('div');
-document.body.appendChild(mainElement);
-
+import {Box, createMuiTheme, Paper, ThemeProvider} from "@material-ui/core";
+import {Theme} from "./helpers/theme";
 
 const defaultMaxFileSizeStrategy: RenderStrategy = {
   type: 'max-file-size',
@@ -86,112 +85,119 @@ const App = () => {
   }, [file]);
 
   return (
-    <div className={css.app}>
-      <div className={css.header}>
-        <ChooseFile fileCB={setFile}/>
-      </div>
-      <Display
-        className={css.display}
-        file={file}
-        ref={videoElementRef}
-      />
-      <div className={css.footer}>
-        <TrimSlider
-          disabled={!file}
-          duration={videoDetails ? videoDetails.duration : 100}
-          onChange={(begin, end, current) => {
-            if (videoElementRef.current) {
-              videoElementRef.current.currentTime = current;
-            }
-            setRange({
-              start: begin,
-              end: end
-            });
-          }}
+    <ThemeProvider theme={Theme.current}>
+      <div className={css.app}>
+        <Paper elevation={3} className={css.header}>
+          <ChooseFile fileCB={setFile}/>
+        </Paper>
+        <Display
+          className={css.display}
+          file={file}
+          ref={videoElementRef}
         />
-
-        <hr/>
-
-        <div className={css.controls}>
-          <div className={css.rows + ' ' + css.flexGrow}>
-
-            <div className={css.settings}>
-              <div className={css.left}>
-                Output must &nbsp;
-                <select
-                  onChange={
-                    e => {
-                      if (e.target.value === 'max-file-size') {
-                        setStrategyType('max-file-size');
-                        setStrategyTune(defaultMaxFileSizeStrategy.tune);
-                      } else {
-                        setStrategyType('constant-quality');
-                        setStrategyTune(defaultConstantQuality.tune);
-                      }
-                    }
-                  }
-                  value={strategyType}
-                >
-                  <option value={'max-file-size'}>have max file size of</option>
-                  <option value={'constant-quality'}>be of constant quality</option>
-                </select>
-
-                {strategyType === 'max-file-size' ?
-                  <ConfigMaxFileSize onChange={size => {
-                    setStrategyTune(size)
-                  }}/> :
-                  <ConfigConstantQuality onChange={quality => {
-                    setStrategyTune(quality)
-                  }}/>
+        <Paper className={css.footer} elevation={3}>
+          <Box paddingX={2} paddingY={2}>
+            <TrimSlider
+              disabled={!file}
+              duration={videoDetails ? videoDetails.duration : 100}
+              onChange={(begin, end, current) => {
+                if (videoElementRef.current) {
+                  videoElementRef.current.currentTime = current;
                 }
-              </div>
-              <div className={css.right}>
-                <ConfigVideoSettings
-                  onChange={setVideoSettings}
-                  details={videoDetails}
+                setRange({
+                  start: begin,
+                  end: end
+                });
+              }}
+            />
+
+            <hr/>
+
+            <div className={css.controls}>
+              <div className={css.rows + ' ' + css.flexGrow}>
+
+                <div className={css.settings}>
+                  <div className={css.left}>
+                    Output must &nbsp;
+                    <select
+                      onChange={
+                        e => {
+                          if (e.target.value === 'max-file-size') {
+                            setStrategyType('max-file-size');
+                            setStrategyTune(defaultMaxFileSizeStrategy.tune);
+                          } else {
+                            setStrategyType('constant-quality');
+                            setStrategyTune(defaultConstantQuality.tune);
+                          }
+                        }
+                      }
+                      value={strategyType}
+                    >
+                      <option value={'max-file-size'}>have max file size of</option>
+                      <option value={'constant-quality'}>be of constant quality</option>
+                    </select>
+
+                    {strategyType === 'max-file-size' ?
+                      <ConfigMaxFileSize onChange={size => {
+                        setStrategyTune(size)
+                      }}/> :
+                      <ConfigConstantQuality onChange={quality => {
+                        setStrategyTune(quality)
+                      }}/>
+                    }
+                  </div>
+                  <div className={css.right}>
+                    <ConfigVideoSettings
+                      onChange={setVideoSettings}
+                      details={videoDetails}
+                    />
+                  </div>
+                </div>
+                <hr/>
+                <SpeedSlider
+                  className={css.speedSlider}
+                  highSpeedText={strategyType === 'max-file-size' ? 'High Speed' : 'High Speed'}
+                  lowSpeedText={strategyType === 'max-file-size' ? 'High Quality' : 'Small File Size'}
+                  onChange={
+                    useCallback(
+                      speedIndex => setStrategySpeed(speedIndex),
+                      [strategySpeed, setStrategySpeed]
+                    )
+                  }
                 />
               </div>
+
+              <button
+                className={css.processBtn}
+                disabled={!file}
+                onClick={startProcessing}
+              >Process
+              </button>
             </div>
-            <hr/>
-            <SpeedSlider
-              className={css.speedSlider}
-              highSpeedText={strategyType === 'max-file-size' ? 'High Speed' : 'High Speed'}
-              lowSpeedText={strategyType === 'max-file-size' ? 'High Quality' : 'Small File Size'}
-              onChange={
-                useCallback(
-                  speedIndex => setStrategySpeed(speedIndex),
-                  [strategySpeed, setStrategySpeed]
-                )
-              }
-            />
-          </div>
+          </Box>
+        </Paper>
 
-          <button
-            className={css.processBtn}
-            disabled={!file}
-            onClick={startProcessing}
-          >Process
-          </button>
-        </div>
+        {processingID ?
+          <ProcessingOverlay
+            fileIn={file}
+            fileOut={fileOut || ''}
+            id={processingID}
+            onDone={() => setProcessingID(null)}
+            onCancelRequest={() => TrimComms.cancelProcess(processingID)}
+          /> :
+          null
+        }
 
+        {
+          file && !videoDetails ? <Loading/> : null
+        }
       </div>
-
-      {processingID ?
-        <ProcessingOverlay
-          fileIn={file}
-          fileOut={fileOut || ''}
-          id={processingID}
-          onDone={() => setProcessingID(null)}
-          onCancelRequest={() => TrimComms.cancelProcess(processingID)}
-        /> :
-        null
-      }
-
-      {
-        file && !videoDetails ? <Loading/> : null
-      }
-    </div>
+    </ThemeProvider>
   )
 }
+
+const mainElement = document.createElement('div');
+mainElement.style.background = Theme.current.palette.background.default;
+document.body.appendChild(mainElement);
 
 ReactDom.render(<App/>, mainElement);

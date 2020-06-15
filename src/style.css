@@ -2,18 +2,15 @@
 :local .display {
     flex-grow: 2;
     display: flex;
-    max-height: calc(100% - 150px);
+    max-height: calc(100% - 185px);
 }
 
 :local .header {
-    flex-grow: 1;
-    max-height: 38px;
+
 }
 
 :local .footer {
-    flex-grow: 1;
-    padding: 0 10px;
-    max-height: 150px;
+
 }
 
 :local .footer .controls {
@@ -56,7 +53,7 @@
 
 body {
     overflow: hidden;
-    padding: 2px;
+    padding: 0;
     margin: 0;
     border: 0;
     box-sizing: border-box;
