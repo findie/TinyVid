@@ -22,8 +22,9 @@ import {RenderStrategy} from "../electron/types";
 import {DetailsComms, TrimComms} from "./helpers/comms";
 import {Loading} from "./components/loading";
 
-import {Box, createMuiTheme, Paper, ThemeProvider} from "@material-ui/core";
+import {Box, Paper, ThemeProvider} from "@material-ui/core";
 import {Theme} from "./helpers/theme";
+import {DurationInfo} from "./components/duration-info";
 
 const defaultMaxFileSizeStrategy: RenderStrategy = {
   type: 'max-file-size',
@@ -56,12 +57,17 @@ const App = () => {
   async function startProcessing() {
     if (!file) return console.warn('refusing to start process with empty video field');
 
-    const fout = `${file}.${range.start.toFixed(2)}-${range.end.toFixed(2)}.mp4`
+    const fout = `${file}.${range.start.toFixed(2)}-${range.end.toFixed(2)}.compressed.mp4`
+
+    // box in the range by one frame to account for browser frame inaccuracy
+    const frameTime = (1 / (videoDetails?.fps || 60));
+    const start = range.start + frameTime;
+    const end = Math.max(start + frameTime, range.end - frameTime);
 
     const data = await TrimComms.startProcess(
       file,
       fout,
-      range,
+      { start, end },
       { type: strategyType, tune: strategyTune, speed: strategySpeed },
       videoSettings
     );
@@ -96,8 +102,18 @@ const App = () => {
           ref={videoElementRef}
         />
         <Paper className={css.footer} elevation={3}>
+          {file ?
+            <DurationInfo
+              className={css.info}
+              start={range.start}
+              end={range.end}
+            /> :
+            null
+          }
+
           <Box paddingX={2} paddingY={2}>
             <TrimSlider
+              step={videoDetails ? 1 / videoDetails.fps : 0}
               disabled={!file}
               duration={videoDetails ? videoDetails.duration : 100}
               onChange={(begin, end, current) => {

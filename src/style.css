@@ -10,7 +10,14 @@
 }
 
 :local .footer {
+    position: relative;
+}
 
+:local .footer .info {
+    position: absolute;
+    top: 0;
+    left: 50%;
+    transform: translate(-50%, -100%);
 }
 
 :local .footer .controls {
@@ -93,8 +100,4 @@ body {
 
 :global .noUi-touch-area:focus + .noUi-tooltip {
     display: block;
-}
-
-:global .noUi-horizontal .noUi-handle {
-    /*width: 14px;*/
 }

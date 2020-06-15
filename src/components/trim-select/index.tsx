@@ -4,11 +4,14 @@ import "nouislider/distribute/nouislider.css";
 import {makeStyles} from "@material-ui/core/styles";
 import {Theme} from "../../helpers/theme";
 import color from 'color'
+import * as css from './style.css';
+import './style.css'
 
 export interface TrimSliderProps {
   duration: number
   onChange: (begin: number, end: number, current: number) => void
   disabled: boolean
+  step: number
 }
 
 const sliderTheme = makeStyles({
@@ -60,15 +63,15 @@ export const TrimSlider = (props: TrimSliderProps) => {
   return (
     <div className={classes.root + ' ' + (props.disabled ? classes.rootDisabled : '')}>
       <Nouislider
+        className={css.slider}
         disabled={props.disabled}
         keyboardSupport
         onSlide={update}
         onSet={update}
-        step={1 / 60}
+        step={props.step}
         range={{ min: 0, max: props.duration }}
         start={[props.duration / 3 * 1, props.duration / 3 * 2]}
         connect={[false, true, false]}
-        tooltips
         format={{
           from(val: string): number {
             return parseFloat(val.split('-')[0].trim().replace('s', ''));
