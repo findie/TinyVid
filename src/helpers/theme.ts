@@ -1,5 +1,6 @@
 import {createMuiTheme} from "@material-ui/core";
 import {remote} from 'electron';
+import {RendererSettings} from "./settings";
 
 export namespace Theme {
 
@@ -28,6 +29,8 @@ export namespace Theme {
 
   export const set = (s: ThemeNames) => {
     nativeTheme.themeSource = s;
+    RendererSettings.settings.theme = s;
+    RendererSettings.save();
   }
 
   export const setNext = (): ThemeNames => {
@@ -44,6 +47,9 @@ export namespace Theme {
     set(t);
     return t;
   }
+
+  // load from settings
+  set(RendererSettings.settings.theme);
 }
 
 window.Theme = Theme;
