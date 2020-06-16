@@ -10,14 +10,14 @@ export interface CodeDisplayProps {
   className?: string
 }
 
-const styles = makeStyles({
+const styles = () => makeStyles({
   'root': {
     background: color(Theme.current().palette.background.paper).lighten(0.3).toString()
   }
 })
 
 export function CodeDisplay(props: CodeDisplayProps) {
-  const classes = styles();
+  const classes = styles()();
 
   return (
     <Box border={1} padding={1} className={(props.className || '') + ' ' + classes.root + ' ' + css.preContainer}>
