@@ -4,9 +4,10 @@ import {FFMpegError, IFFMpegProgressData} from "ffmpeg-progress-wrapper";
 import {remote} from 'electron';
 import {TrimComms} from "../helpers/comms";
 import {Modal} from "../components/modal";
-import {Button, CircularProgress, LinearProgress, Paper} from '@material-ui/core';
+import {Box, Button, CircularProgress, Grid, LinearProgress, Paper, Typography} from '@material-ui/core';
 import * as path from 'path';
 import moment from "moment";
+import {CodeDisplay} from "../components/code";
 
 interface ProgressProps {
   out: string
@@ -56,13 +57,60 @@ const Progress = (props: ProgressProps) => {
 
 interface ProgressErrorProps {
   error: FFMpegError
+  onOk: () => void
 }
 
 const ProgressError = (props: ProgressErrorProps) => {
 
   return (
-    <div>
-      <div>{props.error.message}</div>
+    <div style={{ minWidth: '525px' }}>
+      <Typography align={"center"}>
+        <strong>Oops...</strong> something went wrong!
+      </Typography>
+      <CodeDisplay className={css.maxHeightError}>{props.error.message}</CodeDisplay>
+      <Box marginTop={2}>
+        <Grid container spacing={2} justify={"flex-end"} wrap={"nowrap"}>
+
+          <Grid item>
+            <Button variant={"contained"} color={"secondary"} onClick={() => {
+              remote.shell.openPath(`https://github.com/legraphista/QuickTrim/issues`);
+            }}>
+              View existing reports
+            </Button>
+          </Grid>
+
+          <Grid item>
+            <Button variant={"contained"} color={"primary"} onClick={() => {
+
+              const codeBlock = '```';
+              const c = '`';
+              const title = 'Rendering issue: ' + props.error.message.split('\n')[0];
+              const contents = `
+Code: ${c}${props.error.code}${c}
+Signal: ${c}${props.error.signal}${c}
+Args:
+${codeBlock}
+${props.error.args.join(' ')}          
+${codeBlock}
+
+Message: 
+${codeBlock}
+${props.error.message}
+${codeBlock}
+`
+              remote.shell.openPath(`https://github.com/legraphista/QuickTrim/issues/new?title=${encodeURIComponent(title)}&body=${encodeURIComponent(contents)}`);
+            }}>
+              Submit error report
+            </Button>
+          </Grid>
+
+          <Grid item>
+            <Button variant={"contained"} onClick={props.onOk}>
+              Ok
+            </Button>
+          </Grid>
+        </Grid>
+      </Box>
     </div>
   )
 
@@ -77,16 +125,50 @@ interface DoneProps {
 const Done = (props: DoneProps) => {
   return (
     <div>
-      <div>Done!</div>
-      {
-        props.wasCancelled ?
-          <div>Partially saved file in {props.file}</div> :
-          <div>Saved in {props.file}</div>
-      }
-      <div>
-        <button onClick={props.onOk}>Ok</button>
-        <button onClick={() => remote.shell.openPath(props.file)}>Open</button>
-      </div>
+      <Typography variant={"h4"} className={css.center}>Done!</Typography>
+      <Typography className={css.center}>
+        Your file has been
+        {
+          props.wasCancelled ?
+            <strong> partially </strong> : ''
+        }
+        saved in:
+      </Typography>
+      <CodeDisplay className={css.center}>
+        {props.file}
+      </CodeDisplay>
+      <Box marginTop={2} className={css.center}>
+        <Grid container spacing={2} justify={"flex-end"}>
+          <Grid item>
+            <Button
+              onClick={() => remote.shell.openPath(props.file)}
+              variant={"contained"}
+              color={"primary"}
+            >
+              Open File
+            </Button>
+          </Grid>
+
+          <Grid item>
+            <Button
+              onClick={() => remote.shell.openPath(path.dirname(props.file))}
+              variant={"contained"}
+              color={"secondary"}
+            >
+              Open Location
+            </Button>
+          </Grid>
+
+          <Grid item>
+            <Button
+              onClick={props.onOk}
+              variant={"contained"}
+            >
+              Ok
+            </Button>
+          </Grid>
+        </Grid>
+      </Box>
     </div>
   )
 }
@@ -138,7 +220,7 @@ export const ProcessingOverlay = (props: ProcessingOverlayProps) => {
 
   let component: JSX.Element;
   if (error && !cancelled) {
-    component = <ProgressError error={error}/>
+    component = <ProgressError error={error} onOk={props.onDone}/>
   } else if (isDone) {
     component = <Done file={props.fileOut} onOk={props.onDone} wasCancelled={cancelled}/>
   } else {
@@ -154,7 +236,9 @@ export const ProcessingOverlay = (props: ProcessingOverlayProps) => {
   return (
     <Modal className={css.container}>
       <Paper elevation={3} className={css.title}>
-        <strong>Processing:</strong> {path.dirname(props.fileIn) + path.sep}<strong>{path.basename(props.fileIn)}</strong>
+        <Typography noWrap>
+          <strong>File:</strong> {path.dirname(props.fileIn) + path.sep}<strong>{path.basename(props.fileIn)}</strong>
+        </Typography>
       </Paper>
       <div className={css.innerContainer}>
         {component}

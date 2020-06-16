@@ -32,3 +32,11 @@
     margin-top: 12px;
     width: 140px;
 }
+
+:local .center {
+    text-align: center;
+}
+
+:local .max-height-error {
+    max-height: 50vh;
+}

@@ -5,9 +5,11 @@
 
     transform: translate(-50%, -50%);
 
+    max-height: 90vh;
+    max-width: 90vw;
 }
 
 .transparent {
-    background-color: transparent!important;
-    box-shadow: none!important;
+    background-color: transparent !important;
+    box-shadow: none !important;
 }

@@ -1,0 +1,8 @@
+:local .pre {
+    margin: 0;
+    overflow: auto;
+}
+
+:local .pre-container {
+    overflow: auto;
+}

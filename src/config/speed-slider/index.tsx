@@ -9,32 +9,32 @@ import {Theme} from "../../helpers/theme";
 import color from "color";
 import {Box, Typography} from "@material-ui/core";
 
-const sliderTheme = makeStyles({
+const sliderTheme = () => makeStyles({
   'root': {
     '& .noUi-connects': {
-      background: Theme.current.palette.background.default,
+      background: Theme.current().palette.background.default,
     },
 
     '& .noUi-connect': {
-      background: Theme.current.palette.primary.main,
+      background: Theme.current().palette.primary.main,
     },
     '& .noUi-handle': {
-      background: color(Theme.current.palette.primary.main).saturate(0.5).toString(),
+      background: color(Theme.current().palette.primary.main).saturate(0.5).toString(),
       boxShadow: 'none'
     },
 
     '& .noUi-tooltip': {
-      background: Theme.current.palette.background.paper,
-      color: Theme.current.palette.text.primary,
-      ...Theme.current.typography.body1
+      background: Theme.current().palette.background.paper,
+      color: Theme.current().palette.text.primary,
+      ...Theme.current().typography.body1
     }
   },
   'rootDisabled': {
     '& .noUi-connect': {
-      background: color(Theme.current.palette.primary.main).desaturate(0.7).toString(),
+      background: color(Theme.current().palette.primary.main).desaturate(0.7).toString(),
     },
     '& .noUi-handle': {
-      background: color(Theme.current.palette.primary.main).desaturate(0.7).toString(),
+      background: color(Theme.current().palette.primary.main).desaturate(0.7).toString(),
     }
   }
 });
@@ -51,7 +51,7 @@ interface SpeedSliderProps {
 }
 
 export function SpeedSlider(props: SpeedSliderProps) {
-  const classes = sliderTheme();
+  const classes = sliderTheme()();
 
   return (
     <div

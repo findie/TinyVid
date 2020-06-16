@@ -22,9 +22,20 @@ import {RenderStrategy} from "../electron/types";
 import {DetailsComms, TrimComms} from "./helpers/comms";
 import {Loading} from "./components/loading";
 
-import {Box, Button, FormControl, InputLabel, MenuItem, Paper, Select, ThemeProvider} from "@material-ui/core";
+import {
+  Box,
+  Button,
+  FormControl,
+  IconButton,
+  InputLabel,
+  MenuItem,
+  Paper,
+  Select,
+  ThemeProvider
+} from "@material-ui/core";
 import {Theme} from "./helpers/theme";
 import {DurationInfo} from "./components/duration-info";
+import {Brightness2 as DarkIcon, Brightness5 as LightIcon, BrightnessAuto as AutoIcon} from '@material-ui/icons'
 
 const defaultMaxFileSizeStrategy: RenderStrategy = {
   type: 'max-file-size',
@@ -37,7 +48,13 @@ const defaultConstantQuality: RenderStrategy = {
   speed: ConfigConstantQualityDefaultSpeedOrQuality
 }
 
+const mainElement = document.createElement('div');
+document.body.appendChild(mainElement);
+
 const App = () => {
+  mainElement.style.background = Theme.current().palette.background.default;
+
+  const [theme, setTheme] = useState<Theme.ThemeNames>(Theme.currentName());
 
   const videoElementRef = useRef<HTMLVideoElement>(null)
   const [file, setFile] = useState<string>('');
@@ -91,10 +108,16 @@ const App = () => {
   }, [file]);
 
   return (
-    <ThemeProvider theme={Theme.current}>
+    <ThemeProvider theme={Theme.current()}>
       <div className={css.app}>
         <Paper elevation={3} className={css.header} square={true}>
-          <ChooseFile fileCB={setFile}/>
+          <ChooseFile fileCB={setFile} className={css.flexGrow}/>
+          <IconButton onClick={() => setTheme(Theme.setNext())}>
+            {theme === 'system' ? <AutoIcon/> :
+              theme === 'dark' ? <DarkIcon/> :
+                <LightIcon/>
+            }
+          </IconButton>
         </Paper>
         <Display
           className={css.display}
@@ -188,13 +211,13 @@ const App = () => {
               </div>
 
               <Box marginLeft={2}>
-              <Button
-                variant="contained"
-                className={css.processBtn}
-                disabled={!file}
-                onClick={startProcessing}
-              >Process
-              </Button>
+                <Button
+                  variant="contained"
+                  className={css.processBtn}
+                  disabled={!file}
+                  onClick={startProcessing}
+                >Process
+                </Button>
               </Box>
             </div>
           </Box>
@@ -218,9 +241,5 @@ const App = () => {
     </ThemeProvider>
   )
 }
-
-const mainElement = document.createElement('div');
-mainElement.style.background = Theme.current.palette.background.default;
-document.body.appendChild(mainElement);
 
 ReactDom.render(<App/>, mainElement);

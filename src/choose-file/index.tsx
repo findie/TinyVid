@@ -6,6 +6,7 @@ import {Box, Button, Typography} from "@material-ui/core";
 
 export interface ChooseFileProps {
   fileCB: (path: string) => void
+  className?:string
 }
 
 export const ChooseFile = (props: ChooseFileProps) => {
@@ -32,7 +33,7 @@ export const ChooseFile = (props: ChooseFileProps) => {
   return (
     <Box
       padding={1}
-      className={css.main}
+      className={css.main + ' ' + (props.className||'')}
       onClick={chooseFileCallback}
     >
       <Button
