@@ -8,3 +8,7 @@
 :local .button {
     margin-right: 10px;
 }
+
+:local .text {
+    max-width: calc(100% - 144px);
+}

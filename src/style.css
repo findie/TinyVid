@@ -9,6 +9,10 @@
 display: flex;
 }
 
+:local .header .file-select {
+    max-width: calc(100% - 64px);
+}
+
 :local .footer {
     position: relative;
 }

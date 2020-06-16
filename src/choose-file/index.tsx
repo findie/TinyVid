@@ -6,7 +6,7 @@ import {Box, Button, Typography} from "@material-ui/core";
 
 export interface ChooseFileProps {
   fileCB: (path: string) => void
-  className?:string
+  className?: string
 }
 
 export const ChooseFile = (props: ChooseFileProps) => {
@@ -33,7 +33,7 @@ export const ChooseFile = (props: ChooseFileProps) => {
   return (
     <Box
       padding={1}
-      className={css.main + ' ' + (props.className||'')}
+      className={css.main + ' ' + (props.className || '')}
       onClick={chooseFileCallback}
     >
       <Button
@@ -42,8 +42,8 @@ export const ChooseFile = (props: ChooseFileProps) => {
       >
         Select File
       </Button>
-      <Box marginLeft={2}>
-        <Typography>
+      <Box marginLeft={2} className={css.text}>
+        <Typography noWrap >
           {file ? file : 'No file chosen...'}
         </Typography>
       </Box>

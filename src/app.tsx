@@ -111,7 +111,7 @@ const App = () => {
   }, [file]);
 
   useEffect(function cleanupOnError() {
-    if(error) {
+    if (error) {
       setProcessingID(null);
       setFile('');
     }
@@ -121,7 +121,7 @@ const App = () => {
     <ThemeProvider theme={Theme.current()}>
       <div className={css.app}>
         <Paper elevation={3} className={css.header} square={true}>
-          <ChooseFile fileCB={setFile} className={css.flexGrow}/>
+          <ChooseFile fileCB={setFile} className={css.flexGrow + ' ' + css.fileSelect}/>
           <IconButton onClick={() => setTheme(Theme.setNext())}>
             {theme === 'system' ? <AutoIcon/> :
               theme === 'dark' ? <DarkIcon/> :
