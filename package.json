@@ -7,9 +7,9 @@
     "dev:react": "NODE_ENV=development webpack-dev-server --config webpack.react.config.js --mode development",
     "ffbin": "ffbinaries ffprobe ffmpeg -p linux-64 -o bin/linux-64 && ffbinaries ffprobe ffmpeg -p windows-64 -o bin/windows-64 && ffbinaries ffprobe ffmpeg -p osx-64 -o bin/osx-64",
     "build": "NODE_ENV=production webpack --config webpack.electron.config.js --mode production && NODE_ENV=production webpack --config webpack.react.config.js --mode production",
-    "pkg:linux": "electron-packager . QuickTrim --platform=linux --arch=x64 --ignore bin/windows-64 --ignore bin/osx-64 --ignore node_modules/.cache --out out --prune",
-    "pkg:win": "electron-packager . QuickTrim --platform=win32 --icon icon.ico --arch=x64 --ignore bin/linux-64 --ignore bin/osx-64 --ignore node_modules/.cache --out out --prune",
-    "pkg:osx": "electron-packager . QuickTrim --platform=darwin --icon icon.icns --arch=x64 --ignore bin/linux-64 --ignore bin/windows-64 --ignore node_modules/.cache --out out --prune"
+    "pkg:linux": "electron-packager . QuickTrim --platform=linux --arch=x64 --ignore bin/windows-64 --ignore bin/osx-64 --ignore node_modules/.cache --out out --prune --ignore renderer_settings.json",
+    "pkg:win": "electron-packager . QuickTrim --platform=win32 --icon icon.ico --arch=x64 --ignore bin/linux-64 --ignore bin/osx-64 --ignore node_modules/.cache --out out --prune --ignore renderer_settings.json",
+    "pkg:osx": "electron-packager . QuickTrim --platform=darwin --icon icon.icns --arch=x64 --ignore bin/linux-64 --ignore bin/windows-64 --ignore node_modules/.cache --out out --prune --ignore renderer_settings.json"
   },
   "license": "MIT",
   "devDependencies": {
