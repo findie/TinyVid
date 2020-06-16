@@ -12,27 +12,31 @@ export const ConfigConstantQualityDefaultQuality = 18;
 export const ConfigConstantQualityDefaultSpeedOrQuality = FFHelpers.encodingSpeedPresets.indexOf('medium');
 
 function quality2name(q: number) {
+  // most people don't know the x264 has crf from 0 to 51
+  // and they don't need to know
+  const q_percentage = 100 - ((q - 18) / 2 * 5);
+
   if (q === 18) {
-    return `${q} (crisp picture)`
+    return `${q_percentage}% (crisp picture)`
   }
 
   if (q === 22) {
-    return `${q} (can't really tell the difference)`
+    return `${q_percentage}% (can't really tell the difference)`
   }
 
   if (q === 28) {
-    return `${q} (starting to lose some quality)`
+    return `${q_percentage}% (starting to lose some quality)`
   }
 
   if (q === 32) {
-    return `${q} (your usual twitter video)`
+    return `${q_percentage}% (your usual twitter video)`
   }
 
   if (q === 40) {
-    return `${q} (potato quality 🥔)`
+    return `${q_percentage}% (potato quality 🥔)`
   }
 
-  return q;
+  return `${q_percentage}%`;
 }
 
 export function ConfigConstantQuality(props: ConfigConstantQualityProps) {
