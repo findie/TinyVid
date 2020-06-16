@@ -65,4 +65,7 @@ module.exports = {
       chunkFilename: '[id].css',
     }),
   ],
+  optimization: {
+    minimize: false
+  },
 };

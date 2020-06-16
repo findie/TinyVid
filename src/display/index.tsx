@@ -7,12 +7,12 @@ export interface DisplayProps extends VideoHTMLAttributes<HTMLVideoElement> {
 
 export const Display = forwardRef<HTMLVideoElement, DisplayProps>((props: DisplayProps, ref) => {
 
-  const { file,className, ...p } = props;
+  const { file, className, ...p } = props;
 
   return <div className={className}>
     <video className={css.video}
            ref={ref}
-           src={props.file ? 'video://' + props.file : undefined}
+           src={props.file ? 'video://' + props.file : ''}
            controls={false}
            {...p}
     >

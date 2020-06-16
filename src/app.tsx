@@ -36,6 +36,8 @@ import {
 import {Theme} from "./helpers/theme";
 import {DurationInfo} from "./components/duration-info";
 import {Brightness2 as DarkIcon, Brightness5 as LightIcon, BrightnessAuto as AutoIcon} from '@material-ui/icons'
+import {ErrorLike} from "../electron/protocols/base-protocols";
+import {ErrorDisplayModal} from "./components/error";
 
 const defaultMaxFileSizeStrategy: RenderStrategy = {
   type: 'max-file-size',
@@ -55,6 +57,7 @@ const App = () => {
   mainElement.style.background = Theme.current().palette.background.default;
 
   const [theme, setTheme] = useState<Theme.ThemeNames>(Theme.currentName());
+  const [error, setError] = useState<Error | ErrorLike | null>(null);
 
   const videoElementRef = useRef<HTMLVideoElement>(null)
   const [file, setFile] = useState<string>('');
@@ -103,9 +106,16 @@ const App = () => {
         setVideoDetails(DetailsComms.simplifyMediaDetails(details));
         console.log(details);
       })
-      .catch(console.error);
+      .catch(setError);
 
   }, [file]);
+
+  useEffect(function cleanupOnError() {
+    if(error) {
+      setProcessingID(null);
+      setFile('');
+    }
+  }, [error]);
 
   return (
     <ThemeProvider theme={Theme.current()}>
@@ -236,6 +246,12 @@ const App = () => {
 
         {
           file && !videoDetails ? <Loading/> : null
+        }
+
+        {
+          error ? <ErrorDisplayModal error={error} onOk={() => {
+            setError(null);
+          }}/> : null
         }
       </div>
     </ThemeProvider>

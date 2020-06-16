@@ -61,7 +61,7 @@ interface ProgressErrorProps {
 }
 
 const ProgressError = (props: ProgressErrorProps) => {
-
+  // todo: maybe we can use ErrorDisplay?
   return (
     <div style={{ minWidth: '525px' }}>
       <Typography align={"center"}>

@@ -3,6 +3,17 @@ import {RenderStrategy, VideoSettings} from "../../electron/types";
 import {DetailsProtocol} from "../../electron/protocols/proto/details";
 import {VideoDetails} from "../../electron/helpers/ff/details";
 import {round} from "./math";
+import {isJSONProtocolError, JSONProtocolResponse} from "../../electron/protocols/base-protocols";
+
+function getJSONProtocolDataOrThrow<T>(data: JSONProtocolResponse<T>): T {
+  if (isJSONProtocolError(data)) {
+    const e = new Error(data.error.message);
+    Object.assign(e, data.error);
+    throw e;
+  }
+
+  return data.success;
+}
 
 export namespace TrimComms {
 
@@ -10,9 +21,9 @@ export namespace TrimComms {
     const f = await fetch('trim://' + id, {
       method: 'get'
     });
-    const data: TrimProtocol.TrimCheckResponse = await f.json();
+    const data: JSONProtocolResponse<TrimProtocol.TrimCheckResponse> = await f.json();
 
-    return data;
+    return getJSONProtocolDataOrThrow(data);
   }
 
   export async function startProcess(fileIn: string, fileOut: string, range: { start: number, end: number }, strategy: RenderStrategy, settings: VideoSettings): Promise<TrimProtocol.TrimStartResponse> {
@@ -29,9 +40,9 @@ export namespace TrimComms {
       headers: { 'content-type': 'application/json' }
     });
 
-    const data: TrimProtocol.TrimStartResponse = await f.json();
+    const data: JSONProtocolResponse<TrimProtocol.TrimStartResponse> = await f.json();
 
-    return data;
+    return getJSONProtocolDataOrThrow(data);
   }
 
   export async function cancelProcess(id: string) {
@@ -39,9 +50,9 @@ export namespace TrimComms {
       method: 'delete'
     });
 
-    const data = await f.json();
+    const data: JSONProtocolResponse<null> = await f.json();
 
-    return data;
+    return getJSONProtocolDataOrThrow(data);
   }
 
 }
@@ -60,9 +71,9 @@ export namespace DetailsComms {
       method: 'get',
 
     });
-    const data: DetailsProtocol.DetailsProtocolResponse = await f.json();
+    const data: JSONProtocolResponse<DetailsProtocol.DetailsProtocolResponse> = await f.json();
 
-    return data;
+    return getJSONProtocolDataOrThrow(data);
   }
 
   export function videoStream(data: DetailsProtocol.DetailsProtocolResponse): VideoDetails.VideoStream | null {
