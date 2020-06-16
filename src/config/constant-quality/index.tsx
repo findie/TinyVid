@@ -2,6 +2,7 @@ import React, {useState} from "react";
 import * as css from './style.css';
 import {range} from "../../helpers/math";
 import {FFHelpers} from "../../../electron/helpers/ff";
+import {FormControl, InputLabel, MenuItem, Select} from "@material-ui/core";
 
 export interface ConfigConstantQualityProps {
   onChange: (quality: number) => void
@@ -28,7 +29,7 @@ function quality2name(q: number) {
   }
 
   if (q === 40) {
-    return `${q} (potato quality)`
+    return `${q} (potato quality 🥔)`
   }
 
   return q;
@@ -40,21 +41,23 @@ export function ConfigConstantQuality(props: ConfigConstantQualityProps) {
 
 
   return (<div className={css.maxFileSizeConfig}>
-
-    <select
-      onChange={e => {
-        setQualityPreset(parseInt(e.target.value));
-        props.onChange(parseInt(e.target.value));
-      }}
-      value={qualityPreset}
-    >
-      {
-        range(18, 44, 2).map(q => (
-          <option value={q} key={q}>{quality2name(q)}</option>
-        ))
-      }
-    </select>
-
+    <FormControl>
+      <InputLabel id="quality-label">Quality</InputLabel>
+      <Select
+        labelId={'quality-label'}
+        onChange={e => {
+          setQualityPreset(parseInt(e.target.value as string));
+          props.onChange(parseInt(e.target.value as string));
+        }}
+        value={qualityPreset}
+      >
+        {
+          range(18, 44, 2).map(q => (
+            <MenuItem value={q} key={q}>{quality2name(q)}</MenuItem>
+          ))
+        }
+      </Select>
+    </FormControl>
 
   </div>);
 }

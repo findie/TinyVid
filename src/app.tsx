@@ -22,7 +22,7 @@ import {RenderStrategy} from "../electron/types";
 import {DetailsComms, TrimComms} from "./helpers/comms";
 import {Loading} from "./components/loading";
 
-import {Box, Paper, ThemeProvider} from "@material-ui/core";
+import {Box, Button, FormControl, InputLabel, MenuItem, Paper, Select, ThemeProvider} from "@material-ui/core";
 import {Theme} from "./helpers/theme";
 import {DurationInfo} from "./components/duration-info";
 
@@ -93,7 +93,7 @@ const App = () => {
   return (
     <ThemeProvider theme={Theme.current}>
       <div className={css.app}>
-        <Paper elevation={3} className={css.header}>
+        <Paper elevation={3} className={css.header} square={true}>
           <ChooseFile fileCB={setFile}/>
         </Paper>
         <Display
@@ -101,7 +101,7 @@ const App = () => {
           file={file}
           ref={videoElementRef}
         />
-        <Paper className={css.footer} elevation={3}>
+        <Paper className={css.footer} elevation={3} square={true}>
           {file ?
             <DurationInfo
               className={css.info}
@@ -134,24 +134,28 @@ const App = () => {
 
                 <div className={css.settings}>
                   <div className={css.left}>
-                    Output must &nbsp;
-                    <select
-                      onChange={
-                        e => {
-                          if (e.target.value === 'max-file-size') {
-                            setStrategyType('max-file-size');
-                            setStrategyTune(defaultMaxFileSizeStrategy.tune);
-                          } else {
-                            setStrategyType('constant-quality');
-                            setStrategyTune(defaultConstantQuality.tune);
+                    <FormControl>
+                      <InputLabel id="strategy-label">Output must</InputLabel>
+                      <Select
+                        labelId={"strategy-label"}
+                        value={strategyType}
+                        variant={"standard"}
+                        onChange={
+                          e => {
+                            if (e.target.value === 'max-file-size') {
+                              setStrategyType('max-file-size');
+                              setStrategyTune(defaultMaxFileSizeStrategy.tune);
+                            } else {
+                              setStrategyType('constant-quality');
+                              setStrategyTune(defaultConstantQuality.tune);
+                            }
                           }
                         }
-                      }
-                      value={strategyType}
-                    >
-                      <option value={'max-file-size'}>have max file size of</option>
-                      <option value={'constant-quality'}>be of constant quality</option>
-                    </select>
+                      >
+                        <MenuItem value={'max-file-size'}>have max file size of</MenuItem>
+                        <MenuItem value={'constant-quality'}>be constant quality of</MenuItem>
+                      </Select>
+                    </FormControl>
 
                     {strategyType === 'max-file-size' ?
                       <ConfigMaxFileSize onChange={size => {
@@ -183,12 +187,15 @@ const App = () => {
                 />
               </div>
 
-              <button
+              <Box marginLeft={2}>
+              <Button
+                variant="contained"
                 className={css.processBtn}
                 disabled={!file}
                 onClick={startProcessing}
               >Process
-              </button>
+              </Button>
+              </Box>
             </div>
           </Box>
         </Paper>

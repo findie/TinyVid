@@ -1,7 +1,9 @@
-import React, {useEffect, useState} from "react";
+import React, {FormEvent, useEffect, useState} from "react";
 import * as css from './style.css';
 import {clip} from "../../helpers/math";
 import {FFHelpers} from "../../../electron/helpers/ff";
+import {FormControl, InputBaseComponentProps, InputLabel, MenuItem, Select, TextField} from "@material-ui/core";
+import NumberFormat from 'react-number-format';
 
 export interface ConfigMaxFileSizeProps {
   onChange: (size: number) => void
@@ -22,33 +24,70 @@ export function ConfigMaxFileSize(props: ConfigMaxFileSizeProps) {
     props.onChange(value);
   }, [sizePreset, customSize]);
 
+  // @ts-ignore
+  // @ts-ignore
   return (<div className={css.maxFileSizeConfig}>
+    <FormControl>
+      <InputLabel id="size">Size</InputLabel>
 
-    <select
-      onChange={e => setSizePreset(e.target.value === 'custom' ? 'custom' : parseInt(e.target.value))}
-      value={sizePreset}
-    >
-      <option value={8}> 8 MB (discord free)</option>
-      <option value={10}>10 MB</option>
-      <option value={50}>50 MB (discord nitro)</option>
-      <option value={100}>100 MB</option>
-      <option value={'custom'}>Custom</option>
-    </select>
+      <Select
+        onChange={e => setSizePreset(e.target.value === 'custom' ? 'custom' : parseInt(e.target.value as string))}
+        value={sizePreset}
+        labelId={'size'}
+      >
+        <MenuItem value={8}> 8 MB (discord free)</MenuItem>
+        <MenuItem value={10}>10 MB</MenuItem>
+        <MenuItem value={50}>50 MB (discord nitro)</MenuItem>
+        <MenuItem value={100}>100 MB</MenuItem>
+        <MenuItem value={'custom'}>Custom</MenuItem>
+      </Select>
+    </FormControl>
 
-    {sizePreset === 'custom' ?
-      <div>
-        <input className={css.customInput}
-               type={'number'}
-               onChange={e => setCustomSize(clip(1, parseInt(e.target.value), 1000))}
-               onBlur={e => !e.target.value && setCustomSize(1)}
-               value={customSize}
-               min={1}
-               max={1000}
-               step={1}
-        />MB
-      </div> :
-      null
-    }
+      {sizePreset === 'custom' ?
+        <div>
 
+          <TextField
+            className={css.customInput}
+            onChange={e => setCustomSize(clip(1, parseInt(e.target.value), 1000))}
+            onBlur={e => !e.target.value && setCustomSize(10)}
+            value={customSize}
+            InputProps={{
+              inputComponent: MBNumberFormatCustom,
+            }}
+          />
+        </div> :
+        null
+      }
   </div>);
 }
+
+
+interface MBNumberFormatCustomProps extends InputBaseComponentProps {
+}
+
+function MBNumberFormatCustom(props: MBNumberFormatCustomProps) {
+  const { inputRef, onChange, ...other } = props;
+
+  return (
+    <NumberFormat
+      {...other}
+      getInputRef={inputRef}
+      defaultValue={props.defaultValue?.toString()}
+      onValueChange={(values) => {
+        onChange && onChange({
+          target: {
+            name: props.name,
+            value: values.value,
+          }
+        } as unknown as FormEvent<HTMLInputElement>);
+      }}
+      thousandSeparator
+      isNumericString
+      suffix=" MB"
+      min={1}
+      max={1000}
+      step={1}
+    />
+  );
+}
+

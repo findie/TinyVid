@@ -36,6 +36,7 @@
     "nouislider-react": "^3.3.7",
     "react": "^16.13.1",
     "react-dom": "^16.13.1",
+    "react-number-format": "^4.4.1",
     "source-map-loader": "^1.0.0",
     "style-loader": "^1.2.1",
     "uuid": "^8.1.0",

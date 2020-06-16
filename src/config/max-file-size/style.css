@@ -1,7 +1,8 @@
 .custom-input {
-    width: 45px;
+    width: 60px;
 }
 
 .max-file-size-config {
     display: flex;
+    align-items: flex-end;
 }

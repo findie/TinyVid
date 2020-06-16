@@ -2,7 +2,7 @@
 :local .display {
     flex-grow: 2;
     display: flex;
-    max-height: calc(100% - 185px);
+    max-height: calc(100% - 204px);
 }
 
 :local .header {
@@ -26,10 +26,10 @@
 }
 
 :local .controls .process-btn {
-    width: 80px;
-    z-index: 1;
-    margin-left: 8px;
-    height: 64px;
+    /*width: 80px;*/
+    /*z-index: 1;*s/
+    /*margin-left: 8px;*/
+    height: 84px;
 }
 
 :local .controls .settings {
