@@ -197,8 +197,21 @@ const App = () => {
                 <hr/>
                 <SpeedSlider
                   className={css.speedSlider}
-                  highSpeedText={strategyType === 'max-file-size' ? 'High Speed' : 'High Speed'}
-                  lowSpeedText={strategyType === 'max-file-size' ? 'High Quality' : 'Small File Size'}
+                  highSpeedText={strategyType === 'max-file-size' ? 'Faster Processing' : 'Faster Processing'}
+                  lowSpeedText={strategyType === 'max-file-size' ? 'Better Quality' : 'Smaller File Size'}
+
+                  highSpeedTooltip={
+                    strategyType === 'max-file-size' ?
+                      'Process will finish faster but video quality will suffer' :
+                      'Process will finish faster but file size will be larger'
+                  }
+                  lowSpeedTooltip={
+                    strategyType === 'max-file-size' ?
+                      'Process will finish slower but video will be at the best quality it can' :
+                      'Process will finish slower but file will be at the lowest size quality'
+                  }
+
+
                   onChange={
                     useCallback(
                       speedIndex => setStrategySpeed(speedIndex),

@@ -1,4 +1,4 @@
-import {createMuiTheme} from "@material-ui/core";
+import {createMuiTheme, ThemeOptions} from "@material-ui/core";
 import {remote} from 'electron';
 import {RendererSettings} from "./settings";
 

@@ -7,7 +7,7 @@ import {FFHelpers} from "../../../electron/helpers/ff";
 import {makeStyles} from "@material-ui/core/styles";
 import {Theme} from "../../helpers/theme";
 import color from "color";
-import {Box, Typography} from "@material-ui/core";
+import {Box, Tooltip, Typography} from "@material-ui/core";
 
 const sliderTheme = () => makeStyles({
   'root': {
@@ -43,6 +43,9 @@ interface SpeedSliderProps {
   highSpeedText: string
   lowSpeedText: string
 
+  highSpeedTooltip: string
+  lowSpeedTooltip: string
+
   onChange: (speedIndex: number) => void
 
   className: string
@@ -56,7 +59,11 @@ export function SpeedSlider(props: SpeedSliderProps) {
   return (
     <div
       className={css.container + ' ' + props.className + ' ' + classes.root + ' ' + (props.disabled ? classes.rootDisabled : '')}>
-      <Typography>{props.highSpeedText}</Typography>
+      <Tooltip title={props.highSpeedTooltip} arrow>
+        <Typography>
+          {props.highSpeedText}
+        </Typography>
+      </Tooltip>
       <Box marginX={3} className={css.slider}>
         <Nouislider
           range={{
@@ -78,7 +85,11 @@ export function SpeedSlider(props: SpeedSliderProps) {
           onUpdate={values => props.onChange(FFHelpers.encodingSpeedPresetsDisplay.indexOf(values[0]))}
         />
       </Box>
-      <Typography>{props.lowSpeedText}</Typography>
+      <Tooltip title={props.lowSpeedTooltip} arrow>
+        <Typography>
+          {props.lowSpeedText}
+        </Typography>
+      </Tooltip>
     </div>
   )
 }
