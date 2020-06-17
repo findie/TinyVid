@@ -49,7 +49,7 @@ export function ConfigMaxFileSize(props: ConfigMaxFileSizeProps) {
 
           <TextField
             className={css.customInput}
-            onChange={e => setCustomSize(clip(1, parseInt(e.target.value), 1000))}
+            onChange={e => setCustomSize(clip(1, parseInt(e.target.value), 10000))}
             onBlur={e => !e.target.value && setCustomSize(10)}
             value={customSize}
             InputProps={{

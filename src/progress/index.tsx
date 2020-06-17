@@ -8,6 +8,8 @@ import {Box, Button, CircularProgress, Grid, LinearProgress, Paper, Typography} 
 import * as path from 'path';
 import moment from "moment";
 import {CodeDisplay} from "../components/code";
+import {quality2name} from "../config/constant-quality";
+import {bps2text} from "../helpers/math";
 
 interface ProgressProps {
   out: string
@@ -19,6 +21,26 @@ const Progress = (props: ProgressProps) => {
 
   const [cancelled, setCancelled] = useState(false);
 
+  const quality: null | number = (
+    (props?.progress?.quality?.length || 0) &&
+    (props?.progress?.quality[0] || [])[0]
+  ) ?? null;
+
+  const firstLine: string[] = [
+    `Speed: ${(props?.progress?.speed || 0).toFixed(2)}x`,
+    `Bitrate: ${bps2text(props.progress?.bitrate ?? 0)}`
+  ];
+
+  // fixme quality for faster presets is erroneous
+  //       since faster presets are more sloppy, they allow higher avg bitrate
+  //       and thus quantization decreases (internal frame quality increases)
+  //       but encoder truggles to keep up and the result is a worse quality than advertised
+  // if (quality !== null) {
+  //   firstLine.push(`Quality: ${quality2name(quality - 5, false)}`);
+  // }
+
+  console.log(props.progress);
+
   return (
     <div className={css.progressContainer}>
       <LinearProgress
@@ -28,12 +50,13 @@ const Progress = (props: ProgressProps) => {
       />
 
       <div className={css.info}>
-        <Typography noWrap>Speed: {(props?.progress?.speed || 0).toFixed(2)}x</Typography>
+        <Typography noWrap>{firstLine.join(' | ')}</Typography>
         {
           cancelled ?
             <Typography noWrap>Cancelling the process</Typography> :
             props?.progress?.eta ?
-              <Typography noWrap>Finishing in {moment(Date.now() + (props?.progress?.eta || 0) * 1000).fromNow(true)}</Typography> :
+              <Typography noWrap>Finishing
+                in {moment(Date.now() + (props?.progress?.eta || 0) * 1000).fromNow(true)}</Typography> :
               <Typography noWrap>Starting the process</Typography>
         }
         <Button
@@ -135,9 +158,9 @@ const Done = (props: DoneProps) => {
         saved at:
       </Typography>
       <Box marginTop={1} marginBottom={2}>
-      <CodeDisplay className={css.center} mono={false}>
-        {props.file}
-      </CodeDisplay>
+        <CodeDisplay className={css.center} mono={false}>
+          {props.file}
+        </CodeDisplay>
       </Box>
       <Box className={css.center}>
         <Grid container spacing={2} justify={"flex-end"}>

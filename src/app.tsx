@@ -29,6 +29,7 @@ import {ErrorLike} from "../electron/protocols/base-protocols";
 import {ErrorDisplayModal} from "./components/error";
 import {RendererFileHelpers} from "./helpers/file";
 import {ThemeSwitch} from "./components/theme-switch";
+import {BitrateWarnings} from "./components/bitrate-warnings";
 
 const defaultMaxFileSizeStrategy: RenderStrategy = {
   type: 'max-file-size',
@@ -116,6 +117,18 @@ const App = () => {
         <Paper elevation={3} className={css.header} square={true}>
           <ChooseFile fileCB={setFile} className={css.flexGrow + ' ' + css.fileSelect}/>
           <ThemeSwitch theme={theme} onClick={() => setTheme(Theme.setNext())}/>
+
+          {
+            strategyType === "max-file-size" ?
+              <BitrateWarnings
+                fileSizeInBytes={strategyTune}
+                className={css.alert}
+                duration={range.end - range.start}
+                videoDetails={videoDetails}
+                videoSettings={videoSettings}
+              /> :
+              null
+          }
         </Paper>
         <Display
           className={css.display}

@@ -6,11 +6,20 @@
 }
 
 :local .header {
-display: flex;
+    display: flex;
+    position: relative;
 }
 
 :local .header .file-select {
     max-width: calc(100% - 64px);
+}
+
+:local .header .alert {
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    width: 80%;
+    transform: translate(-50%, 0%);
 }
 
 :local .footer {

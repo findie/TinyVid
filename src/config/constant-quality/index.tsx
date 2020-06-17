@@ -1,6 +1,6 @@
 import React, {useState} from "react";
 import * as css from './style.css';
-import {range} from "../../helpers/math";
+import {clip, range} from "../../helpers/math";
 import {FFHelpers} from "../../../electron/helpers/ff";
 import {FormControl, InputLabel, MenuItem, Select} from "@material-ui/core";
 
@@ -11,31 +11,43 @@ export interface ConfigConstantQualityProps {
 export const ConfigConstantQualityDefaultQuality = 18;
 export const ConfigConstantQualityDefaultSpeedOrQuality = FFHelpers.encodingSpeedPresets.indexOf('medium');
 
-function quality2name(q: number) {
+export function quality2name(q: number, flavored: boolean = true) {
   // most people don't know the x264 has crf from 0 to 51
   // and they don't need to know
-  const q_percentage = 100 - ((q - 18) / 2 * 5);
 
-  if (q === 18) {
-    return `${q_percentage}% (crisp picture)`
+  let q_percentage = 100 - ((q - 18) / 2 * 5);
+  const better_than_100 = q_percentage > 100;
+  const worse_than_5 = q_percentage < 5;
+  q_percentage = clip(0, q_percentage, 100);
+
+  if (flavored) {
+    if (q === 18) {
+      return `${q_percentage}% (crisp picture)`
+    }
+
+    if (q === 22) {
+      return `${q_percentage}% (can't really tell the difference)`
+    }
+
+    if (q === 28) {
+      return `${q_percentage}% (starting to lose some quality)`
+    }
+
+    if (q === 32) {
+      return `${q_percentage}% (your usual twitter video)`
+    }
+
+    if (q === 40) {
+      return `${q_percentage}% (potato quality 🥔)`
+    }
   }
 
-  if (q === 22) {
-    return `${q_percentage}% (can't really tell the difference)`
+  if(better_than_100){
+    return `${q_percentage}% +`;
   }
-
-  if (q === 28) {
-    return `${q_percentage}% (starting to lose some quality)`
+  if(worse_than_5){
+    return `< 5% (oh boy)`;
   }
-
-  if (q === 32) {
-    return `${q_percentage}% (your usual twitter video)`
-  }
-
-  if (q === 40) {
-    return `${q_percentage}% (potato quality 🥔)`
-  }
-
   return `${q_percentage}%`;
 }
 

@@ -14,12 +14,7 @@ export namespace VideoProcess {
         ];
 
       case "max-file-size":
-        const fileSizeInKB = strategy.tune * 1000;
-
-        const bitrateInKb = fileSizeInKB / duration * 8;
-
-        const audioBitrateInKb = Math.min(bitrateInKb * 0.1, 128); // 10% or at most 128k
-        const videoBitrateInKb = bitrateInKb - audioBitrateInKb;
+        const { audioBitrateInKb, videoBitrateInKb } = FFHelpers.computeAverageBPS(strategy.tune, duration);
 
         return [
           '-qmin:v', '-1',
@@ -28,7 +23,7 @@ export namespace VideoProcess {
           '-maxrate:v', Math.floor(videoBitrateInKb) + 'k',
           '-minrate:v', Math.floor(videoBitrateInKb * 0.9) + 'k',
           '-b:a', Math.floor(audioBitrateInKb) + 'k',
-          '-bufsize:v', Math.floor(bitrateInKb) + 'k',
+          '-bufsize:v', Math.floor(videoBitrateInKb) + 'k',
           '-preset:v', FFHelpers.encodingSpeedPresets[strategy.speed],
           '-x264-params', "nal-hrd=cbr"
         ];
