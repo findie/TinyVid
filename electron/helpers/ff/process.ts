@@ -76,9 +76,7 @@ export namespace VideoProcess {
         '-vf', settings2filters(settings).join(';'),
         ...strategy2params(strategy, end - start),
         '-c:v', 'libx264',
-        out, '-y',
-        '-psnr',
-        '-vstats_file', 'test.vstats.txt'
+        out, '-y'
       ],
       {
         duration: (end - start),
