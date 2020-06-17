@@ -38,6 +38,7 @@ import {DurationInfo} from "./components/duration-info";
 import {Brightness2 as DarkIcon, Brightness5 as LightIcon, BrightnessAuto as AutoIcon} from '@material-ui/icons'
 import {ErrorLike} from "../electron/protocols/base-protocols";
 import {ErrorDisplayModal} from "./components/error";
+import {RendererFileHelpers} from "./helpers/file";
 
 const defaultMaxFileSizeStrategy: RenderStrategy = {
   type: 'max-file-size',
@@ -77,7 +78,9 @@ const App = () => {
   async function startProcessing() {
     if (!file) return console.warn('refusing to start process with empty video field');
 
-    const fout = `${file}.${range.start.toFixed(2)}-${range.end.toFixed(2)}.compressed.mp4`
+    const strategy: RenderStrategy = { type: strategyType, tune: strategyTune, speed: strategySpeed };
+
+    const fout = RendererFileHelpers.generateFileOutName(file, range, strategy, videoSettings);
 
     // box in the range by one frame to account for browser frame inaccuracy
     const frameTime = (1 / (videoDetails?.fps || 60));
@@ -88,7 +91,7 @@ const App = () => {
       file,
       fout,
       { start, end },
-      { type: strategyType, tune: strategyTune, speed: strategySpeed },
+      strategy,
       videoSettings
     );
 
