@@ -22,23 +22,13 @@ import {RenderStrategy} from "../electron/types";
 import {DetailsComms, TrimComms} from "./helpers/comms";
 import {Loading} from "./components/loading";
 
-import {
-  Box,
-  Button,
-  FormControl,
-  IconButton,
-  InputLabel,
-  MenuItem,
-  Paper,
-  Select,
-  ThemeProvider
-} from "@material-ui/core";
+import {Box, Button, FormControl, InputLabel, MenuItem, Paper, Select, ThemeProvider} from "@material-ui/core";
 import {Theme} from "./helpers/theme";
 import {DurationInfo} from "./components/duration-info";
-import {Brightness2 as DarkIcon, Brightness5 as LightIcon, BrightnessAuto as AutoIcon} from '@material-ui/icons'
 import {ErrorLike} from "../electron/protocols/base-protocols";
 import {ErrorDisplayModal} from "./components/error";
 import {RendererFileHelpers} from "./helpers/file";
+import {ThemeSwitch} from "./components/theme-switch";
 
 const defaultMaxFileSizeStrategy: RenderStrategy = {
   type: 'max-file-size',
@@ -125,12 +115,7 @@ const App = () => {
       <div className={css.app}>
         <Paper elevation={3} className={css.header} square={true}>
           <ChooseFile fileCB={setFile} className={css.flexGrow + ' ' + css.fileSelect}/>
-          <IconButton onClick={() => setTheme(Theme.setNext())}>
-            {theme === 'system' ? <AutoIcon/> :
-              theme === 'dark' ? <DarkIcon/> :
-                <LightIcon/>
-            }
-          </IconButton>
+          <ThemeSwitch theme={theme} onClick={() => setTheme(Theme.setNext())}/>
         </Paper>
         <Display
           className={css.display}

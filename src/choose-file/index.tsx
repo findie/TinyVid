@@ -2,7 +2,7 @@ import React, {useState} from "react";
 import css from './style.css'
 import {remote} from 'electron'
 
-import {Box, Button, Typography} from "@material-ui/core";
+import {Box, Button, Tooltip, Typography} from "@material-ui/core";
 
 export interface ChooseFileProps {
   fileCB: (path: string) => void
@@ -43,9 +43,11 @@ export const ChooseFile = (props: ChooseFileProps) => {
         Select File
       </Button>
       <Box marginLeft={2} className={css.text}>
-        <Typography noWrap >
-          {file ? file : 'No file chosen...'}
-        </Typography>
+        <Tooltip title={file ? file : 'No file chosen...'} arrow>
+          <Typography noWrap>
+            {file ? file : 'No file chosen...'}
+          </Typography>
+        </Tooltip>
       </Box>
     </Box>
   )
