@@ -28,13 +28,13 @@ const Progress = (props: ProgressProps) => {
       />
 
       <div className={css.info}>
-        <div>Speed: {(props?.progress?.speed || 0).toFixed(2)}x</div>
+        <Typography noWrap>Speed: {(props?.progress?.speed || 0).toFixed(2)}x</Typography>
         {
           cancelled ?
-            <div>Cancelling the process</div> :
+            <Typography noWrap>Cancelling the process</Typography> :
             props?.progress?.eta ?
-              <div>Finishing in {moment(Date.now() + (props?.progress?.eta || 0) * 1000).fromNow(true)}</div> :
-              <div>Starting the process</div>
+              <Typography noWrap>Finishing in {moment(Date.now() + (props?.progress?.eta || 0) * 1000).fromNow(true)}</Typography> :
+              <Typography noWrap>Starting the process</Typography>
         }
         <Button
           variant="contained"
@@ -125,19 +125,21 @@ interface DoneProps {
 const Done = (props: DoneProps) => {
   return (
     <div>
-      <Typography variant={"h4"} className={css.center}>Done!</Typography>
+      <Typography variant={"h5"} className={css.center}>Done!</Typography>
       <Typography className={css.center}>
         Your file has been
         {
           props.wasCancelled ?
-            <strong> partially </strong> : ''
+            <strong> partially </strong> : ' '
         }
-        saved in:
+        saved at:
       </Typography>
-      <CodeDisplay className={css.center}>
+      <Box marginTop={1} marginBottom={2}>
+      <CodeDisplay className={css.center} mono={false}>
         {props.file}
       </CodeDisplay>
-      <Box marginTop={2} className={css.center}>
+      </Box>
+      <Box className={css.center}>
         <Grid container spacing={2} justify={"flex-end"}>
           <Grid item>
             <Button
@@ -197,6 +199,7 @@ export const ProcessingOverlay = (props: ProcessingOverlayProps) => {
 
       if (task?.error) {
         setError(task.error);
+        clearInterval(interval);
       }
 
       if (task?.progress) {
@@ -205,6 +208,7 @@ export const ProcessingOverlay = (props: ProcessingOverlayProps) => {
 
       if (!task || task.done) {
         setIsDone(true);
+        clearInterval(interval);
       }
 
       if (task && task.cancelled) {
