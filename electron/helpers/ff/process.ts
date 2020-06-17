@@ -18,17 +18,19 @@ export namespace VideoProcess {
 
         const bitrateInKb = fileSizeInKB / duration * 8;
 
-        const audioBitrateInKb = Math.min(bitrateInKb * 0.1, 96); // 10% or at most 64k
+        const audioBitrateInKb = Math.min(bitrateInKb * 0.1, 128); // 10% or at most 128k
         const videoBitrateInKb = bitrateInKb - audioBitrateInKb;
 
         return [
-          '-qmin:v', '21',
-          // '-b:v', Math.floor(videoBitrateInKb) + 'k',
+          '-qmin:v', '-1',
+          '-qmax:v', '-1',
+          '-b:v', Math.floor(videoBitrateInKb) + 'k',
           '-maxrate:v', Math.floor(videoBitrateInKb) + 'k',
           '-minrate:v', Math.floor(videoBitrateInKb * 0.9) + 'k',
           '-b:a', Math.floor(audioBitrateInKb) + 'k',
-          '-bufsize', Math.floor(bitrateInKb / 2) + 'k',
-          '-preset:v', FFHelpers.encodingSpeedPresets[strategy.speed]
+          '-bufsize:v', Math.floor(bitrateInKb) + 'k',
+          '-preset:v', FFHelpers.encodingSpeedPresets[strategy.speed],
+          '-x264-params', "nal-hrd=cbr"
         ];
 
       default:
@@ -74,7 +76,9 @@ export namespace VideoProcess {
         '-vf', settings2filters(settings).join(';'),
         ...strategy2params(strategy, end - start),
         '-c:v', 'libx264',
-        out, '-y'
+        out, '-y',
+        '-psnr',
+        '-vstats_file', 'test.vstats.txt'
       ],
       {
         duration: (end - start),
