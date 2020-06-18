@@ -8,8 +8,8 @@
     "dev:electron": "NODE_ENV=development webpack --config webpack.electron.config.js --mode development --watch",
     "dev:react": "NODE_ENV=development webpack-dev-server --config webpack.react.config.js --mode development",
     "ffbin": "ffbinaries ffprobe ffmpeg -p linux-64 -o bin/linux-64 && ffbinaries ffprobe ffmpeg -p windows-64 -o bin/windows-64 && ffbinaries ffprobe ffmpeg -p osx-64 -o bin/osx-64",
-    "build": "NODE_ENV=production webpack --config webpack.electron.config.js --mode production && NODE_ENV=production webpack --config webpack.react.config.js --mode production",
-    "release": "yarn build && electron-builder --win --linux --mac"
+    "build:js": "NODE_ENV=production webpack --config webpack.electron.config.js --mode production && NODE_ENV=production webpack --config webpack.react.config.js --mode production",
+    "build": "yarn build:js && electron-builder --win --linux --mac"
   },
   "license": "MIT",
   "devDependencies": {
@@ -30,6 +30,7 @@
     "css-loader": "^3.5.3",
     "electron": "^9.0.0",
     "electron-builder": "^22.7.0",
+    "electron-builder-squirrel-windows": "^22.7.0",
     "ffbinaries": "^1.1.4",
     "html-webpack-plugin": "^4.3.0",
     "mini-css-extract-plugin": "^0.9.0",
@@ -53,6 +54,7 @@
   "build": {
     "appId": "rocks.corneroftheinternet.quick-trim",
     "productName": "QuickTrim",
+    "artifactName": "${name}-${os}-${arch}-${version}.${ext}",
     "asar": true,
     "files": [
       "dist",
@@ -78,12 +80,19 @@
       "target": [
         "msi",
         "dir",
-        "zip"
+        "zip",
+        "nsis"
       ],
       "icon": "icon.ico",
       "extraFiles": [
         "bin/windows-64"
       ]
+    },
+    "nsis": {
+      "oneClick": false,
+      "installerIcon": "icon.ico",
+      "uninstallerIcon": "icon.ico",
+      "allowToChangeInstallationDirectory": true
     },
     "linux": {
       "target": [
