@@ -26,10 +26,10 @@ export function BitrateWarnings(props: BitrateWarningsProps) {
   let alert: React.ReactNode = null;
   let shouldShowAlert = false;
 
-  console.log('avg bitrate in Kb', averageBitrateInKb.videoBitrateInKb)
+  // console.log('avg bitrate in Kb', averageBitrateInKb.videoBitrateInKb)
   // console.log(bitrateThresholds)
-  console.log('bits per pixel ratio', averageVideoBitrateInBits / (props.videoDetails.width * props.videoDetails.height * props.videoDetails.fps))
-  console.log('~'.repeat(80));
+  // console.log('bits per pixel ratio', averageVideoBitrateInBits / (props.videoDetails.width * props.videoDetails.height * props.videoDetails.fps))
+  // console.log('~'.repeat(80));
 
   // bad quality
   if (between(bitrateThresholds.mayCorrupt[0], averageVideoBitrateInBits, bitrateThresholds.mayCorrupt[1])) {
@@ -45,7 +45,8 @@ export function BitrateWarnings(props: BitrateWarningsProps) {
     alert =
       <Alert elevation={6} severity={'warning'} variant={'filled'}>
         <AlertTitle>Video may look blocky!</AlertTitle>
-        Depending on how much movement there is, you may have to reduce video duration, fps, resolution or increase file size.
+        Depending on how much movement there is, you may have to reduce video duration, fps, resolution or increase file
+        size.
       </Alert>;
     shouldShowAlert = true;
 

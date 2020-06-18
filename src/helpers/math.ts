@@ -43,3 +43,11 @@ export function between(min: number, val: number, max: number): boolean {
   if (max < val) return false;
   return true;
 }
+
+export function arrIsConsistent(arr: number[]): boolean {
+  const template = arr[0];
+  for (let i = 1; i < arr.length; i++) {
+    if (template !== arr[i]) return false;
+  }
+  return true;
+}

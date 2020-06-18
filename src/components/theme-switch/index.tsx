@@ -8,7 +8,7 @@ interface ThemeSwitchProps {
   onClick: () => void
 }
 
-export function ThemeSwitch({ onClick, theme }: ThemeSwitchProps) {
+export const ThemeSwitch = React.memo(function ThemeSwitch({ onClick, theme }: ThemeSwitchProps) {
 
   let tooltip = 'System Theme (based on system preference)';
   let icon = <AutoIcon/>;
@@ -29,4 +29,4 @@ export function ThemeSwitch({ onClick, theme }: ThemeSwitchProps) {
     </Tooltip>
   );
 
-}
+});

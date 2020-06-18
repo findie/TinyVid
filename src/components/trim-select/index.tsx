@@ -6,6 +6,7 @@ import {Theme} from "../../helpers/theme";
 import color from 'color'
 import * as css from './style.css';
 import './style.css'
+import {arrIsConsistent} from "../../helpers/math";
 
 export interface TrimSliderProps {
   duration: number
@@ -51,13 +52,42 @@ export const TrimSlider = (props: TrimSliderProps) => {
   let end = props.duration * .66;
   let current = props.duration * .5;
 
+  let lastUpdates: number[] = [];
+  let to_detect_drag: NodeJS.Timeout | null = null;
+
   function update(values: any[], handle: number, unencodedValues: number[], tap: boolean, positions: number[]) {
+
     const val = unencodedValues[handle];
     current = val;
     start = unencodedValues[0];
     end = unencodedValues[1];
 
-    props.onChange(unencodedValues[0], unencodedValues[1], val);
+    // ~~~~ CONNECT DRAG DETECTION ~~~~~
+    // if we have a mixed bag of handles
+    // aka we've dragged the entire region
+    // fire onChange for 1st region
+    // this is a hacky and inefficient way to detect if the connect was dragged instead of the head
+
+    lastUpdates.push(handle);
+
+    if (arrIsConsistent(lastUpdates)) {
+      console.log('dragging head', unencodedValues.findIndex(x => x === val), val);
+      // it's a slider drag
+      props.onChange(unencodedValues[0], unencodedValues[1], val);
+    } else {
+      // it's a connect drag, just update head (first slider)
+      console.log('dragging connect', 0, unencodedValues[0]);
+      props.onChange(unencodedValues[0], unencodedValues[1], unencodedValues[0]);
+    }
+
+    if (!to_detect_drag) {
+      to_detect_drag = setTimeout(() => {
+
+        lastUpdates = [];
+        to_detect_drag = null;
+
+      }, 0);
+    }
   }
 
   return (
@@ -80,7 +110,8 @@ export const TrimSlider = (props: TrimSliderProps) => {
             return `${val.toFixed(3)}s - Duration: ${(end - start).toFixed(2)}s`;
           }
         }}
-
+        behaviour={'drag'}
+        // behaviour={'drag-snap'}
       />
     </div>
   );
