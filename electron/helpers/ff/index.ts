@@ -7,6 +7,9 @@ export namespace FFHelpers {
   export const ffprobe: string = ResourceHelpers.bin_dir('ffprobe');
   export const ffmpeg: string = ResourceHelpers.bin_dir('ffmpeg');
 
+  console.log('settings ffmpeg to', ffmpeg);
+  console.log('settings ffprobe to', ffprobe);
+
   export const encodingSpeedPresets: EncodingSpeedPresetsType[] = [
     'ultrafast',
     'superfast',

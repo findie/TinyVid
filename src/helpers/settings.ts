@@ -12,7 +12,7 @@ export namespace RendererSettings {
     theme: "dark"
   }
 
-  export const settings_file = ResourceHelpers.app_dir('renderer_settings.json');
+  export const settings_file = ResourceHelpers.real_app_dir('renderer_settings.json');
 
   export function load() {
     if (!existsSync(settings_file)) {
