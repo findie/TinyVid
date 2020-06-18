@@ -30,6 +30,7 @@ import {ErrorDisplayModal} from "./components/error";
 import {RendererFileHelpers} from "./helpers/file";
 import {ThemeSwitch} from "./components/theme-switch";
 import {BitrateWarnings} from "./components/bitrate-warnings";
+import {PreventClosing} from "./components/prevent-closing";
 
 const defaultMaxFileSizeStrategy: RenderStrategy = {
   type: 'max-file-size',
@@ -267,6 +268,8 @@ const App = () => {
             setError(null);
           }}/> : null
         }
+
+        <PreventClosing prevent={!!processingID}/>
       </div>
     </ThemeProvider>
   )

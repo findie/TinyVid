@@ -105,6 +105,15 @@ export namespace TrimProtocol {
 
       return {};
     }
+
+    terminateAll() {
+      this.tasks.forEach(x => {
+        if (x.process && !x.done) {
+          console.log('Terminating task', x.id, 'args:', x.process.args.join(' '));
+          x.process.kill('SIGINT')
+        }
+      });
+    }
   }
 
 }

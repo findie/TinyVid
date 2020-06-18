@@ -9,7 +9,8 @@
     "build": "NODE_ENV=production webpack --config webpack.electron.config.js --mode production && NODE_ENV=production webpack --config webpack.react.config.js --mode production",
     "pkg:linux": "electron-packager . QuickTrim --platform=linux --arch=x64 --ignore bin/windows-64 --ignore bin/osx-64 --ignore node_modules/.cache --out out --prune --ignore renderer_settings.json",
     "pkg:win": "electron-packager . QuickTrim --platform=win32 --icon icon.ico --arch=x64 --ignore bin/linux-64 --ignore bin/osx-64 --ignore node_modules/.cache --out out --prune --ignore renderer_settings.json",
-    "pkg:osx": "electron-packager . QuickTrim --platform=darwin --icon icon.icns --arch=x64 --ignore bin/linux-64 --ignore bin/windows-64 --ignore node_modules/.cache --out out --prune --ignore renderer_settings.json"
+    "pkg:osx": "electron-packager . QuickTrim --platform=darwin --icon icon.icns --arch=x64 --ignore bin/linux-64 --ignore bin/windows-64 --ignore node_modules/.cache --out out --prune --ignore renderer_settings.json",
+    "release": "yarn build && yarn pkg:linux && yarn pkg:win && yarn pkg:osx"
   },
   "license": "MIT",
   "devDependencies": {

@@ -5,6 +5,7 @@ import * as path from 'path';
 import * as url from 'url';
 import * as os from 'os';
 import {Protocols} from "./protocols";
+import {TrimProtocol} from "./protocols/proto/trim";
 
 let mainWindow: Electron.BrowserWindow | null;
 
@@ -39,8 +40,26 @@ function createWindow() {
     );
   }
 
+  mainWindow.on('close', (e) => {
+    mainWindow?.webContents.executeJavaScript('window.dispatchEvent(new Event("x-closing-window"))');
+    e.preventDefault();
+    e.returnValue = true;
+  });
+
   mainWindow.on('closed', () => {
     mainWindow = null;
+    console.log('Killing process because window is closed');
+
+    // kill ffmpegs
+    Protocols
+      .list
+      .find((x): x is TrimProtocol.TrimProtocol => x instanceof TrimProtocol.TrimProtocol)!
+      .terminateAll();
+
+    // give time for IO to finish
+    setTimeout(() => {
+      process.exit(0);
+    }, 100);
   });
 }
 
