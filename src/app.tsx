@@ -31,6 +31,7 @@ import {RendererFileHelpers} from "./helpers/file";
 import {ThemeSwitch} from "./components/theme-switch";
 import {BitrateWarnings} from "./components/bitrate-warnings";
 import {PreventClosing} from "./components/prevent-closing";
+import {remote} from "electron";
 
 const defaultMaxFileSizeStrategy: RenderStrategy = {
   type: 'max-file-size',
@@ -68,11 +69,25 @@ const App = () => {
   const [processingID, setProcessingID] = useState<string | null>(null);
 
   async function startProcessing() {
-    if (!file) return console.warn('refusing to start process with empty video field');
+    if (!file) {
+      return console.warn('refusing to start process with empty video field');
+    }
 
     const strategy: RenderStrategy = { type: strategyType, tune: strategyTune, speed: strategySpeed };
 
-    const fout = RendererFileHelpers.generateFileOutName(file, range, strategy, videoSettings);
+    const fout = remote.dialog.showSaveDialogSync(
+      remote.getCurrentWindow(),
+      {
+        title: 'Output location',
+        defaultPath: RendererFileHelpers.generateFileOutName(file, range, strategy, videoSettings),
+        buttonLabel: 'Save & Start',
+        filters: [{ name: 'Video', extensions: ['mp4'] }],
+        properties: ['createDirectory', 'showOverwriteConfirmation']
+      });
+
+    if (!fout) {
+      return console.warn('refusing to start process with empty output location');
+    }
 
     // box in the range by one frame to account for browser frame inaccuracy
     const frameTime = (1 / (videoDetails?.fps || 60));

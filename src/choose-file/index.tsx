@@ -14,15 +14,17 @@ export const ChooseFile = (props: ChooseFileProps) => {
   const [file, setFile] = useState('');
 
   const chooseFileCallback = async () => {
-    const files = await remote.dialog.showOpenDialog({
-      properties: ['openFile'],
-      filters: [
-        {
-          name: 'Video',
-          extensions: ['mp4']
-        }
-      ]
-    });
+    const files = await remote.dialog.showOpenDialog(
+      remote.getCurrentWindow(),
+      {
+        properties: ['openFile'],
+        filters: [
+          {
+            name: 'Video',
+            extensions: ['mp4']
+          }
+        ]
+      });
 
     if (!files.canceled && files.filePaths[0]) {
       setFile(files.filePaths[0]);
