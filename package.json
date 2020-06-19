@@ -31,6 +31,7 @@
     "electron": "^9.0.0",
     "electron-builder": "^22.7.0",
     "electron-builder-squirrel-windows": "^22.7.0",
+    "electron-updater": "^4.3.1",
     "ffbinaries": "^1.1.4",
     "html-webpack-plugin": "^4.3.0",
     "mini-css-extract-plugin": "^0.9.0",
@@ -49,7 +50,8 @@
   },
   "dependencies": {
     "ffmpeg-progress-wrapper": "^2.0.0",
-    "source-map-support": "^0.5.19"
+    "source-map-support": "^0.5.19",
+    "electron-log": "^4.2.2"
   },
   "build": {
     "appId": "rocks.corneroftheinternet.quick-trim",

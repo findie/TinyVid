@@ -1,4 +1,5 @@
 import "source-map-support/register"
+import "./helpers/log"
 
 import {app, BrowserWindow, session} from 'electron';
 import * as path from 'path';
@@ -22,7 +23,7 @@ function createWindow() {
     webPreferences: {
       nodeIntegration: true,
       enableRemoteModule: true,
-      // webSecurity: false,
+      webSecurity: true,
     },
   });
 

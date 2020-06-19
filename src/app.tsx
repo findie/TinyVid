@@ -1,4 +1,6 @@
+import '../electron/helpers/log'
 import './types'
+
 import React, {useCallback, useEffect, useRef, useState} from 'react';
 import ReactDom from 'react-dom';
 import {ChooseFile} from "./choose-file";

@@ -71,7 +71,7 @@ export const TrimSlider = (props: TrimSliderProps) => {
     lastUpdates.push(handle);
 
     if (arrIsConsistent(lastUpdates)) {
-      console.log('dragging head', unencodedValues.findIndex(x => x === val), val);
+      // console.log('dragging head', unencodedValues.findIndex(x => x === val), val);
       // it's a slider drag
       props.onChange(unencodedValues[0], unencodedValues[1], val);
     } else {
