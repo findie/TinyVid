@@ -20,6 +20,7 @@
     left: 50%;
     width: 80%;
     transform: translate(-50%, 0%);
+    z-index: 10;
 }
 
 :local .footer {
