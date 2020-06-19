@@ -68,10 +68,13 @@ Protocols.grantPrivileges();
 app.on('ready', () => {
   Protocols.register();
   createWindow();
-  session.defaultSession.loadExtension(
-    path.join(os.homedir(), '.config/google-chrome/Default/Extensions/fmkadmapgofadopljbjfkapdkoienihi/4.7.0_0/')
-  )
-    .then(ex => console.log('Registered extension ' + ex.name))
-    .catch(e => console.error('Failed to register extension fmkadmapgofadopljbjfkapdkoienihi (React Dev Tools)', e));
+
+  if (!app.isPackaged) {
+    session.defaultSession.loadExtension(
+      path.join(os.homedir(), '.config/google-chrome/Default/Extensions/fmkadmapgofadopljbjfkapdkoienihi/4.7.0_0/')
+    )
+      .then(ex => console.log('Registered extension ' + ex.name))
+      .catch(e => console.error('Failed to register extension fmkadmapgofadopljbjfkapdkoienihi (React Dev Tools)', e));
+  }
 });
 app.allowRendererProcessReuse = true;
