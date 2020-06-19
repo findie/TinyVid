@@ -19,12 +19,20 @@ export namespace RendererSettings {
       return;
     }
     console.log('loading settings from', settings_file);
-    Object.assign(settings, JSON.parse(readFileSync(settings_file).toString()));
+    try {
+      Object.assign(settings, JSON.parse(readFileSync(settings_file).toString()));
+    } catch (e) {
+      console.error('failed to load settings file', e);
+    }
   }
 
   export function save() {
     console.log('saving settings from', settings_file);
-    return writeFileSync(settings_file, JSON.stringify(settings));
+    try {
+      writeFileSync(settings_file, JSON.stringify(settings));
+    } catch (e) {
+      console.error('failed to save settings file', e);
+    }
   }
 
   // load settings in
