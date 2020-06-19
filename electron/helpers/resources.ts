@@ -3,6 +3,16 @@ import {app, remote} from 'electron';
 
 export namespace ResourceHelpers {
 
+  export function userData_dir(...paths: string[]) {
+    return path.join((app || remote.app).getPath('userData'), ...paths);
+  }
+  export function logs_dir(...paths: string[]) {
+    return path.join((app || remote.app).getPath('logs'), ...paths);
+  }
+  export function temp_dir(...paths: string[]) {
+    return path.join((app || remote.app).getPath('temp'), ...paths);
+  }
+
   export function real_app_dir(...paths: string[]) {
     let appDir = '';
 
