@@ -2,6 +2,7 @@ import {createMuiTheme, ThemeOptions} from "@material-ui/core";
 import {remote} from 'electron';
 import {RendererSettings} from "./settings";
 import color from "color";
+import {objectMergeDeep} from "./js";
 
 export namespace Theme {
 
@@ -12,6 +13,14 @@ export namespace Theme {
   const shouldUseDarkTheme = () => nativeTheme.shouldUseDarkColors;
 
   const commonTheme: ThemeOptions = {
+    palette: {
+      primary: {
+        main: '#0082FF'
+      },
+      secondary: {
+        main: '#6E27CC'
+      }
+    },
     overrides: {
       MuiTooltip: {
         tooltip: {
@@ -21,19 +30,19 @@ export namespace Theme {
     }
   };
 
-  const darkTheme = createMuiTheme({
+  const darkTheme = createMuiTheme(objectMergeDeep({
     palette: {
       type: 'dark',
     }
-  });
+  }, commonTheme));
 
-  const lightTheme = createMuiTheme({
+  const lightTheme = createMuiTheme(objectMergeDeep({
     palette: {
       background: {
         paper: '#e8e8e8'
       }
     },
-  });
+  }, commonTheme));
 
   export const current = () => shouldUseDarkTheme() ? darkTheme : lightTheme;
   export const currentName = () => nativeTheme.themeSource;

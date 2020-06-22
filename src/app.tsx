@@ -256,6 +256,7 @@ const App = () => {
                       startIcon={<Videocam/>}
                       variant="contained"
                       className={css.processBtn}
+                      color={"secondary"}
                       disabled={!file}
                       onClick={startProcessing}
                     >Process
