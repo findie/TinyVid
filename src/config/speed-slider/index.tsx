@@ -101,7 +101,7 @@ export function SpeedSlider(props: SpeedSliderProps) {
             }
           }}
           start={['medium']}
-          onUpdate={values => props.onChange(FFHelpers.encodingSpeedPresetsDisplay.indexOf(values[0]))}
+          onUpdate={(values, handler, unencodedValues) => props.onChange(unencodedValues[0])}
         />
       </Box>
       <Tooltip title={props.lowSpeedTooltip} arrow>
