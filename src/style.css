@@ -2,7 +2,7 @@
 :local .display {
     flex-grow: 2;
     display: flex;
-    max-height: calc(100% - 204px);
+    max-height: calc(100% - 194px);
 }
 
 :local .header {
@@ -43,7 +43,7 @@
     /*width: 80px;*/
     /*z-index: 1;*s/
     /*margin-left: 8px;*/
-    height: 84px;
+    height: 68px;
 }
 
 :local .controls .settings {
@@ -102,6 +102,7 @@ body {
 
 :global .noUi-tooltip {
     display: none;
+    white-space: pre;
 }
 
 :global .noUi-active .noUi-tooltip {
@@ -118,10 +119,15 @@ body {
 
 :global .noUi-horizontal .noUi-handle {
     border-radius: 50%;
-    height: 34px;
-    top: -12px;
+    width: 28px;
+    height: 28px;
+
+    /* top = height/2 - connectsHeight/2*/
+    top: -11px;
+    /* right = width/2 */
+    right: -14px;
     border: none;
-    box-shadow: 0 0px 4px 0 #303030;
+    box-shadow: 0 0px 2px 0 #303030;
 }
 
 :global .noUi-handle::before, :global .noUi-handle::after {
@@ -133,7 +139,7 @@ body {
 }
 
 :global .noUi-horizontal {
-    height: 10px;
+    height: 6px;
 }
 
 :global .noUi-connects {

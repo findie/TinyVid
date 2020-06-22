@@ -3,6 +3,45 @@ import {VideoSettings} from "../../types";
 
 export namespace FFHelpers {
 
+  // https://write.corbpie.com/ffmpeg-preset-comparison-x264-2019-encode-speed-and-file-size/
+  export const benchmarksH264: ({ [s in EncodingSpeedPresetsType]: { fps: number, kbit: number } }) = {
+    veryslow: {
+      fps: 19,
+      kbit: 2970
+    },
+    slower: {
+      fps: 33,
+      kbit: 3185,
+    },
+    slow: {
+      fps: 61,
+      kbit: 3200
+    },
+    medium: {
+      fps: 87,
+      kbit: 3271
+    },
+    fast: {
+      fps: 95,
+      kbit: 3379
+    },
+    faster: {
+      fps: 101,
+      kbit: 3600//3226// ????
+    },
+    veryfast: {
+      fps: 114,
+      kbit: 4000,//2816// ????
+    },
+    superfast: {
+      fps: 115,
+      kbit: 5050
+    },
+    ultrafast: {
+      fps: 123,
+      kbit: 7666
+    }
+  }
 
   export const ffprobe: string = ResourceHelpers.bin_dir('ffprobe');
   export const ffmpeg: string = ResourceHelpers.bin_dir('ffmpeg');
@@ -31,8 +70,8 @@ export namespace FFHelpers {
     'medium',
     'slow',
     'slower',
-    'very slow'
-  ]
+    `very slow`
+  ];
 
   export type EncodingSpeedPresetsType =
     'ultrafast'

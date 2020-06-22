@@ -52,6 +52,26 @@ interface SpeedSliderProps {
   disabled?: boolean
 }
 
+
+function wrapPresetNameInBenchmarks(preset: FFHelpers.EncodingSpeedPresetsType): string {
+  const { medium } = FFHelpers.benchmarksH264;
+  const target = FFHelpers.benchmarksH264[preset];
+
+  const targetIndex = FFHelpers.encodingSpeedPresets.findIndex(x => x === preset);
+  const mediumIndex = FFHelpers.encodingSpeedPresets.findIndex(x => x === 'medium');
+
+  const presetName = FFHelpers.encodingSpeedPresetsDisplay[targetIndex];
+
+  if (targetIndex > mediumIndex) {
+    return `<strong>${presetName}</strong>\n${Math.round((1 - target.fps / medium.fps) * 100)}% slower than medium\n${Math.round((1 - target.kbit / medium.kbit) * 100)}% better than medium`
+  }
+  if (targetIndex < mediumIndex) {
+    return `<strong>${presetName}</strong>\n${Math.round((target.fps / medium.fps - 1) * 100)}% faster than medium\n${Math.round((1 - medium.kbit / target.kbit) * 100)}% worse than medium`
+  }
+
+  return `<string>${presetName}</string>`;
+}
+
 export function SpeedSlider(props: SpeedSliderProps) {
   const classes = sliderTheme()();
 
@@ -67,17 +87,17 @@ export function SpeedSlider(props: SpeedSliderProps) {
         <Nouislider
           range={{
             min: [0, 1],
-            '50%': [5, 1],
+            '50%': [2, 1],
             max: FFHelpers.encodingSpeedPresets.length - 1
           }}
           tooltips={true}
           disabled={props.disabled}
           format={{
             to(val: number): string {
-              return FFHelpers.encodingSpeedPresetsDisplay[Math.round(val)];
+              return wrapPresetNameInBenchmarks(FFHelpers.encodingSpeedPresets[Math.round(val)]);
             },
             from(val: FFHelpers.EncodingSpeedPresetsType): number {
-              return FFHelpers.encodingSpeedPresetsDisplay.indexOf(val);
+              return FFHelpers.encodingSpeedPresetsDisplay.findIndex(x => val.indexOf(x) === 0);
             }
           }}
           start={['medium']}

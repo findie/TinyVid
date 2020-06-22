@@ -11,10 +11,20 @@ export namespace Theme {
 
   const shouldUseDarkTheme = () => nativeTheme.shouldUseDarkColors;
 
+  const commonTheme: ThemeOptions = {
+    overrides: {
+      MuiTooltip: {
+        tooltip: {
+          fontSize: '0.8rem'
+        }
+      }
+    }
+  };
+
   const darkTheme = createMuiTheme({
     palette: {
       type: 'dark',
-    },
+    }
   });
 
   const lightTheme = createMuiTheme({
