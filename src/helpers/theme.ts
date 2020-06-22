@@ -10,7 +10,7 @@ export namespace Theme {
 
   const nativeTheme = remote.nativeTheme;
 
-  const shouldUseDarkTheme = () => nativeTheme.shouldUseDarkColors;
+  export const shouldUseDarkTheme = () => nativeTheme.shouldUseDarkColors;
 
   const commonTheme: ThemeOptions = {
     palette: {
@@ -26,6 +26,11 @@ export namespace Theme {
         tooltip: {
           fontSize: '0.8rem'
         }
+      },
+      MuiLink: {
+        root: {
+          cursor: 'pointer'
+        }
       }
     }
   };
@@ -33,6 +38,13 @@ export namespace Theme {
   const darkTheme = createMuiTheme(objectMergeDeep({
     palette: {
       type: 'dark',
+    },
+    overrides: {
+      MuiLink: {
+        root: {
+          color: 'white'
+        }
+      }
     }
   }, commonTheme));
 
@@ -42,6 +54,13 @@ export namespace Theme {
         paper: '#e8e8e8'
       }
     },
+    overrides: {
+      MuiLink: {
+        root: {
+          color: 'black'
+        }
+      }
+    }
   }, commonTheme));
 
   export const current = () => shouldUseDarkTheme() ? darkTheme : lightTheme;

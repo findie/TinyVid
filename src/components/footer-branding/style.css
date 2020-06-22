@@ -1,0 +1,29 @@
+:local .main {
+    display: flex;
+    opacity: 0.7;
+    font-size: 70%;
+}
+
+:local .left {
+    flex-grow: 1;
+}
+
+:local .right {
+    display: flex;
+    align-items: center;
+}
+
+:local .heart {
+    width: 16px!important;
+    height: 16px!important;;
+}
+
+:local .kamua {
+    height: 12px;
+    padding-left: 2px;
+}
+
+:local .logo {
+    height: 12px;
+    width: 12px;
+}

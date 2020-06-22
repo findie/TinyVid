@@ -40,6 +40,17 @@ module.exports = {
         test: /node_modules.*\.css$/,
         use: [MiniCssExtractPlugin.loader, 'css-loader'],
       },
+      {
+        test: /\.(png|jpg|gif)$/i,
+        use: [
+          {
+            loader: 'url-loader',
+            options: {
+              limit: false,
+            },
+          },
+        ],
+      },
     ],
   },
   devServer: {

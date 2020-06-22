@@ -24,7 +24,19 @@ import {RenderStrategy} from "../electron/types";
 import {DetailsComms, TrimComms} from "./helpers/comms";
 import {Loading} from "./components/loading";
 
-import {Box, Button, FormControl, InputLabel, MenuItem, Paper, Select, ThemeProvider} from "@material-ui/core";
+import {
+  Box,
+  Button,
+  Divider,
+  FormControl,
+  InputLabel,
+  Link,
+  MenuItem,
+  Paper,
+  Select,
+  ThemeProvider,
+  Typography
+} from "@material-ui/core";
 import {Theme} from "./helpers/theme";
 import {DurationInfo} from "./components/duration-info";
 import {ErrorLike} from "../electron/protocols/base-protocols";
@@ -34,7 +46,8 @@ import {ThemeSwitch} from "./components/theme-switch";
 import {BitrateWarnings} from "./components/bitrate-warnings";
 import {PreventClosing} from "./components/prevent-closing";
 import {remote} from "electron";
-import {Videocam} from "@material-ui/icons";
+import {Favorite, Videocam} from "@material-ui/icons";
+import {FooterBranding} from "./components/footer-branding";
 
 const defaultMaxFileSizeStrategy: RenderStrategy = {
   type: 'max-file-size',
@@ -225,7 +238,7 @@ const App = () => {
                   </div>
                 </div>
 
-                <Box marginTop={2} style={{display: 'flex'}}>
+                <Box marginTop={2} style={{ display: 'flex' }}>
                   <SpeedSlider
                     className={css.speedSlider}
                     highSpeedText={strategyType === 'max-file-size' ? 'Faster Processing' : 'Faster Processing'}
@@ -250,7 +263,6 @@ const App = () => {
                       )
                     }
                   />
-
                   <Box marginLeft={2}>
                     <Button
                       startIcon={<Videocam/>}
@@ -263,6 +275,13 @@ const App = () => {
                     </Button>
                   </Box>
                 </Box>
+
+                <Box paddingY={1}>
+                  <Divider/>
+                </Box>
+
+                <FooterBranding/>
+
               </div>
 
             </Box>
