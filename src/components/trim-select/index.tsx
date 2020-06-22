@@ -7,6 +7,7 @@ import color from 'color'
 import * as css from './style.css';
 import './style.css'
 import {arrIsConsistent} from "../../helpers/math";
+import {Box} from "@material-ui/core"
 
 export interface TrimSliderProps {
   duration: number
@@ -91,7 +92,7 @@ export const TrimSlider = (props: TrimSliderProps) => {
   }
 
   return (
-    <div className={classes.root + ' ' + (props.disabled ? classes.rootDisabled : '')}>
+    <Box marginY={2} marginX={2} className={classes.root + ' ' + (props.disabled ? classes.rootDisabled : '')}>
       <Nouislider
         className={css.slider}
         disabled={props.disabled}
@@ -113,7 +114,7 @@ export const TrimSlider = (props: TrimSliderProps) => {
         behaviour={'drag'}
         // behaviour={'drag-snap'}
       />
-    </div>
+    </Box>
   );
 
 }

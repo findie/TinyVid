@@ -24,7 +24,7 @@ import {RenderStrategy} from "../electron/types";
 import {DetailsComms, TrimComms} from "./helpers/comms";
 import {Loading} from "./components/loading";
 
-import {Box, Button, FormControl, InputLabel, MenuItem, Paper, Select, ThemeProvider} from "@material-ui/core";
+import {Box, Button, FormControl, InputLabel, MenuItem, Paper, Select, ThemeProvider, Divider} from "@material-ui/core";
 import {Theme} from "./helpers/theme";
 import {DurationInfo} from "./components/duration-info";
 import {ErrorLike} from "../electron/protocols/base-protocols";
@@ -163,7 +163,7 @@ const App = () => {
             null
           }
 
-          <Box paddingX={2} paddingY={2}>
+          <Box>
             <TrimSlider
               step={videoDetails ? 1 / videoDetails.fps : 0}
               disabled={!file}
@@ -179,9 +179,9 @@ const App = () => {
               }}
             />
 
-            <hr/>
+            <Divider/>
 
-            <div className={css.controls}>
+            <Box marginX={2} marginY={1} className={css.controls}>
               <div className={css.rows + ' ' + css.flexGrow}>
 
                 <div className={css.settings}>
@@ -225,7 +225,9 @@ const App = () => {
                     />
                   </div>
                 </div>
-                <hr/>
+
+                <Divider/>
+
                 <SpeedSlider
                   className={css.speedSlider}
                   highSpeedText={strategyType === 'max-file-size' ? 'Faster Processing' : 'Faster Processing'}
@@ -261,7 +263,7 @@ const App = () => {
                 >Process
                 </Button>
               </Box>
-            </div>
+            </Box>
           </Box>
         </Paper>
 

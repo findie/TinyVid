@@ -64,7 +64,7 @@ export function SpeedSlider(props: SpeedSliderProps) {
           {props.highSpeedText}
         </Typography>
       </Tooltip>
-      <Box marginX={3} className={css.slider}>
+      <Box marginX={3} marginY={2} className={css.slider}>
         <Nouislider
           range={{
             min: [0, 1],
