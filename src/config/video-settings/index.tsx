@@ -42,7 +42,7 @@ export function ConfigVideoSettings(props: ConfigVideoSettingsProps) {
   }, [props.details]);
 
   return (<div className={css.maxFileSizeConfig}>
-    <Box marginRight={1}>
+    <Box marginRight={2}>
     <FormControl>
       <InputLabel id={'frame-size'}>Resolution</InputLabel>
       <Select

@@ -69,7 +69,7 @@ function wrapPresetNameInBenchmarks(preset: FFHelpers.EncodingSpeedPresetsType):
     return `<strong>${presetName}</strong>\n${Math.round((target.fps / medium.fps - 1) * 100)}% faster than medium\n${Math.round((1 - medium.kbit / target.kbit) * 100)}% worse than medium`
   }
 
-  return `<string>${presetName}</string>`;
+  return `<strong>${presetName}</strong>`;
 }
 
 export function SpeedSlider(props: SpeedSliderProps) {

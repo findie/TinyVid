@@ -24,7 +24,7 @@ import {RenderStrategy} from "../electron/types";
 import {DetailsComms, TrimComms} from "./helpers/comms";
 import {Loading} from "./components/loading";
 
-import {Box, Button, FormControl, InputLabel, MenuItem, Paper, Select, ThemeProvider, Divider} from "@material-ui/core";
+import {Box, Button, FormControl, InputLabel, MenuItem, Paper, Select, ThemeProvider} from "@material-ui/core";
 import {Theme} from "./helpers/theme";
 import {DurationInfo} from "./components/duration-info";
 import {ErrorLike} from "../electron/protocols/base-protocols";
@@ -34,6 +34,7 @@ import {ThemeSwitch} from "./components/theme-switch";
 import {BitrateWarnings} from "./components/bitrate-warnings";
 import {PreventClosing} from "./components/prevent-closing";
 import {remote} from "electron";
+import {Videocam} from "@material-ui/icons";
 
 const defaultMaxFileSizeStrategy: RenderStrategy = {
   type: 'max-file-size',
@@ -179,8 +180,6 @@ const App = () => {
               }}
             />
 
-            <Divider/>
-
             <Box marginX={2} marginY={1} className={css.controls}>
               <div className={css.rows + ' ' + css.flexGrow}>
 
@@ -226,43 +225,45 @@ const App = () => {
                   </div>
                 </div>
 
-                <Divider/>
+                <Box marginTop={2} style={{display: 'flex'}}>
+                  <SpeedSlider
+                    className={css.speedSlider}
+                    highSpeedText={strategyType === 'max-file-size' ? 'Faster Processing' : 'Faster Processing'}
+                    lowSpeedText={strategyType === 'max-file-size' ? 'Better Quality' : 'Smaller File Size'}
 
-                <SpeedSlider
-                  className={css.speedSlider}
-                  highSpeedText={strategyType === 'max-file-size' ? 'Faster Processing' : 'Faster Processing'}
-                  lowSpeedText={strategyType === 'max-file-size' ? 'Better Quality' : 'Smaller File Size'}
-
-                  highSpeedTooltip={
-                    strategyType === 'max-file-size' ?
-                      'Process will finish faster but video quality will suffer' :
-                      'Process will finish faster but file size will be larger'
-                  }
-                  lowSpeedTooltip={
-                    strategyType === 'max-file-size' ?
-                      'Process will finish slower but video will be at the best quality it can' :
-                      'Process will finish slower but file will be at the lowest size quality'
-                  }
+                    highSpeedTooltip={
+                      strategyType === 'max-file-size' ?
+                        'Process will finish faster but video quality will suffer' :
+                        'Process will finish faster but file size will be larger'
+                    }
+                    lowSpeedTooltip={
+                      strategyType === 'max-file-size' ?
+                        'Process will finish slower but video will be at the best quality it can' :
+                        'Process will finish slower but file will be at the lowest size quality'
+                    }
 
 
-                  onChange={
-                    useCallback(
-                      speedIndex => setStrategySpeed(speedIndex),
-                      [strategySpeed, setStrategySpeed]
-                    )
-                  }
-                />
+                    onChange={
+                      useCallback(
+                        speedIndex => setStrategySpeed(speedIndex),
+                        [strategySpeed, setStrategySpeed]
+                      )
+                    }
+                  />
+
+                  <Box marginLeft={2}>
+                    <Button
+                      startIcon={<Videocam/>}
+                      variant="contained"
+                      className={css.processBtn}
+                      disabled={!file}
+                      onClick={startProcessing}
+                    >Process
+                    </Button>
+                  </Box>
+                </Box>
               </div>
 
-              <Box marginLeft={2}>
-                <Button
-                  variant="contained"
-                  className={css.processBtn}
-                  disabled={!file}
-                  onClick={startProcessing}
-                >Process
-                </Button>
-              </Box>
             </Box>
           </Box>
         </Paper>

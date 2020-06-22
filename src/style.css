@@ -2,7 +2,7 @@
 :local .display {
     flex-grow: 2;
     display: flex;
-    max-height: calc(100% - 194px);
+    max-height: calc(100% - 200px);
 }
 
 :local .header {
@@ -43,7 +43,7 @@
     /*width: 80px;*/
     /*z-index: 1;*s/
     /*margin-left: 8px;*/
-    height: 68px;
+    /*height: 68px;*/
 }
 
 :local .controls .settings {
@@ -59,6 +59,7 @@
 }
 
 :local .controls .settings .right {
+    margin-right: 140px;
 }
 
 :local .controls .speed-slider {
