@@ -3,13 +3,23 @@ import css from './style.css'
 import {remote} from 'electron'
 
 import {Box, Button, Tooltip, Typography} from "@material-ui/core";
+import {makeStyles} from "@material-ui/core/styles";
+import {Theme} from "../helpers/theme";
 
 export interface ChooseFileProps {
   fileCB: (path: string) => void
   className?: string
 }
 
+const styles = () => makeStyles({
+  'textField': {
+    background: Theme.current().palette.background.default
+  }
+})
+
 export const ChooseFile = (props: ChooseFileProps) => {
+
+  const classes = styles()();
 
   const [file, setFile] = useState('');
 
@@ -44,7 +54,7 @@ export const ChooseFile = (props: ChooseFileProps) => {
       >
         Select File
       </Button>
-      <Box marginLeft={2} className={css.text}>
+      <Box paddingLeft={2} className={css.text + ' ' + classes.textField}>
         <Tooltip title={file ? file : 'No file chosen...'} arrow>
           <Typography noWrap>
             {file ? file : 'No file chosen...'}
