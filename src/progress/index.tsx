@@ -8,7 +8,6 @@ import {Box, Button, CircularProgress, Grid, LinearProgress, Paper, Typography} 
 import * as path from 'path';
 import moment from "moment";
 import {CodeDisplay} from "../components/code";
-import {quality2name} from "../config/constant-quality";
 import {bps2text} from "../helpers/math";
 
 interface ProgressProps {
@@ -222,26 +221,36 @@ export const ProcessingOverlay = (props: ProcessingOverlayProps) => {
 
       if (task?.error) {
         setError(task.error);
+        remote.getCurrentWindow().setProgressBar(1, { mode: "error" });
         clearInterval(interval);
       }
 
       if (task?.progress) {
         setProgress(task.progress);
+        remote.getCurrentWindow().setProgressBar(
+          task.progress.progress || 0,
+          {
+            mode: "normal"
+          }
+        );
       }
 
       if (!task || task.done) {
         setIsDone(true);
         clearInterval(interval);
+        remote.getCurrentWindow().setProgressBar(0, { mode: "none" });
       }
 
       if (task && task.cancelled) {
         setCancelled(true);
+        remote.getCurrentWindow().setProgressBar(0, { mode: "none" });
       }
 
     }, 1000);
 
     return function cleanup() {
       clearInterval(interval);
+      remote.getCurrentWindow().setProgressBar(0, { mode: "none" });
     }
   }, [])
 
