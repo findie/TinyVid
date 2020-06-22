@@ -16,7 +16,7 @@ export function FooterBranding() {
   const classes = styles();
 
   return (
-    <div className={css.main + ' ' + classes}>
+    <div className={css.main + ' ' + classes.root}>
       <div className={css.left}>
         <Link
           href={'https://github.com/legraphista/QuickTrim/issues/new?assignees=legraphista&labels=enhancement&template=feature_request.md&title='}
