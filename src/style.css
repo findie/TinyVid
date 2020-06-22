@@ -115,3 +115,27 @@ body {
 :global .noUi-touch-area:focus + .noUi-tooltip {
     display: block;
 }
+
+:global .noUi-horizontal .noUi-handle {
+    border-radius: 50%;
+    height: 34px;
+    top: -12px;
+    border: none;
+    box-shadow: 0 0px 4px 0 #303030;
+}
+
+:global .noUi-handle::before, :global .noUi-handle::after {
+    display: none;
+}
+
+:global .noUi-target {
+    border: none;
+}
+
+:global .noUi-horizontal {
+    height: 10px;
+}
+
+:global .noUi-connects {
+    box-shadow: inset -1px -1px 2px 0px #00000047;
+}

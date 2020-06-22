@@ -1,6 +1,7 @@
 import {createMuiTheme, ThemeOptions} from "@material-ui/core";
 import {remote} from 'electron';
 import {RendererSettings} from "./settings";
+import color from "color";
 
 export namespace Theme {
 
@@ -19,13 +20,17 @@ export namespace Theme {
   const lightTheme = createMuiTheme({
     palette: {
       background: {
-        paper: '#f3f3f3'
+        paper: '#e8e8e8'
       }
     },
   });
 
   export const current = () => shouldUseDarkTheme() ? darkTheme : lightTheme;
   export const currentName = () => nativeTheme.themeSource;
+
+  export const disabledColor = (c: string) => shouldUseDarkTheme() ?
+    color(c).desaturate(0.7).toString() :
+    color(c).desaturate(0.7).lighten(0.5).toString()
 
   export const set = (s: ThemeNames) => {
     nativeTheme.themeSource = s;

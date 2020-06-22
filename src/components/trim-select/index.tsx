@@ -26,8 +26,7 @@ const sliderTheme = () => makeStyles({
       background: Theme.current().palette.primary.main,
     },
     '& .noUi-handle': {
-      background: color(Theme.current().palette.primary.main).saturate(0.5).toString(),
-      boxShadow: 'none'
+      background: color(Theme.current().palette.primary.main).saturate(0.5).toString()
     },
 
     '& .noUi-tooltip': {
@@ -38,10 +37,10 @@ const sliderTheme = () => makeStyles({
   },
   'rootDisabled': {
     '& .noUi-connect': {
-      background: color(Theme.current().palette.primary.main).desaturate(0.7).toString(),
+      background: Theme.disabledColor(Theme.current().palette.primary.main),
     },
     '& .noUi-handle': {
-      background: color(Theme.current().palette.primary.main).desaturate(0.7).toString(),
+      background: Theme.disabledColor(Theme.current().palette.primary.main),
     }
   }
 });
