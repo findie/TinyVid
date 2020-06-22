@@ -1,12 +1,12 @@
 import "source-map-support/register"
 import "./helpers/log"
-
 import {app, BrowserWindow, session, shell} from 'electron';
 import * as path from 'path';
 import * as url from 'url';
 import * as os from 'os';
 import {Protocols} from "./protocols";
 import {TrimProtocol} from "./protocols/proto/trim";
+import {update} from "./update";
 
 let mainWindow: Electron.BrowserWindow | null;
 
@@ -87,7 +87,7 @@ app.on('web-contents-created', (event, contents) => {
   })
 });
 
-app.on('ready', () => {
+app.on('ready', async () => {
   Protocols.register();
   createWindow();
 
@@ -97,6 +97,13 @@ app.on('ready', () => {
     )
       .then(ex => console.log('Registered extension ' + ex.name))
       .catch(e => console.error('Failed to register extension fmkadmapgofadopljbjfkapdkoienihi (React Dev Tools)', e));
+  }
+
+  try {
+    await update();
+  } catch (e) {
+    console.error('update failed!');
+    console.error(e);
   }
 });
 app.allowRendererProcessReuse = true;

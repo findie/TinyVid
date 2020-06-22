@@ -66,6 +66,11 @@
       "dist",
       "icon.png"
     ],
+    "publish": [{
+      "provider": "github",
+      "owner": "legraphista",
+      "repo": "QuickTrim"
+    }],
     "directories": {
       "buildResources": "build",
       "output": "out"
@@ -103,7 +108,10 @@
     "linux": {
       "target": [
         "dir",
-        "zip"
+        "zip",
+        "appImage",
+        "snap",
+        "deb"
       ],
       "extraFiles": [
         "bin/linux-64"
