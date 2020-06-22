@@ -1,7 +1,7 @@
 import "source-map-support/register"
 import "./helpers/log"
 
-import {app, BrowserWindow, session} from 'electron';
+import {app, BrowserWindow, session, shell} from 'electron';
 import * as path from 'path';
 import * as url from 'url';
 import * as os from 'os';
@@ -13,7 +13,7 @@ let mainWindow: Electron.BrowserWindow | null;
 function createWindow() {
   mainWindow = new BrowserWindow({
     icon: path.join(app.getAppPath(), 'icon.png'),
-    title: 'QuickTrim',
+    title: `QuickTrim - v${app.getVersion()}`,
     center: true,
     autoHideMenuBar: true,
     width: 900,
@@ -25,6 +25,10 @@ function createWindow() {
       enableRemoteModule: true,
       webSecurity: true,
     },
+  });
+
+  mainWindow.on('page-title-updated', (evt) => {
+    evt.preventDefault();
   });
 
   console.log('NODE_ENV', process.env.NODE_ENV);
@@ -65,6 +69,24 @@ function createWindow() {
 }
 
 Protocols.grantPrivileges();
+
+
+app.on('web-contents-created', (event, contents) => {
+  contents.on('will-navigate', (event, navigationUrl) => {
+    const parsedUrl = new URL(navigationUrl)
+
+    event.preventDefault();
+  });
+
+  contents.on('new-window', async (event, navigationUrl) => {
+    // In this example, we'll ask the operating system
+    // to open this event's url in the default browser.
+    event.preventDefault();
+
+    await shell.openExternal(navigationUrl);
+  })
+});
+
 app.on('ready', () => {
   Protocols.register();
   createWindow();
