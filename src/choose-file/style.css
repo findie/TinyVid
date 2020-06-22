@@ -1,6 +1,6 @@
 :local .main {
     display: flex;
-    align-items: baseline;
+    align-items: center;
     padding: 4px;
     cursor: pointer;
 }
@@ -11,7 +11,7 @@
 
 :local .text {
     max-width: calc(100% - 144px);
-    width: 100%;
+    flex-grow: 1;
     border-radius: 0 8px 8px 0;
     /*border-color: black;*/
     /*border-style: solid;*/

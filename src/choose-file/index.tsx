@@ -5,6 +5,7 @@ import {remote} from 'electron'
 import {Box, Button, Tooltip, Typography} from "@material-ui/core";
 import {makeStyles} from "@material-ui/core/styles";
 import {Theme} from "../helpers/theme";
+import {VideoLibrary} from "@material-ui/icons"
 
 export interface ChooseFileProps {
   fileCB: (path: string) => void
@@ -51,8 +52,9 @@ export const ChooseFile = (props: ChooseFileProps) => {
       <Button
         variant="contained"
         className={css.button}
+        startIcon={<VideoLibrary/>}
       >
-        Select File
+        Open File
       </Button>
       <Box paddingLeft={2} className={css.text + ' ' + classes.textField}>
         <Tooltip title={file ? file : 'No file chosen...'} arrow>
