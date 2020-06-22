@@ -1,4 +1,5 @@
 import {spawn, SpawnOptions} from 'child_process'
+import * as path from "path";
 
 export namespace ProcessHelpers {
 
@@ -38,7 +39,7 @@ export namespace ProcessHelpers {
       p.once('close', (code, sig) => {
 
         if (code || sig) {
-          return rej(new ProcessError(`${exec}: ${stderr || 'unknown failure'}`, code, sig));
+          return rej(new ProcessError(`${path.basename(exec)}: ${stderr || 'unknown failure'}`, code, sig));
         }
 
         return res();

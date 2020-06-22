@@ -106,6 +106,7 @@ export namespace VideoDetails {
 
     const data = await ProcessHelpers.simpleSpawn(FFHelpers.ffprobe, [
       '-i', file,
+      '-hide_banner',
       '-show_format',
       '-show_streams',
       '-count_packets',
