@@ -238,12 +238,12 @@ export const ProcessingOverlay = (props: ProcessingOverlayProps) => {
       if (!task || task.done) {
         setIsDone(true);
         clearInterval(interval);
-        remote.getCurrentWindow().setProgressBar(0, { mode: "none" });
+        remote.getCurrentWindow().setProgressBar(-1, { mode: "none" });
       }
 
       if (task && task.cancelled) {
         setCancelled(true);
-        remote.getCurrentWindow().setProgressBar(0, { mode: "none" });
+        remote.getCurrentWindow().setProgressBar(-1, { mode: "none" });
       }
 
     }, 1000);
