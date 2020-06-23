@@ -24,19 +24,7 @@ import {RenderStrategy} from "../electron/types";
 import {DetailsComms, TrimComms} from "./helpers/comms";
 import {Loading} from "./components/loading";
 
-import {
-  Box,
-  Button,
-  Divider,
-  FormControl,
-  InputLabel,
-  Link,
-  MenuItem,
-  Paper,
-  Select,
-  ThemeProvider,
-  Typography
-} from "@material-ui/core";
+import {Box, Button, Divider, FormControl, InputLabel, MenuItem, Paper, Select, ThemeProvider} from "@material-ui/core";
 import {Theme} from "./helpers/theme";
 import {DurationInfo} from "./components/duration-info";
 import {ErrorLike} from "../electron/protocols/base-protocols";
@@ -46,7 +34,7 @@ import {ThemeSwitch} from "./components/theme-switch";
 import {BitrateWarnings} from "./components/bitrate-warnings";
 import {PreventClosing} from "./components/prevent-closing";
 import {remote} from "electron";
-import {Favorite, Videocam} from "@material-ui/icons";
+import {Videocam} from "@material-ui/icons";
 import {FooterBranding} from "./components/footer-branding";
 
 const defaultMaxFileSizeStrategy: RenderStrategy = {
@@ -280,8 +268,9 @@ const App = () => {
                   <Divider/>
                 </Box>
 
-                <FooterBranding/>
-
+                <Box marginBottom={-1}>
+                  <FooterBranding/>
+                </Box>
               </div>
 
             </Box>

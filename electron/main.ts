@@ -75,7 +75,16 @@ app.on('web-contents-created', (event, contents) => {
   contents.on('will-navigate', (event, navigationUrl) => {
     const parsedUrl = new URL(navigationUrl)
 
-    event.preventDefault();
+    if (app.isPackaged && parsedUrl.hostname === null) {
+      return;
+    }
+
+    if (!app.isPackaged && parsedUrl.hostname === 'localhost') {
+      return;
+    }
+
+    console.warn('prevented navigation to', navigationUrl);
+    return event.preventDefault();
   });
 
   contents.on('new-window', async (event, navigationUrl) => {
