@@ -12,7 +12,7 @@ export namespace DetailsProtocol {
     }
 
     async onRequest(req: Electron.Request, payload: any): Promise<DetailsProtocolResponse> {
-      const pathname = req.url.replace(`${this.protocolName}://`, '');
+      const pathname = decodeURIComponent(req.url.replace(`${this.protocolName}://`, ''));
 
       return await VideoDetails.details(pathname);
     }

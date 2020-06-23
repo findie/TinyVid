@@ -30,7 +30,7 @@ export namespace TrimProtocol {
     }
 
     async onRequest(req: Electron.Request, payload: TrimPostData): Promise<any> {
-      const pathname = req.url.replace(`${this.protocolName}://`, '');
+      const pathname = decodeURIComponent(req.url.replace(`${this.protocolName}://`, ''));
 
       switch (req.method) {
         case 'POST':

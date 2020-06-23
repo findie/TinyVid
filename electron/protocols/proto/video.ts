@@ -10,7 +10,7 @@ export namespace VideoProtocol {
     }
 
     async onRequest(req: Electron.Request) {
-      const pathname = req.url.replace(`${this.protocolName}://`, '');
+      const pathname = decodeURIComponent(req.url.replace(`${this.protocolName}://`, ''));
 
       return {
         path: pathname,
