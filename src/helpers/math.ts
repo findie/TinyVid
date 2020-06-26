@@ -20,7 +20,7 @@ export function range(start: number, end: number, step: number): number[] {
 
 export function round(n: number, decimals: number): number {
   const p = 10 ** decimals;
-  return Math.round(n * p) / p;
+  return Math.round(n * p + Number.EPSILON) / p;
 }
 
 export function bps2text(bps: number): string {
@@ -50,4 +50,16 @@ export function arrIsConsistent(arr: number[]): boolean {
     if (template !== arr[i]) return false;
   }
   return true;
+}
+
+function pad2(n: number, decimals = 0): string {
+  return n >= 10 ? n.toFixed(decimals) : `0${n.toFixed(decimals)}`;
+}
+
+export function seconds2time(seconds: number): string {
+  const h = Math.floor(seconds / 3600);
+  const m = Math.floor(seconds / 60) % 60;
+  const s = seconds % 60;
+
+  return `${h ? `${pad2(h)}h ` : ''}${m ? `${pad2(m)}m ` : ''}${pad2(s, 2)}s`
 }
