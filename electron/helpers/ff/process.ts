@@ -68,7 +68,7 @@ export namespace VideoProcess {
         '-ss', start.toFixed(6),
         '-to', end.toFixed(6),
         '-i', file,
-        '-vf', settings2filters(settings).join(';'),
+        '-vf', settings2filters(settings).join(','),
         ...strategy2params(strategy, end - start),
         '-c:v', 'libx264',
         out, '-y'
