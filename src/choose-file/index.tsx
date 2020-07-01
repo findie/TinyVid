@@ -32,7 +32,7 @@ export const ChooseFile = (props: ChooseFileProps) => {
         filters: [
           {
             name: 'Video',
-            extensions: ['mp4']
+            extensions: ['mp4', 'mov', 'm4v']
           }
         ]
       });
