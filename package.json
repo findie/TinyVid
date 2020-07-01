@@ -1,6 +1,6 @@
 {
   "name": "QuickTrim",
-  "version": "0.12.2",
+  "version": "0.12.3",
   "main": "./dist/main.js",
   "author": "Stefan-Gabriel Muscalu<stefan.gabriel.muscalu@gmail.com>",
   "description": "Simple to use video trimmer & compressor",
