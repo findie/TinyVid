@@ -12,7 +12,7 @@ export const Display = forwardRef<HTMLVideoElement, DisplayProps>((props: Displa
   return <div className={className}>
     <video className={css.video}
            ref={ref}
-           src={props.file ? 'video://' + props.file : ''}
+           src={props.file ? 'video://' + encodeURIComponent(props.file) : ''}
            controls={false}
            {...p}
     >

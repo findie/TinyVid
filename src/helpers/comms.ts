@@ -28,7 +28,7 @@ export namespace TrimComms {
 
   export async function startProcess(fileIn: string, fileOut: string, range: { start: number, end: number }, strategy: RenderStrategy, settings: VideoSettings): Promise<TrimProtocol.TrimStartResponse> {
 
-    const f = await fetch('trim://' + fileIn, {
+    const f = await fetch('trim://' + encodeURIComponent(fileIn), {
       method: 'post',
       body: JSON.stringify({
         start: range.start,
@@ -67,7 +67,7 @@ export namespace DetailsComms {
   }
 
   export async function getDetails(file: string): Promise<DetailsProtocol.DetailsProtocolResponse> {
-    const f = await fetch('details://' + file, {
+    const f = await fetch('details://' + encodeURIComponent(file), {
       method: 'get',
 
     });
