@@ -3,6 +3,21 @@
     flex-grow: 2;
     display: flex;
     max-height: calc(100% - 232px);
+    position: relative;
+}
+
+:local .display .children {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+
+    display: flex;
+    flex-flow: column;
+    align-items: center;
+    align-content: center;
+    justify-content: center;
 }
 
 :local .header {

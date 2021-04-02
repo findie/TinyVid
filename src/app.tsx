@@ -24,7 +24,19 @@ import {RenderStrategy} from "../electron/types";
 import {DetailsComms, TrimComms} from "./helpers/comms";
 import {Loading} from "./components/loading";
 
-import {Box, Button, Divider, FormControl, InputLabel, MenuItem, Paper, Select, ThemeProvider} from "@material-ui/core";
+import {
+  Box,
+  Button,
+  Divider,
+  FormControl,
+  Icon,
+  InputLabel,
+  MenuItem,
+  Paper,
+  Select,
+  ThemeProvider,
+  Typography
+} from "@material-ui/core";
 import {Theme} from "./helpers/theme";
 import {DurationInfo} from "./components/duration-info";
 import {ErrorLike} from "../electron/protocols/base-protocols";
@@ -34,10 +46,11 @@ import {ThemeSwitch} from "./components/theme-switch";
 import {BitrateWarnings} from "./components/bitrate-warnings";
 import {PreventClosing} from "./components/prevent-closing";
 import {remote} from "electron";
-import {Videocam} from "@material-ui/icons";
+import {BrokenImage, Videocam} from "@material-ui/icons";
 import {FooterBranding} from "./components/footer-branding";
 
 import '../common/sentry';
+import {VideoHelpers} from "./helpers/video";
 
 const defaultMaxFileSizeStrategy: RenderStrategy = {
   type: 'max-file-size',
@@ -133,6 +146,13 @@ const App = () => {
     }
   }, [error]);
 
+  const mediaNoVideo = videoDetails && !videoDetails.videoCodec;
+  const mediaNotSupported = videoDetails && (
+    !VideoHelpers.supportedVideoCodec(videoDetails.videoCodec || '') ||
+    !VideoHelpers.supportedFormatContainer(videoDetails.containerFormats) ||
+    !VideoHelpers.supportedPixelFormat(videoDetails.pixelFormat || '')
+  );
+
   return (
     <ThemeProvider theme={Theme.current()}>
       <div className={css.app}>
@@ -156,7 +176,34 @@ const App = () => {
           className={css.display}
           file={file}
           ref={videoElementRef}
-        />
+        >
+          <Box className={css.children}>
+
+            {mediaNoVideo && (
+              <Typography variant="h5" color="textPrimary" align="center">
+                🤔 No video detected
+              </Typography>
+            )}
+
+            {!mediaNoVideo && mediaNotSupported && (
+              <>
+                <Icon fontSize="large" color="error">
+                  <BrokenImage fontSize="inherit"/>
+                </Icon>
+                <Typography variant="h5" color="textPrimary" align="center">
+                  Sorry, we can't preview this file
+                </Typography>
+                <Typography variant="h6" color="textPrimary" align="center">
+                  You can still process it
+                </Typography>
+                <Typography variant="body2" color="textPrimary" align="center">
+                  We're working on a solution in a future update
+                </Typography>
+              </>
+
+            )}
+          </Box>
+        </Display>
         <Paper className={css.footer} elevation={3} square={true}>
           {file ?
             <DurationInfo
@@ -259,7 +306,7 @@ const App = () => {
                       variant="contained"
                       className={css.processBtn}
                       color={"secondary"}
-                      disabled={!file}
+                      disabled={!file || !!mediaNoVideo}
                       onClick={startProcessing}
                     >Process
                     </Button>

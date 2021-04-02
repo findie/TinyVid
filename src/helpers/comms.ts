@@ -63,7 +63,11 @@ export namespace DetailsComms {
     fps: number
     width: number
     height: number
-    duration: number
+    duration: number,
+    videoCodec: string | null,
+    pixelFormat: string | null,
+    audioCodec: string | null,
+    containerFormats: string[]
   }
 
   export async function getDetails(file: string): Promise<DetailsProtocol.DetailsProtocolResponse> {
@@ -78,6 +82,10 @@ export namespace DetailsComms {
 
   export function videoStream(data: DetailsProtocol.DetailsProtocolResponse): VideoDetails.VideoStream | null {
     return data.streams.find((x): x is VideoDetails.VideoStream => x.codec_type === 'video') || null;
+  }
+
+  export function audioStream(data: DetailsProtocol.DetailsProtocolResponse): VideoDetails.VideoStream | null {
+    return data.streams.find((x): x is VideoDetails.VideoStream => x.codec_type === 'audio') || null;
   }
 
   export function duration(data: DetailsProtocol.DetailsProtocolResponse): number {
@@ -108,11 +116,34 @@ export namespace DetailsComms {
     )
   }
 
+  export function codecs(data: DetailsProtocol.DetailsProtocolResponse): Pick<SimpleVideoDetails, 'audioCodec' | 'videoCodec'> {
+    const video = videoStream(data);
+    const audio = audioStream(data);
+
+    return {
+      videoCodec: video?.codec_name || null,
+      audioCodec: audio?.codec_name || null,
+    }
+  }
+
+  export function pixelFormat(data: DetailsProtocol.DetailsProtocolResponse): string {
+    const video = videoStream(data);
+    return video?.pix_fmt || '';
+  }
+
+  export function formats(data: DetailsProtocol.DetailsProtocolResponse): string[] {
+    const { format } = data;
+    return (format.format_name || '').split(',').map(x => x.trim());
+  }
+
   export function simplifyMediaDetails(data: DetailsProtocol.DetailsProtocolResponse): SimpleVideoDetails {
     return {
       fps: fps(data),
       duration: duration(data),
-      ...frameSize(data)
+      containerFormats: formats(data),
+      pixelFormat: pixelFormat(data),
+      ...frameSize(data),
+      ...codecs(data),
     }
   }
 }

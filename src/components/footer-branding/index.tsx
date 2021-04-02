@@ -18,17 +18,17 @@ export function FooterBranding() {
   return (
     <div className={css.main + ' ' + classes.root}>
       <div className={css.left}>
-        <Link
-          href={'https://github.com/legraphista/QuickTrim/issues/new?assignees=legraphista&labels=enhancement&template=feature_request.md&title='}
-          target={'_blank'}>
-          Request a feature
-        </Link>
-        &nbsp;|&nbsp;
-        <Link
-          href={'https://github.com/legraphista/QuickTrim/issues/new?assignees=legraphista&labels=enhancement&template=feature_request.md&title='}
-          target={'_blank'}>
-          Submit an issue
-        </Link>
+        {/*<Link*/}
+        {/*  href={'https://github.com/legraphista/QuickTrim/issues/new?assignees=legraphista&labels=enhancement&template=feature_request.md&title='}*/}
+        {/*  target={'_blank'}>*/}
+        {/*  Request a feature*/}
+        {/*</Link>*/}
+        {/*&nbsp;|&nbsp;*/}
+        {/*<Link*/}
+        {/*  href={'https://github.com/legraphista/QuickTrim/issues/new?assignees=legraphista&labels=enhancement&template=feature_request.md&title='}*/}
+        {/*  target={'_blank'}>*/}
+        {/*  Submit an issue*/}
+        {/*</Link>*/}
       </div>
 
       <Link

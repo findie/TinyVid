@@ -5,7 +5,7 @@ export interface DisplayProps extends VideoHTMLAttributes<HTMLVideoElement> {
   file: string
 }
 
-export const Display = forwardRef<HTMLVideoElement, DisplayProps>((props: DisplayProps, ref) => {
+export const Display = forwardRef<HTMLVideoElement, DisplayProps>(function Display(props: DisplayProps, ref) {
 
   const { file, className, ...p } = props;
 
@@ -16,8 +16,9 @@ export const Display = forwardRef<HTMLVideoElement, DisplayProps>((props: Displa
            controls={false}
            {...p}
     >
-      {props.children}
     </video>
+
+    {props.children}
   </div>;
 
 });

@@ -7,6 +7,8 @@ import {makeStyles} from "@material-ui/core/styles";
 import {Theme} from "../helpers/theme";
 import {VideoLibrary} from "@material-ui/icons"
 
+import classNames from 'classnames';
+
 export interface ChooseFileProps {
   fileCB: (path: string) => void
   className?: string
@@ -32,7 +34,7 @@ export const ChooseFile = (props: ChooseFileProps) => {
         filters: [
           {
             name: 'Video',
-            extensions: ['mp4', 'mov', 'm4v']
+            extensions: ['mp4', 'mov', 'm4v', 'webm']
           }
         ]
       });
@@ -46,7 +48,7 @@ export const ChooseFile = (props: ChooseFileProps) => {
   return (
     <Box
       padding={1}
-      className={css.main + ' ' + (props.className || '')}
+      className={classNames(css.main, props.className)}
       onClick={chooseFileCallback}
     >
       <Button

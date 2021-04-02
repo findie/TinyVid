@@ -98,9 +98,9 @@ export const TrimSlider = (props: TrimSliderProps) => {
         keyboardSupport
         onSlide={update}
         onSet={update}
-        step={props.step}
-        range={{ min: 0, max: props.duration }}
-        start={[0, props.duration]}
+        step={isNaN(props.step) || !isFinite(props.step) ? 0 : props.step}
+        range={{ min: 0, max: props.duration || 0 }}
+        start={[0, props.duration || 0]}
         connect={[false, true, false]}
         format={{
           from(val: string): number {
