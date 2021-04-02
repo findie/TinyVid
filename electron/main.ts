@@ -1,6 +1,6 @@
 import "source-map-support/register"
 import "./helpers/log"
-import {app, BrowserWindow, session, shell} from 'electron';
+import {app, BrowserWindow, nativeTheme, session, shell} from 'electron';
 import * as path from 'path';
 import * as url from 'url';
 import * as os from 'os';
@@ -29,6 +29,12 @@ function createWindow() {
       preload: path.join(__dirname, "..", "common", "sentry"),
     },
   });
+
+  mainWindow.setBackgroundColor(
+    nativeTheme.shouldUseDarkColors ?
+      '#303030' :
+      '#FFFFFF'
+  );
 
   mainWindow.on('page-title-updated', (evt) => {
     evt.preventDefault();
