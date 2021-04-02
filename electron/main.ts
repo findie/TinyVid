@@ -26,6 +26,7 @@ function createWindow() {
       nodeIntegration: true,
       enableRemoteModule: true,
       webSecurity: true,
+      preload: path.join(__dirname, "..", "common", "sentry"),
     },
   });
 
