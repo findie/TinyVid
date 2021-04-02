@@ -6,7 +6,7 @@ export async function update() {
   autoUpdater.logger = logger;
   console.log('setFeedURL', autoUpdater.setFeedURL({
     "provider": "github",
-    "owner": "legraphista",
+    "owner": "findie",
     "repo": "QuickTrim"
   }))
   console.log('checking for updates', await autoUpdater.checkForUpdates());

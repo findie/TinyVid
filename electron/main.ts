@@ -8,12 +8,14 @@ import {Protocols} from "./protocols";
 import {TrimProtocol} from "./protocols/proto/trim";
 import {update} from "./update";
 
+import "../common/sentry";
+
 let mainWindow: Electron.BrowserWindow | null;
 
 function createWindow() {
   mainWindow = new BrowserWindow({
     icon: path.join(app.getAppPath(), 'icon.png'),
-    title: `QuickTrim - v${app.getVersion()}`,
+    title: `TinyVid.io - v${app.getVersion()}`,
     center: true,
     autoHideMenuBar: true,
     width: 900,

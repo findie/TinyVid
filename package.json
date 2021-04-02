@@ -53,13 +53,14 @@
     "webpack-dev-server": "^3.11.0"
   },
   "dependencies": {
+    "@sentry/electron": "^2.4.0",
     "electron-log": "^4.2.2",
     "ffmpeg-progress-wrapper": "^2.0.0",
     "source-map-support": "^0.5.19"
   },
   "build": {
-    "appId": "rocks.corneroftheinternet.quick-trim",
-    "productName": "QuickTrim",
+    "appId": "com.kamua.tinyvid.io",
+    "productName": "TinyVid.io",
     "artifactName": "${name}-${os}-${arch}-${version}.${ext}",
     "asar": true,
     "files": [
@@ -69,7 +70,7 @@
     "publish": [
       {
         "provider": "github",
-        "owner": "legraphista",
+        "owner": "findie",
         "repo": "QuickTrim"
       }
     ],
@@ -118,7 +119,7 @@
       "extraFiles": [
         "bin/linux-64"
       ],
-      "executableName": "quicktrim",
+      "executableName": "tinyvidio",
       "icon": "icon.png"
     }
   }

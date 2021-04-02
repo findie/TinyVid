@@ -37,6 +37,8 @@ import {remote} from "electron";
 import {Videocam} from "@material-ui/icons";
 import {FooterBranding} from "./components/footer-branding";
 
+import '../common/sentry';
+
 const defaultMaxFileSizeStrategy: RenderStrategy = {
   type: 'max-file-size',
   tune: ConfigMaxFileSizeDefaultSize,

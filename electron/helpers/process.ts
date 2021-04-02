@@ -34,7 +34,7 @@ export namespace ProcessHelpers {
       });
     }
 
-    await new Promise((res, rej) => {
+    await new Promise<void>((res, rej) => {
 
       p.once('close', (code, sig) => {
 

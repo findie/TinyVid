@@ -1,4 +1,5 @@
 import {CustomScheme, FilePathWithHeaders, protocol, Request} from 'electron';
+import {logError} from "../../common/sentry";
 
 abstract class Protocol {
   readonly protocolName: string
@@ -89,6 +90,9 @@ export abstract class JSONProtocol extends Protocol {
           mimeType: 'application/json'
         });
       } catch (e) {
+
+        logError(e);
+
         callback({
           data: JSON.stringify({
             error: {
