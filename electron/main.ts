@@ -9,6 +9,7 @@ import {TrimProtocol} from "./protocols/proto/trim";
 import {update} from "./update";
 
 import "../common/sentry";
+import {RendererSettings} from "../src/helpers/settings";
 
 let mainWindow: Electron.BrowserWindow | null;
 
@@ -31,7 +32,7 @@ function createWindow() {
   });
 
   mainWindow.setBackgroundColor(
-    nativeTheme.shouldUseDarkColors ?
+    RendererSettings.settings.theme === "dark" || nativeTheme.shouldUseDarkColors ?
       '#303030' :
       '#FFFFFF'
   );
