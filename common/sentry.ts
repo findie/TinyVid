@@ -33,7 +33,7 @@ if (process.type === 'browser') {
   const { crashReporter } = require("electron");
   crashReporter.start({
     companyName: "Kamua",
-    productName: "TinyVid.io",
+    productName: "TinyVid",
     ignoreSystemCrashHandler: true,
     submitURL: "https://o106683.ingest.sentry.io/api/5703632/minidump/?sentry_key=4dd962835ee849558d9726c06957f9cd",
   });

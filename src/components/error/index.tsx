@@ -20,36 +20,36 @@ export function ErrorDisplay({ error, onOk }: ErrorDisplayProps) {
       <Box marginTop={2}>
         <Grid container spacing={2} justify={"flex-end"} wrap={"nowrap"}>
 
-          <Grid item>
-            <Button variant={"contained"} color={"secondary"} onClick={() => {
-              remote.shell.openPath(`https://github.com/legraphista/QuickTrim/issues`);
-            }}>
-              View existing reports
-            </Button>
-          </Grid>
+{/*          <Grid item>*/}
+{/*            <Button variant={"contained"} color={"secondary"} onClick={() => {*/}
+{/*              remote.shell.openPath(`https://github.com/legraphista/QuickTrim/issues`);*/}
+{/*            }}>*/}
+{/*              View existing reports*/}
+{/*            </Button>*/}
+{/*          </Grid>*/}
 
-          <Grid item>
-            <Button variant={"contained"} color={"primary"} onClick={() => {
+{/*          <Grid item>*/}
+{/*            <Button variant={"contained"} color={"primary"} onClick={() => {*/}
 
-              const codeBlock = '```';
-              const c = '`';
-              const title = 'Error: ' + error.message.split('\n')[0].substr(0, 120);
-              const contents = `
-Message: 
-${codeBlock}
-${error.message}
-${codeBlock}
+{/*              const codeBlock = '```';*/}
+{/*              const c = '`';*/}
+{/*              const title = 'Error: ' + error.message.split('\n')[0].substr(0, 120);*/}
+{/*              const contents = `*/}
+{/*Message: */}
+{/*${codeBlock}*/}
+{/*${error.message}*/}
+{/*${codeBlock}*/}
 
-Stack: 
-${codeBlock}
-${error?.stack?.replace(error.message, '')}
-${codeBlock}
-`;
-              remote.shell.openPath(`https://github.com/legraphista/QuickTrim/issues/new?title=${encodeURIComponent(title)}&body=${encodeURIComponent(contents)}`);
-            }}>
-              Submit error report
-            </Button>
-          </Grid>
+{/*Stack: */}
+{/*${codeBlock}*/}
+{/*${error?.stack?.replace(error.message, '')}*/}
+{/*${codeBlock}*/}
+{/*`;*/}
+{/*              remote.shell.openPath(`https://github.com/legraphista/QuickTrim/issues/new?title=${encodeURIComponent(title)}&body=${encodeURIComponent(contents)}`);*/}
+{/*            }}>*/}
+{/*              Submit error report*/}
+{/*            </Button>*/}
+{/*          </Grid>*/}
 
           <Grid item>
             <Button variant={"contained"} onClick={onOk}>

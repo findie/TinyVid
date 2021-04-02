@@ -93,38 +93,38 @@ const ProgressError = (props: ProgressErrorProps) => {
       <Box marginTop={2}>
         <Grid container spacing={2} justify={"flex-end"} wrap={"nowrap"}>
 
-          <Grid item>
-            <Button variant={"contained"} color={"secondary"} onClick={() => {
-              remote.shell.openPath(`https://github.com/legraphista/QuickTrim/issues`);
-            }}>
-              View existing reports
-            </Button>
-          </Grid>
+          {/*<Grid item>*/}
+          {/*  <Button variant={"contained"} color={"secondary"} onClick={() => {*/}
+          {/*    remote.shell.openPath(`https://github.com/legraphista/QuickTrim/issues`);*/}
+          {/*  }}>*/}
+          {/*    View existing reports*/}
+          {/*  </Button>*/}
+          {/*</Grid>*/}
 
-          <Grid item>
-            <Button variant={"contained"} color={"primary"} onClick={() => {
+{/*          <Grid item>*/}
+{/*            <Button variant={"contained"} color={"primary"} onClick={() => {*/}
 
-              const codeBlock = '```';
-              const c = '`';
-              const title = 'Rendering issue: ' + props.error.message.split('\n')[0];
-              const contents = `
-Code: ${c}${props.error.code}${c}
-Signal: ${c}${props.error.signal}${c}
-Args:
-${codeBlock}
-${props.error.args.join(' ')}          
-${codeBlock}
+{/*              const codeBlock = '```';*/}
+{/*              const c = '`';*/}
+{/*              const title = 'Rendering issue: ' + props.error.message.split('\n')[0];*/}
+{/*              const contents = `*/}
+{/*Code: ${c}${props.error.code}${c}*/}
+{/*Signal: ${c}${props.error.signal}${c}*/}
+{/*Args:*/}
+{/*${codeBlock}*/}
+{/*${props.error.args.join(' ')}          */}
+{/*${codeBlock}*/}
 
-Message: 
-${codeBlock}
-${props.error.message}
-${codeBlock}
-`
-              remote.shell.openPath(`https://github.com/legraphista/QuickTrim/issues/new?title=${encodeURIComponent(title)}&body=${encodeURIComponent(contents)}`);
-            }}>
-              Submit error report
-            </Button>
-          </Grid>
+{/*Message: */}
+{/*${codeBlock}*/}
+{/*${props.error.message}*/}
+{/*${codeBlock}*/}
+{/*`*/}
+{/*              remote.shell.openPath(`https://github.com/legraphista/QuickTrim/issues/new?title=${encodeURIComponent(title)}&body=${encodeURIComponent(contents)}`);*/}
+{/*            }}>*/}
+{/*              Submit error report*/}
+{/*            </Button>*/}
+{/*          </Grid>*/}
 
           <Grid item>
             <Button variant={"contained"} onClick={props.onOk}>

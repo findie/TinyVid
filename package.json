@@ -66,8 +66,8 @@
     "source-map-support": "^0.5.19"
   },
   "build": {
-    "appId": "com.kamua.tinyvid.io",
-    "productName": "TinyVid.io",
+    "appId": "com.kamua.tinyvid",
+    "productName": "TinyVid",
     "artifactName": "${name}-${os}-${arch}-${version}.${ext}",
     "asar": true,
     "files": [
@@ -126,7 +126,7 @@
       "extraFiles": [
         "bin/linux-64"
       ],
-      "executableName": "tinyvidio",
+      "executableName": "TinyVid",
       "icon": "icon.png"
     }
   }

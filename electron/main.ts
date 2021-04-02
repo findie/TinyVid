@@ -16,7 +16,7 @@ let mainWindow: Electron.BrowserWindow | null;
 function createWindow() {
   mainWindow = new BrowserWindow({
     icon: path.join(app.getAppPath(), 'icon.png'),
-    title: `TinyVid.io - v${app.getVersion()}`,
+    title: `TinyVid - v${app.getVersion()}`,
     center: true,
     autoHideMenuBar: true,
     width: 900,

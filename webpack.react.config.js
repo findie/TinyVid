@@ -69,7 +69,7 @@ module.exports = {
   plugins: [
     new HtmlWebpackPlugin({
       minify: false,
-      title: "TinyVid.io"
+      title: "TinyVid"
     }),
     new MiniCssExtractPlugin({
       filename: '[name].css',
