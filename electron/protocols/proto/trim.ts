@@ -4,6 +4,7 @@ import {FFMpegError, FFMpegProgress} from "ffmpeg-progress-wrapper";
 import {IFFMpegProgressData} from "ffmpeg-progress-wrapper/src/index";
 import {v4 as uuid} from 'uuid'
 import {VideoProcess} from "../../helpers/ff/process";
+import {logError} from "../../../common/sentry";
 
 export namespace TrimProtocol {
 
@@ -72,6 +73,7 @@ export namespace TrimProtocol {
           task.error = { ...e };
           task.error!.stack = e.stack;
           task.error!.message = e.message;
+          logError(e);
         })
         .finally(() => task.done = true);
 
