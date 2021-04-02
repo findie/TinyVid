@@ -100,7 +100,7 @@ export const TrimSlider = (props: TrimSliderProps) => {
         onSet={update}
         step={props.step}
         range={{ min: 0, max: props.duration }}
-        start={[props.duration / 3 * 1, props.duration / 3 * 2]}
+        start={[0, props.duration]}
         connect={[false, true, false]}
         format={{
           from(val: string): number {
