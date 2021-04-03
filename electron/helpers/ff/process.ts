@@ -85,7 +85,7 @@ export namespace VideoProcess {
       progress(p);
     });
 
-    p.on('raw', console.error);
+    p.on('raw', console.log);
 
     return p;
   }
