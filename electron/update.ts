@@ -4,11 +4,6 @@ import {app, dialog} from 'electron';
 
 export async function update() {
   autoUpdater.logger = logger;
-  console.log('setFeedURL', autoUpdater.setFeedURL({
-    "provider": "github",
-    "owner": "findie",
-    "repo": "QuickTrim"
-  }))
   console.log('checking for updates', await autoUpdater.checkForUpdates());
   autoUpdater.on('update-downloaded', async (info) => {
     const resp = await dialog.showMessageBox({
