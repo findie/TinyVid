@@ -34,7 +34,12 @@ export const ChooseFile = (props: ChooseFileProps) => {
         filters: [
           {
             name: 'Video',
-            extensions: ['mp4', 'mov', 'm4v', 'webm']
+            extensions: [
+              'mp4', 'MP4',
+              'mov', 'MOV',
+              'm4v', 'M4V',
+              'webm', 'WEBM', 'WebM'
+            ]
           }
         ]
       });
