@@ -1,6 +1,6 @@
 {
   "name": "TinyVid",
-  "version": "0.14.1",
+  "version": "0.14.2",
   "main": "./dist/main.js",
   "author": "Kamua<hello@kamua.com>",
   "description": "Simple to use video trimmer & compressor",
