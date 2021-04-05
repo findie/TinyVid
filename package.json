@@ -12,7 +12,7 @@
     "build:js": "yarn install && NODE_ENV=production webpack --config webpack.electron.config.js --mode production && NODE_ENV=production webpack --config webpack.react.config.js --mode production",
     "build:win": "yarn build:js && electron-builder --win -p always",
     "build:linux": "yarn build:js && electron-builder --linux -p always",
-    "build:mac": "yarn build:js && electron-builder --mac -p always"
+    "build:mac": "yarn build:js && electron-builder --mac -p never"
   },
   "license": "MIT",
   "devDependencies": {
@@ -32,10 +32,12 @@
     "babel-loader": "^8.1.0",
     "color": "^3.1.2",
     "css-loader": "^3.5.3",
+    "dotenv": "^8.2.0",
     "electron": "^9.0.0",
     "electron-builder": "^22.10.5",
     "electron-builder-squirrel-windows": "^22.10.5",
     "electron-download": "^4.1.1",
+    "electron-notarize": "^1.0.0",
     "electron-updater": "^4.3.8",
     "ffbinaries": "^1.1.4",
     "file-loader": "^6.0.0",
@@ -74,6 +76,7 @@
       "dist",
       "icon.png"
     ],
+    "afterSign": "build/scripts/notarize.js",
     "publish": [
       {
         "provider": "s3",
@@ -96,7 +99,10 @@
       "darkModeSupport": true,
       "extraFiles": [
         "bin/osx-64"
-      ]
+      ],
+      "hardenedRuntime": true,
+      "entitlements": "build/entitlements.mac.plist",
+      "entitlementsInherit": "build/entitlements.mac.plist"
     },
     "win": {
       "target": [
