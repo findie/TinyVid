@@ -4,3 +4,4 @@ node_modules/
 dist/
 out/
 renderer_settings.json
+.env
