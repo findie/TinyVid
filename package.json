@@ -2,7 +2,7 @@
   "name": "TinyVid",
   "version": "0.14.1",
   "main": "./dist/main.js",
-  "author": "Stefan-Gabriel Muscalu<stefan.gabriel.muscalu@gmail.com>",
+  "author": "Kamua<hello@kamua.com>",
   "description": "Simple to use video trimmer & compressor",
   "scripts": {
     "dev:electron": "NODE_ENV=development webpack --config webpack.electron.config.js --mode development --watch",
@@ -14,7 +14,7 @@
     "build:linux": "yarn build:js && electron-builder --linux -p always",
     "build:mac": "yarn build:js && electron-builder --mac -p never"
   },
-  "license": "MIT",
+  "private": true,
   "devDependencies": {
     "@babel/core": "^7.9.6",
     "@babel/preset-env": "^7.9.6",
