@@ -12,7 +12,7 @@
     "build:js": "yarn install && NODE_ENV=production webpack --config webpack.electron.config.js --mode production && NODE_ENV=production webpack --config webpack.react.config.js --mode production",
     "build:win": "yarn build:js && electron-builder --win -p always",
     "build:linux": "yarn build:js && electron-builder --linux -p always",
-    "build:mac": "yarn build:js && electron-builder --mac -p never"
+    "build:mac": "yarn build:js && electron-builder --mac -p always"
   },
   "private": true,
   "devDependencies": {
