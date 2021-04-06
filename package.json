@@ -92,7 +92,6 @@
       "category": "public.app-category.video",
       "target": [
         "dir",
-        "zip",
         "dmg"
       ],
       "icon": "icon.icns",
@@ -107,8 +106,8 @@
     "win": {
       "target": [
         "dir",
-        "zip",
-        "nsis"
+        "nsis",
+        "zip"
       ],
       "icon": "icon.ico",
       "extraFiles": [
@@ -124,9 +123,8 @@
     "linux": {
       "target": [
         "dir",
-        "zip",
         "appImage",
-        "deb"
+        "zip"
       ],
       "extraFiles": [
         "bin/linux-64"
