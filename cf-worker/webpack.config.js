@@ -3,7 +3,7 @@ const webpack = require('webpack');
 module.exports = {
   entry: {
     feedback: "./src/feedback.ts",
-    // "helpers/easings/index": "./src/helpers/easings/"
+    download: "./src/download.ts",
   },
 
   target: 'webworker',
