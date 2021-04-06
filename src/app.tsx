@@ -324,7 +324,7 @@ const App = () => {
                 <Box marginBottom={-1}>
                   <FooterBranding>
                     <Link onClick={() => setShowFeedback(true)}>
-                      Feedback
+                      Send Feedback 👋
                     </Link>
                   </FooterBranding>
                 </Box>
