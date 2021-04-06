@@ -1,0 +1,11 @@
+.root {
+
+}
+
+.root .padVertical {
+    margin: 8px 0;
+}
+
+.right {
+    justify-content: flex-end;
+}

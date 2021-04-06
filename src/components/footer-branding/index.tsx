@@ -12,7 +12,12 @@ const styles = makeStyles({
   }
 })
 
-export function FooterBranding() {
+export type FooterBrandingProps = {
+  children?: React.ReactNode
+}
+
+
+export function FooterBranding({ children }: FooterBrandingProps) {
   const classes = styles();
 
   return (
@@ -29,6 +34,7 @@ export function FooterBranding() {
         {/*  target={'_blank'}>*/}
         {/*  Submit an issue*/}
         {/*</Link>*/}
+        {children}
       </div>
 
       <Link
