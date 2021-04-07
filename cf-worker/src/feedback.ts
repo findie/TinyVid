@@ -2,9 +2,11 @@
  Copyright Findie 2021
  */
 import 'source-map-support/register'
+import {corsHoF} from "./helpers/cors";
 
+const corsedHandler = corsHoF(handleRequest);
 addEventListener('fetch', event => {
-  event.respondWith(handleRequest(event.request))
+  event.respondWith(corsedHandler(event));
 });
 
 function prettify(data: any, depth = 0): string[] {
@@ -32,7 +34,9 @@ function prettify(data: any, depth = 0): string[] {
   return lines;
 }
 
-async function handleRequest(request: Request) {
+async function handleRequest(event: FetchEvent) {
+  const request = event.request;
+
   if (request.method.toLowerCase() !== 'post') {
     return new Response(JSON.stringify({ error: 'Method Not Allowed' }), {
       status: 405,

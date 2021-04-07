@@ -7,15 +7,17 @@ export interface ModalProps {
   open?: boolean
   transparent?: boolean
   className?: string
+  onClose?: () => void
 }
 
-export function Modal({ children, open = true, transparent = false, className = '' }: ModalProps) {
+export function Modal({ children, open = true, transparent = false, className = '' , onClose}: ModalProps) {
 
   return (
     <MUIModal
       open={open}
       disableAutoFocus={true}
       disableEnforceFocus={true}
+      onClose={onClose}
     >
       <Paper elevation={3} className={css.container + ' ' + (transparent ? css.transparent : '') + ' ' + className}>
         {children}

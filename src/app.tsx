@@ -31,6 +31,7 @@ import {
   FormControl,
   Icon,
   InputLabel,
+  Link,
   MenuItem,
   Paper,
   Select,
@@ -51,6 +52,7 @@ import {FooterBranding} from "./components/footer-branding";
 
 import '../common/sentry';
 import {VideoHelpers} from "./helpers/video";
+import {FeedbackModal} from "./components/feedback/Feedback";
 
 const defaultMaxFileSizeStrategy: RenderStrategy = {
   type: 'max-file-size',
@@ -86,6 +88,8 @@ const App = () => {
   const [videoSettings, setVideoSettings] = useState<ConfigVideoSettingsData>(ConfigVideoSettingsDefault);
 
   const [processingID, setProcessingID] = useState<string | null>(null);
+
+  const [showFeedback, setShowFeedback] = useState(false);
 
   async function startProcessing() {
     if (!file) {
@@ -318,7 +322,11 @@ const App = () => {
                 </Box>
 
                 <Box marginBottom={-1}>
-                  <FooterBranding/>
+                  <FooterBranding>
+                    <Link onClick={() => setShowFeedback(true)}>
+                      Send Feedback 👋
+                    </Link>
+                  </FooterBranding>
                 </Box>
               </div>
 
@@ -348,6 +356,9 @@ const App = () => {
         }
 
         <PreventClosing prevent={!!processingID}/>
+
+        <FeedbackModal open={showFeedback} onClose={() => setShowFeedback(false)}/>
+
       </div>
     </ThemeProvider>
   )

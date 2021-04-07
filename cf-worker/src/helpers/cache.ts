@@ -2,9 +2,6 @@
  Copyright Findie 2021
  */
 
-// @ts-ignore
-const cache: Cache = caches.default;
-
 // https://developers.cloudflare.com/workers/examples/cache-api
 
 export function cacheHoF(handler: (e: FetchEvent) => Promise<Response>, ttl : number) {
