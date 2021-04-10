@@ -61,6 +61,7 @@
     "@sentry/electron": "^2.4.0",
     "@sentry/integrations": "^6.2.5",
     "@types/classnames": "^2.2.11",
+    "await-lock": "^2.1.0",
     "classnames": "^2.3.0",
     "electron-log": "^4.2.2",
     "ffmpeg-progress-wrapper": "^2.0.0",
@@ -109,6 +110,7 @@
         "nsis",
         "zip"
       ],
+      "sign": "build/scripts/eSigner.js",
       "icon": "icon.ico",
       "extraFiles": [
         "bin/windows-64"
