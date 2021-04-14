@@ -9,8 +9,9 @@
     "dev:prod:electron": "NODE_ENV=production webpack --config webpack.electron.config.js --mode production --watch",
     "dev:react": "NODE_ENV=development webpack-dev-server --config webpack.react.config.js --mode development",
     "ffbin": "ffbinaries ffprobe ffmpeg -p linux-64 -o bin/linux-64 && ffbinaries ffprobe ffmpeg -p windows-64 -o bin/windows-64 && ffbinaries ffprobe ffmpeg -p osx-64 -o bin/osx-64",
+    "build:js-win": "yarn install && set NODE_ENV=production && webpack --config webpack.electron.config.js --mode production && set NODE_ENV=production && webpack --config webpack.react.config.js --mode production",
     "build:js": "yarn install && NODE_ENV=production webpack --config webpack.electron.config.js --mode production && NODE_ENV=production webpack --config webpack.react.config.js --mode production",
-    "build:win": "yarn build:js && electron-builder --win -p always",
+    "build:win": "yarn build:js-win && electron-builder --win -p never",
     "build:linux": "yarn build:js && electron-builder --linux -p always",
     "build:mac": "yarn build:js && electron-builder --mac -p always"
   },
@@ -65,6 +66,7 @@
     "classnames": "^2.3.0",
     "electron-log": "^4.2.2",
     "ffmpeg-progress-wrapper": "^2.0.0",
+    "otplib": "^12.0.1",
     "react-merge-refs": "^1.1.0",
     "source-map-support": "^0.5.19"
   },
@@ -107,14 +109,14 @@
     "win": {
       "target": [
         "dir",
-        "nsis",
-        "zip"
+        "nsis"
       ],
       "sign": "build/scripts/eSigner.js",
       "icon": "icon.ico",
       "extraFiles": [
         "bin/windows-64"
-      ]
+      ],
+      "certificateSubjectName": "Findie Development Limited"
     },
     "nsis": {
       "oneClick": false,
