@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, {useCallback, useEffect, useState} from 'react';
 import css from './style.css'
 import {FFMpegError, IFFMpegProgressData} from "ffmpeg-progress-wrapper";
 import {remote} from 'electron';
@@ -9,6 +9,8 @@ import * as path from 'path';
 import moment from "moment";
 import {CodeDisplay} from "../components/code";
 import {bps2text} from "../helpers/math";
+import {AppState} from "../AppState.store";
+import {ProcessStore} from "../Process.store";
 
 interface ProgressProps {
   out: string
@@ -92,40 +94,6 @@ const ProgressError = (props: ProgressErrorProps) => {
       <CodeDisplay className={css.maxHeightError}>{props.error.message}</CodeDisplay>
       <Box marginTop={2}>
         <Grid container spacing={2} justify={"flex-end"} wrap={"nowrap"}>
-
-          {/*<Grid item>*/}
-          {/*  <Button variant={"contained"} color={"secondary"} onClick={() => {*/}
-          {/*    remote.shell.openPath(`https://github.com/legraphista/QuickTrim/issues`);*/}
-          {/*  }}>*/}
-          {/*    View existing reports*/}
-          {/*  </Button>*/}
-          {/*</Grid>*/}
-
-{/*          <Grid item>*/}
-{/*            <Button variant={"contained"} color={"primary"} onClick={() => {*/}
-
-{/*              const codeBlock = '```';*/}
-{/*              const c = '`';*/}
-{/*              const title = 'Rendering issue: ' + props.error.message.split('\n')[0];*/}
-{/*              const contents = `*/}
-{/*Code: ${c}${props.error.code}${c}*/}
-{/*Signal: ${c}${props.error.signal}${c}*/}
-{/*Args:*/}
-{/*${codeBlock}*/}
-{/*${props.error.args.join(' ')}          */}
-{/*${codeBlock}*/}
-
-{/*Message: */}
-{/*${codeBlock}*/}
-{/*${props.error.message}*/}
-{/*${codeBlock}*/}
-{/*`*/}
-{/*              remote.shell.openPath(`https://github.com/legraphista/QuickTrim/issues/new?title=${encodeURIComponent(title)}&body=${encodeURIComponent(contents)}`);*/}
-{/*            }}>*/}
-{/*              Submit error report*/}
-{/*            </Button>*/}
-{/*          </Grid>*/}
-
           <Grid item>
             <Button variant={"contained"} onClick={props.onOk}>
               Ok
@@ -198,14 +166,23 @@ const Done = (props: DoneProps) => {
 }
 
 export interface ProcessingOverlayProps {
-  id: string
-  fileIn: string
-  fileOut: string
-  onDone: () => void
-  onCancelRequest: () => void
 }
 
 export const ProcessingOverlay = (props: ProcessingOverlayProps) => {
+
+  const fileIn = AppState.file;
+  const fileOut = ProcessStore.fileOut;
+  const id = ProcessStore.processingID!;
+
+  const onDone = useCallback(() => {
+    return ProcessStore.setProcessingID(null);
+  }, []);
+  const onCancelRequest = useCallback(() => {
+    if (ProcessStore.processingID) {
+      return TrimComms.cancelProcess(ProcessStore.processingID!)
+    }
+    return Promise.resolve(null);
+  }, []);
 
   const [isDone, setIsDone] = useState(false);
   const [progress, setProgress] = useState<IFFMpegProgressData | null>(null);
@@ -217,7 +194,7 @@ export const ProcessingOverlay = (props: ProcessingOverlayProps) => {
 
       console.log(interval, Date.now());
 
-      const task = await TrimComms.checkProcess(props.id);
+      const task = await TrimComms.checkProcess(id);
 
       if (task?.error) {
         setError(task.error);
@@ -252,20 +229,20 @@ export const ProcessingOverlay = (props: ProcessingOverlayProps) => {
       clearInterval(interval);
       remote.getCurrentWindow().setProgressBar(0, { mode: "none" });
     }
-  }, [])
+  }, [id])
 
   let component: JSX.Element;
   if (error && !cancelled) {
-    component = <ProgressError error={error} onOk={props.onDone}/>
+    component = <ProgressError error={error} onOk={onDone}/>
   } else if (isDone) {
-    component = <Done file={props.fileOut} onOk={props.onDone} wasCancelled={cancelled}/>
+    component = <Done file={fileOut} onOk={onDone} wasCancelled={cancelled}/>
   } else {
     component = <Progress
       progress={progress}
-      out={props.fileOut}
+      out={fileOut}
       onCancel={() => {
         setCancelled(true);
-        props.onCancelRequest();
+        onCancelRequest().catch(console.error);
       }}/>
   }
 
@@ -273,7 +250,7 @@ export const ProcessingOverlay = (props: ProcessingOverlayProps) => {
     <Modal className={css.container}>
       <Paper elevation={3} className={css.title}>
         <Typography noWrap>
-          <strong>File:</strong> {path.dirname(props.fileIn) + path.sep}<strong>{path.basename(props.fileIn)}</strong>
+          <strong>File:</strong> {path.dirname(fileIn) + path.sep}<strong>{path.basename(fileIn)}</strong>
         </Typography>
       </Paper>
       <div className={css.innerContainer}>

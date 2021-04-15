@@ -204,13 +204,7 @@ const App = observer(() => {
         </Paper>
 
         {ProcessStore.processingID ?
-          <ProcessingOverlay
-            fileIn={AppState.file}
-            fileOut={ProcessStore.fileOut || ''}
-            id={ProcessStore.processingID}
-            onDone={() => ProcessStore.setProcessingID(null)}
-            onCancelRequest={() => TrimComms.cancelProcess(ProcessStore.processingID!)}
-          /> :
+          <ProcessingOverlay/> :
           null
         }
 
