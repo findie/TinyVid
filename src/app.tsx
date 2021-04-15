@@ -1,7 +1,7 @@
 import '../electron/helpers/log'
 import './types'
 
-import React, {useRef, useState} from 'react';
+import React, {useState} from 'react';
 import ReactDom from 'react-dom';
 import {ChooseFile} from "./choose-file";
 import {Display} from "./display";
@@ -12,7 +12,6 @@ import {ConfigMaxFileSize} from "./config/max-file-size";
 import {SpeedSlider} from "./config/speed-slider";
 import {ConfigConstantQuality} from "./config/constant-quality";
 import {ConfigVideoSettings} from "./config/video-settings";
-import {TrimComms} from "./helpers/comms";
 import {Loading} from "./components/loading";
 
 import {
@@ -68,7 +67,7 @@ const App = observer(() => {
     <ThemeProvider theme={Theme.current}>
       <div className={css.app}>
         <Paper elevation={3} className={css.header} square={true}>
-          <ChooseFile fileCB={AppState.setFile} className={css.flexGrow + ' ' + css.fileSelect}/>
+          <ChooseFile className={css.flexGrow + ' ' + css.fileSelect}/>
           <ThemeSwitch theme={Theme.currentName} onClick={Theme.setNext}/>
           <BitrateWarnings className={css.alert}/>
         </Paper>
