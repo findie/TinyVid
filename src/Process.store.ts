@@ -136,3 +136,6 @@ class ProcessStoreClass {
 }
 
 export const ProcessStore = new ProcessStoreClass();
+
+// @ts-ignore
+window.ProcessStore = ProcessStore;

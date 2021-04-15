@@ -31,17 +31,6 @@ export const ChooseFile = (props: ChooseFileProps) => {
       remote.getCurrentWindow(),
       {
         properties: ['openFile'],
-        filters: [
-          {
-            name: 'Video',
-            extensions: [
-              'mp4', 'MP4',
-              'mov', 'MOV',
-              'm4v', 'M4V',
-              'webm', 'WEBM', 'WebM'
-            ]
-          }
-        ]
       });
 
     if (!files.canceled && files.filePaths[0]) {

@@ -49,7 +49,9 @@ export const TrimSlider = observer(function TrimSlider(props: TrimSliderProps) {
   const classes = sliderTheme()();
 
   const disabled = !AppState.file;
-  const duration = ProcessStore.simpleVideoDetails ? ProcessStore.simpleVideoDetails.duration : 100;
+  const duration = ProcessStore.simpleVideoDetails ?
+    ProcessStore.simpleVideoDetails.duration || 0.04 :
+    100;
   const step = ProcessStore.simpleVideoDetails ? 1 / ProcessStore.simpleVideoDetails.fps : 0;
 
   let start = duration * .33;
@@ -106,8 +108,8 @@ export const TrimSlider = observer(function TrimSlider(props: TrimSliderProps) {
         onSlide={update}
         onSet={update}
         step={isNaN(step) || !isFinite(step) ? 0 : step}
-        range={{ min: 0, max: duration || 0 }}
-        start={[0, duration || 0]}
+        range={{ min: 0, max: duration || 0.04 }}
+        start={[0, duration || 0.04]}
         connect={[false, true, false]}
         format={{
           from(val: string): number {

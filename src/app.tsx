@@ -44,9 +44,13 @@ import {FeedbackModal} from "./components/feedback/Feedback";
 import {AppState} from "./AppState.store";
 import {observer} from "mobx-react";
 import {ProcessStore} from "./Process.store";
+import {toJS} from "mobx";
 
 const mainElement = document.createElement('div');
 document.body.appendChild(mainElement);
+
+// @ts-ignore
+window.toJS = toJS
 
 const App = observer(() => {
   mainElement.style.background = Theme.current.palette.background.default;
