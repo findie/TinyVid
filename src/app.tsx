@@ -104,27 +104,16 @@ const App = observer(() => {
         </Display>
         <Paper className={css.footer} elevation={3} square={true}>
           {AppState.file ?
-            <DurationInfo
-              className={css.info}
-              start={AppState.trimRange.start}
-              end={AppState.trimRange.end}
-            /> :
+            <DurationInfo className={css.info}/> :
             null
           }
 
           <Box>
             <TrimSlider
-              step={ProcessStore.simpleVideoDetails ? 1 / ProcessStore.simpleVideoDetails.fps : 0}
-              disabled={!AppState.file}
-              duration={ProcessStore.simpleVideoDetails ? ProcessStore.simpleVideoDetails.duration : 100}
               onChange={(begin, end, current) => {
                 if (videoElementRef.current) {
                   videoElementRef.current.currentTime = current;
                 }
-                AppState.setTrimRange({
-                  start: begin,
-                  end: end
-                });
               }}
             />
 
@@ -143,10 +132,8 @@ const App = observer(() => {
                           e => {
                             if (e.target.value === 'max-file-size') {
                               ProcessStore.setStrategyType('max-file-size');
-
                             } else {
                               ProcessStore.setStrategyType('constant-quality');
-
                             }
                           }
                         }

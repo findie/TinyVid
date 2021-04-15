@@ -8,12 +8,13 @@ import * as css from './style.css';
 import './style.css'
 import {arrIsConsistent} from "../../helpers/math";
 import {Box} from "@material-ui/core"
+import {observer} from "mobx-react";
+import {AppState} from "../../AppState.store";
+import {ProcessStore} from "../../Process.store";
+import classNames from "classnames";
 
 export interface TrimSliderProps {
-  duration: number
   onChange: (begin: number, end: number, current: number) => void
-  disabled: boolean
-  step: number
 }
 
 const sliderTheme = () => makeStyles({
@@ -45,12 +46,16 @@ const sliderTheme = () => makeStyles({
   }
 });
 
-export const TrimSlider = (props: TrimSliderProps) => {
+export const TrimSlider = observer(function TrimSlider(props: TrimSliderProps) {
   const classes = sliderTheme()();
 
-  let start = props.duration * .33;
-  let end = props.duration * .66;
-  let current = props.duration * .5;
+  const disabled = !AppState.file;
+  const duration = ProcessStore.simpleVideoDetails ? ProcessStore.simpleVideoDetails.duration : 100;
+  const step = ProcessStore.simpleVideoDetails ? 1 / ProcessStore.simpleVideoDetails.fps : 0;
+
+  let start = duration * .33;
+  let end = duration * .66;
+  let current = duration * .5;
 
   let lastUpdates: number[] = [];
   let to_detect_drag: NodeJS.Timeout | null = null;
@@ -80,6 +85,9 @@ export const TrimSlider = (props: TrimSliderProps) => {
       props.onChange(unencodedValues[0], unencodedValues[1], unencodedValues[0]);
     }
 
+    AppState.setTrimRangeComponent('start',  unencodedValues[0]);
+    AppState.setTrimRangeComponent('end',  unencodedValues[1]);
+
     if (!to_detect_drag) {
       to_detect_drag = setTimeout(() => {
 
@@ -91,16 +99,16 @@ export const TrimSlider = (props: TrimSliderProps) => {
   }
 
   return (
-    <Box marginY={2} marginX={2} className={classes.root + ' ' + (props.disabled ? classes.rootDisabled : '')}>
+    <Box marginY={2} marginX={2} className={classNames(classes.root, disabled && classes.rootDisabled )}>
       <Nouislider
         className={css.slider}
-        disabled={props.disabled}
+        disabled={disabled}
         keyboardSupport
         onSlide={update}
         onSet={update}
-        step={isNaN(props.step) || !isFinite(props.step) ? 0 : props.step}
-        range={{ min: 0, max: props.duration || 0 }}
-        start={[0, props.duration || 0]}
+        step={isNaN(step) || !isFinite(step) ? 0 : step}
+        range={{ min: 0, max: duration || 0 }}
+        start={[0, duration || 0]}
         connect={[false, true, false]}
         format={{
           from(val: string): number {
@@ -116,4 +124,4 @@ export const TrimSlider = (props: TrimSliderProps) => {
     </Box>
   );
 
-}
+});
