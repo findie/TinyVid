@@ -19,7 +19,7 @@
 .wiper > span {
 }
 .wiper > span > svg {
-    padding: 60px 10px;
+    padding: 60px 20px;
     transform:
             translateY(-100%)
             translateY(+8px)

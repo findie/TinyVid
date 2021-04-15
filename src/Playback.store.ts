@@ -19,8 +19,10 @@ class PlaybackStoreClass {
 
     this.currentVideoTimestamp = video.currentTime ?? 0;
 
-    if (video.currentTime >= AppState.trimRange.end) {
-      video.currentTime = AppState.trimRange.start;
+    if(this.isPlaying) {
+      if (video.currentTime >= AppState.trimRange.end) {
+        video.currentTime = AppState.trimRange.start;
+      }
     }
   }
 
