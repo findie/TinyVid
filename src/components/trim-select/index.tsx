@@ -19,28 +19,28 @@ export interface TrimSliderProps {
 const sliderTheme = () => makeStyles({
   'root': {
     '& .noUi-connects': {
-      background: Theme.current().palette.background.default,
+      background: Theme.current.palette.background.default,
     },
 
     '& .noUi-connect': {
-      background: Theme.current().palette.primary.main,
+      background: Theme.current.palette.primary.main,
     },
     '& .noUi-handle': {
-      background: color(Theme.current().palette.primary.main).saturate(0.5).toString()
+      background: color(Theme.current.palette.primary.main).saturate(0.5).toString()
     },
 
     '& .noUi-tooltip': {
-      background: Theme.current().palette.background.paper,
-      color: Theme.current().palette.text.primary,
-      ...Theme.current().typography.body1
+      background: Theme.current.palette.background.paper,
+      color: Theme.current.palette.text.primary,
+      ...Theme.current.typography.body1
     }
   },
   'rootDisabled': {
     '& .noUi-connect': {
-      background: Theme.disabledColor(Theme.current().palette.primary.main),
+      background: Theme.disabledColor(Theme.current.palette.primary.main),
     },
     '& .noUi-handle': {
-      background: Theme.disabledColor(Theme.current().palette.primary.main),
+      background: Theme.disabledColor(Theme.current.palette.primary.main),
     }
   }
 });

@@ -8,7 +8,7 @@ import {Kamua} from "./kamua";
 
 const styles = makeStyles({
   'root': {
-    ...Theme.current().typography.body1
+    ...Theme.current.typography.body1
   }
 })
 

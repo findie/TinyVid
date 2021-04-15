@@ -3,97 +3,121 @@ import {remote} from 'electron';
 import {RendererSettings} from "./settings";
 import color from "color";
 import {objectMergeDeep} from "./js";
+import {action, computed, makeObservable, observable} from "mobx";
 
-export namespace Theme {
+export type ThemeNames = 'dark' | 'light' | 'system';
 
-  export type ThemeNames = 'dark' | 'light' | 'system';
-
-  const nativeTheme = remote.nativeTheme;
-
-  export const shouldUseDarkTheme = () => nativeTheme.shouldUseDarkColors;
-
-  const commonTheme: ThemeOptions = {
-    palette: {
-      primary: {
-        main: '#0082FF'
-      },
-      secondary: {
-        main: '#6E27CC'
+const commonTheme: ThemeOptions = {
+  palette: {
+    primary: {
+      main: '#0082FF'
+    },
+    secondary: {
+      main: '#6E27CC'
+    }
+  },
+  overrides: {
+    MuiTooltip: {
+      tooltip: {
+        fontSize: '0.8rem'
       }
     },
-    overrides: {
-      MuiTooltip: {
-        tooltip: {
-          fontSize: '0.8rem'
-        }
-      },
-      MuiLink: {
-        root: {
-          cursor: 'pointer'
-        }
+    MuiLink: {
+      root: {
+        cursor: 'pointer'
       }
     }
+  }
+};
+
+const darkTheme = createMuiTheme(objectMergeDeep({
+  palette: {
+    type: 'dark',
+  },
+  overrides: {
+    MuiLink: {
+      root: {
+        color: 'white'
+      }
+    }
+  }
+}, commonTheme));
+
+const lightTheme = createMuiTheme(objectMergeDeep({
+  palette: {
+    background: {
+      paper: '#e8e8e8'
+    }
+  },
+  overrides: {
+    MuiLink: {
+      root: {
+        color: 'black'
+      }
+    }
+  }
+}, commonTheme));
+
+class ThemeClass {
+
+  private readonly nativeTheme = remote.nativeTheme;
+
+  @observable private themeSource = remote.nativeTheme.themeSource;
+  @observable private shouldUseDarkColors = remote.nativeTheme.shouldUseDarkColors;
+
+  constructor() {
+    makeObservable(this);
+    // load from settings
+    this.set(RendererSettings.settings.theme);
+
+    this.nativeTheme.on('updated', action(() => {
+      this.themeSource = this.nativeTheme.themeSource;
+      this.shouldUseDarkColors = this.nativeTheme.shouldUseDarkColors;
+    }));
+  }
+
+  @computed get shouldUseDarkTheme() {
+    return this.shouldUseDarkColors;
   };
 
-  const darkTheme = createMuiTheme(objectMergeDeep({
-    palette: {
-      type: 'dark',
-    },
-    overrides: {
-      MuiLink: {
-        root: {
-          color: 'white'
-        }
-      }
-    }
-  }, commonTheme));
+  @computed get current() {
+    return this.shouldUseDarkTheme ? darkTheme : lightTheme
+  };
 
-  const lightTheme = createMuiTheme(objectMergeDeep({
-    palette: {
-      background: {
-        paper: '#e8e8e8'
-      }
-    },
-    overrides: {
-      MuiLink: {
-        root: {
-          color: 'black'
-        }
-      }
-    }
-  }, commonTheme));
+  @computed get currentName() {
+    return this.themeSource;
+  }
 
-  export const current = () => shouldUseDarkTheme() ? darkTheme : lightTheme;
-  export const currentName = () => nativeTheme.themeSource;
-
-  export const disabledColor = (c: string) => shouldUseDarkTheme() ?
+  disabledColor = (c: string) => this.shouldUseDarkTheme ?
     color(c).desaturate(0.7).toString() :
     color(c).desaturate(0.7).lighten(0.5).toString()
 
-  export const set = (s: ThemeNames) => {
-    nativeTheme.themeSource = s;
+  @action
+  set = (s: ThemeNames) => {
+    this.nativeTheme.themeSource = s;
+    this.themeSource = s;
     RendererSettings.settings.theme = s;
     RendererSettings.save();
   }
 
-  export const setNext = (): ThemeNames => {
+  setNext = (): ThemeNames => {
     let t: ThemeNames = 'system';
-    if (nativeTheme.themeSource === 'system') {
+    if (this.nativeTheme.themeSource === 'system') {
       t = 'dark';
     }
-    if (nativeTheme.themeSource === 'dark') {
+    if (this.nativeTheme.themeSource === 'dark') {
       t = 'light';
     }
-    if (nativeTheme.themeSource === 'light') {
+    if (this.nativeTheme.themeSource === 'light') {
       t = 'system';
     }
-    set(t);
+    this.set(t);
     return t;
   }
 
-  // load from settings
-  set(RendererSettings.settings.theme);
 }
+
+export const Theme = new ThemeClass()
 
 window.Theme = Theme;
 

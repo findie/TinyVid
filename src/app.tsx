@@ -52,9 +52,7 @@ const mainElement = document.createElement('div');
 document.body.appendChild(mainElement);
 
 const App = observer(() => {
-  mainElement.style.background = Theme.current().palette.background.default;
-
-  const [theme, setTheme] = useState<Theme.ThemeNames>(Theme.currentName());
+  mainElement.style.background = Theme.current.palette.background.default;
 
   const videoElementRef = useRef<HTMLVideoElement>(null)
 
@@ -68,11 +66,11 @@ const App = observer(() => {
   );
 
   return (
-    <ThemeProvider theme={Theme.current()}>
+    <ThemeProvider theme={Theme.current}>
       <div className={css.app}>
         <Paper elevation={3} className={css.header} square={true}>
           <ChooseFile fileCB={AppState.setFile} className={css.flexGrow + ' ' + css.fileSelect}/>
-          <ThemeSwitch theme={theme} onClick={() => setTheme(Theme.setNext())}/>
+          <ThemeSwitch theme={Theme.currentName} onClick={Theme.setNext}/>
 
           {
             ProcessStore.strategyType === "max-file-size" ?

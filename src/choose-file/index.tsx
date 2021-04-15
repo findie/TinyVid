@@ -16,7 +16,7 @@ export interface ChooseFileProps {
 
 const styles = () => makeStyles({
   'textField': {
-    background: Theme.current().palette.background.default
+    background: Theme.current.palette.background.default
   }
 })
 

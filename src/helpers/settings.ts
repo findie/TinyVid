@@ -1,11 +1,11 @@
 import {existsSync, readFileSync, writeFileSync} from "fs";
 import {ResourceHelpers} from "../../electron/helpers/resources";
-import {Theme} from "./theme";
+import {Theme, ThemeNames} from "./theme";
 
 export namespace RendererSettings {
 
   export interface RendererSettings {
-    theme: Theme.ThemeNames
+    theme: ThemeNames
   }
 
   export const settings: RendererSettings = {
