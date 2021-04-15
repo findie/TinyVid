@@ -112,7 +112,7 @@ app.on('ready', async () => {
 
   if (!app.isPackaged) {
     session.defaultSession.loadExtension(
-      path.join(os.homedir(), '.config/google-chrome/Default/Extensions/fmkadmapgofadopljbjfkapdkoienihi/4.10.1_0/')
+      path.join(os.homedir(), '.config/google-chrome/Default/Extensions/fmkadmapgofadopljbjfkapdkoienihi/4.11.0_0/')
     )
       .then(ex => console.log('Registered extension ' + ex.name))
       .catch(e => console.error('Failed to register extension fmkadmapgofadopljbjfkapdkoienihi (React Dev Tools)', e));

@@ -12,7 +12,6 @@ import {ConfigMaxFileSize} from "./config/max-file-size";
 import {SpeedSlider} from "./config/speed-slider";
 import {ConfigConstantQuality} from "./config/constant-quality";
 import {ConfigVideoSettings} from "./config/video-settings";
-import {RenderStrategy} from "../electron/types";
 import {TrimComms} from "./helpers/comms";
 import {Loading} from "./components/loading";
 
@@ -33,11 +32,9 @@ import {
 import {Theme} from "./helpers/theme";
 import {DurationInfo} from "./components/duration-info";
 import {ErrorDisplayModal} from "./components/error";
-import {RendererFileHelpers} from "./helpers/file";
 import {ThemeSwitch} from "./components/theme-switch";
 import {BitrateWarnings} from "./components/bitrate-warnings";
 import {PreventClosing} from "./components/prevent-closing";
-import {remote} from "electron";
 import {BrokenImage, Videocam} from "@material-ui/icons";
 import {FooterBranding} from "./components/footer-branding";
 
@@ -71,18 +68,7 @@ const App = observer(() => {
         <Paper elevation={3} className={css.header} square={true}>
           <ChooseFile fileCB={AppState.setFile} className={css.flexGrow + ' ' + css.fileSelect}/>
           <ThemeSwitch theme={Theme.currentName} onClick={Theme.setNext}/>
-
-          {
-            ProcessStore.strategyType === "max-file-size" ?
-              <BitrateWarnings
-                fileSizeInBytes={ProcessStore.strategyTune}
-                className={css.alert}
-                duration={AppState.trimRange.end - AppState.trimRange.start}
-                videoDetails={ProcessStore.simpleVideoDetails}
-                videoSettings={ProcessStore.videoSettings}
-              /> :
-              null
-          }
+          <BitrateWarnings className={css.alert}/>
         </Paper>
         <Display
           className={css.display}
