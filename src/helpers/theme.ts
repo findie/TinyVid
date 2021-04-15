@@ -95,7 +95,8 @@ class ThemeClass {
   @action
   set = (s: ThemeNames) => {
     this.nativeTheme.themeSource = s;
-    this.themeSource = s;
+    this.themeSource = this.nativeTheme.themeSource;
+    this.shouldUseDarkColors = this.nativeTheme.shouldUseDarkColors;
     RendererSettings.settings.theme = s;
     RendererSettings.save();
   }
