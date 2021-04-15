@@ -51,8 +51,6 @@ document.body.appendChild(mainElement);
 const App = observer(() => {
   mainElement.style.background = Theme.current.palette.background.default;
 
-  const videoElementRef = useRef<HTMLVideoElement>(null)
-
   const [showFeedback, setShowFeedback] = useState(false);
 
   const mediaNoVideo = ProcessStore.simpleVideoDetails && !ProcessStore.simpleVideoDetails.videoCodec;
@@ -73,7 +71,6 @@ const App = observer(() => {
         <Display
           className={css.display}
           file={AppState.file}
-          ref={videoElementRef}
         >
           <Box className={css.children}>
 
@@ -109,13 +106,7 @@ const App = observer(() => {
           }
 
           <Box>
-            <TrimSlider
-              onChange={(begin, end, current) => {
-                if (videoElementRef.current) {
-                  videoElementRef.current.currentTime = current;
-                }
-              }}
-            />
+            <TrimSlider/>
 
             <Box marginX={2} marginY={1} className={css.controls}>
               <div className={css.rows + ' ' + css.flexGrow}>

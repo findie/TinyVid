@@ -14,7 +14,6 @@ import {ProcessStore} from "../../Process.store";
 import classNames from "classnames";
 
 export interface TrimSliderProps {
-  onChange: (begin: number, end: number, current: number) => void
 }
 
 const sliderTheme = () => makeStyles({
@@ -78,11 +77,11 @@ export const TrimSlider = observer(function TrimSlider(props: TrimSliderProps) {
     if (arrIsConsistent(lastUpdates)) {
       // console.log('dragging head', unencodedValues.findIndex(x => x === val), val);
       // it's a slider drag
-      props.onChange(unencodedValues[0], unencodedValues[1], val);
+      AppState.setLastTrimValue(val);
     } else {
       // it's a connect drag, just update head (first slider)
-      console.log('dragging connect', 0, unencodedValues[0]);
-      props.onChange(unencodedValues[0], unencodedValues[1], unencodedValues[0]);
+      // console.log('dragging connect', 0, unencodedValues[0]);
+      AppState.setLastTrimValue(unencodedValues[0]);
     }
 
     AppState.setTrimRangeComponent('start',  unencodedValues[0]);

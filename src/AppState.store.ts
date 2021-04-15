@@ -10,8 +10,9 @@ class AppStateClass {
   @action setFile = (f: string) => this.file = f;
 
   @observable trimRange: { start: number, end: number } = { start: 0, end: 0 };
-  @action setTrimRange = (tr: AppStateClass['trimRange']) => this.trimRange = tr;
   @action setTrimRangeComponent = (k: keyof AppStateClass['trimRange'], v: number) => this.trimRange[k] = v;
+  @observable lastTrimValue: number = 0;
+  @action setLastTrimValue = (v: number) => this.lastTrimValue = v;
 
   constructor() {
     makeObservable(this);
