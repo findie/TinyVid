@@ -12,11 +12,6 @@ export interface ConfigVideoSettingsProps {
   details: DetailsComms.SimpleVideoDetails | null
 }
 
-export const ConfigVideoSettingsDefault: ConfigVideoSettingsData = {
-  fps: 'original',
-  height: 'original'
-};
-
 export function ConfigVideoSettings(props: ConfigVideoSettingsProps) {
 
   const originalVideoHeight: number | null = props.details?.height || null;

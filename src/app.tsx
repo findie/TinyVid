@@ -1,27 +1,19 @@
 import '../electron/helpers/log'
 import './types'
 
-import React, {useCallback, useEffect, useRef, useState} from 'react';
+import React, {useRef, useState} from 'react';
 import ReactDom from 'react-dom';
 import {ChooseFile} from "./choose-file";
 import {Display} from "./display";
 import {TrimSlider} from "./components/trim-select";
 import {ProcessingOverlay} from "./progress";
 import css from './style.css';
-import {
-  ConfigMaxFileSize,
-  ConfigMaxFileSizeDefaultSize,
-  ConfigMaxFileSizeDefaultSpeedOrQuality
-} from "./config/max-file-size";
+import {ConfigMaxFileSize} from "./config/max-file-size";
 import {SpeedSlider} from "./config/speed-slider";
-import {
-  ConfigConstantQuality,
-  ConfigConstantQualityDefaultQuality,
-  ConfigConstantQualityDefaultSpeedOrQuality
-} from "./config/constant-quality";
-import {ConfigVideoSettings, ConfigVideoSettingsData, ConfigVideoSettingsDefault} from "./config/video-settings";
+import {ConfigConstantQuality} from "./config/constant-quality";
+import {ConfigVideoSettings} from "./config/video-settings";
 import {RenderStrategy} from "../electron/types";
-import {DetailsComms, TrimComms} from "./helpers/comms";
+import {TrimComms} from "./helpers/comms";
 import {Loading} from "./components/loading";
 
 import {
@@ -40,7 +32,6 @@ import {
 } from "@material-ui/core";
 import {Theme} from "./helpers/theme";
 import {DurationInfo} from "./components/duration-info";
-import {ErrorLike} from "../electron/protocols/base-protocols";
 import {ErrorDisplayModal} from "./components/error";
 import {RendererFileHelpers} from "./helpers/file";
 import {ThemeSwitch} from "./components/theme-switch";
@@ -53,132 +44,51 @@ import {FooterBranding} from "./components/footer-branding";
 import '../common/sentry';
 import {VideoHelpers} from "./helpers/video";
 import {FeedbackModal} from "./components/feedback/Feedback";
-
-const defaultMaxFileSizeStrategy: RenderStrategy = {
-  type: 'max-file-size',
-  tune: ConfigMaxFileSizeDefaultSize,
-  speed: ConfigMaxFileSizeDefaultSpeedOrQuality
-}
-const defaultConstantQuality: RenderStrategy = {
-  type: 'constant-quality',
-  tune: ConfigConstantQualityDefaultQuality,
-  speed: ConfigConstantQualityDefaultSpeedOrQuality
-}
+import {AppState} from "./AppState.store";
+import {observer} from "mobx-react";
+import {ProcessStore} from "./Process.store";
 
 const mainElement = document.createElement('div');
 document.body.appendChild(mainElement);
 
-const App = () => {
+const App = observer(() => {
   mainElement.style.background = Theme.current().palette.background.default;
 
   const [theme, setTheme] = useState<Theme.ThemeNames>(Theme.currentName());
-  const [error, setError] = useState<Error | ErrorLike | null>(null);
 
   const videoElementRef = useRef<HTMLVideoElement>(null)
-  const [file, setFile] = useState<string>('');
-  const [videoDetails, setVideoDetails] = useState<null | DetailsComms.SimpleVideoDetails>(null);
-  const [range, setRange] = useState<{ start: number, end: number }>({ start: 0, end: 0 })
-
-  const [fileOut, setFileOut] = useState<string>();
-
-  const [strategyType, setStrategyType] = useState<RenderStrategy['type']>(defaultMaxFileSizeStrategy.type);
-  const [strategyTune, setStrategyTune] = useState<RenderStrategy['tune']>(defaultMaxFileSizeStrategy.tune);
-  const [strategySpeed, setStrategySpeed] = useState<RenderStrategy['speed']>(defaultMaxFileSizeStrategy.speed);
-
-  const [videoSettings, setVideoSettings] = useState<ConfigVideoSettingsData>(ConfigVideoSettingsDefault);
-
-  const [processingID, setProcessingID] = useState<string | null>(null);
 
   const [showFeedback, setShowFeedback] = useState(false);
 
-  async function startProcessing() {
-    if (!file) {
-      return console.warn('refusing to start process with empty video field');
-    }
-
-    const strategy: RenderStrategy = { type: strategyType, tune: strategyTune, speed: strategySpeed };
-
-    const fout = remote.dialog.showSaveDialogSync(
-      remote.getCurrentWindow(),
-      {
-        title: 'Output location',
-        defaultPath: RendererFileHelpers.generateFileOutName(file, range, strategy, videoSettings),
-        buttonLabel: 'Save & Start',
-        filters: [{ name: 'Video', extensions: ['mp4'] }],
-        properties: ['createDirectory', 'showOverwriteConfirmation']
-      });
-
-    if (!fout) {
-      return console.warn('refusing to start process with empty output location');
-    }
-
-    // box in the range by one frame to account for browser frame inaccuracy
-    const frameTime = (1 / (videoDetails?.fps || 60));
-    const start = range.start + frameTime;
-    const end = Math.max(start + frameTime, range.end - frameTime);
-
-    const data = await TrimComms.startProcess(
-      file,
-      fout,
-      { start, end },
-      strategy,
-      videoSettings
-    );
-
-    setFileOut(fout);
-    setProcessingID(data.id);
-  }
-
-  useEffect(function getVideoDetails() {
-    if (!file) return console.warn('refusing to start process with empty video field');
-
-    setVideoDetails(null);
-
-    DetailsComms.getDetails(file)
-      .then(details => {
-        setVideoDetails(DetailsComms.simplifyMediaDetails(details));
-        console.log(details);
-      })
-      .catch(setError);
-
-  }, [file]);
-
-  useEffect(function cleanupOnError() {
-    if (error) {
-      setProcessingID(null);
-      setFile('');
-    }
-  }, [error]);
-
-  const mediaNoVideo = videoDetails && !videoDetails.videoCodec;
-  const mediaNotSupported = videoDetails && (
-    !VideoHelpers.supportedVideoCodec(videoDetails.videoCodec || '') ||
-    !VideoHelpers.supportedFormatContainer(videoDetails.containerFormats) ||
-    !VideoHelpers.supportedPixelFormat(videoDetails.pixelFormat || '')
+  const mediaNoVideo = ProcessStore.simpleVideoDetails && !ProcessStore.simpleVideoDetails.videoCodec;
+  const mediaNotSupported = ProcessStore.simpleVideoDetails && (
+    !VideoHelpers.supportedVideoCodec(ProcessStore.simpleVideoDetails.videoCodec || '') ||
+    !VideoHelpers.supportedFormatContainer(ProcessStore.simpleVideoDetails.containerFormats) ||
+    !VideoHelpers.supportedPixelFormat(ProcessStore.simpleVideoDetails.pixelFormat || '')
   );
 
   return (
     <ThemeProvider theme={Theme.current()}>
       <div className={css.app}>
         <Paper elevation={3} className={css.header} square={true}>
-          <ChooseFile fileCB={setFile} className={css.flexGrow + ' ' + css.fileSelect}/>
+          <ChooseFile fileCB={AppState.setFile} className={css.flexGrow + ' ' + css.fileSelect}/>
           <ThemeSwitch theme={theme} onClick={() => setTheme(Theme.setNext())}/>
 
           {
-            strategyType === "max-file-size" ?
+            ProcessStore.strategyType === "max-file-size" ?
               <BitrateWarnings
-                fileSizeInBytes={strategyTune}
+                fileSizeInBytes={ProcessStore.strategyTune}
                 className={css.alert}
-                duration={range.end - range.start}
-                videoDetails={videoDetails}
-                videoSettings={videoSettings}
+                duration={AppState.trimRange.end - AppState.trimRange.start}
+                videoDetails={ProcessStore.simpleVideoDetails}
+                videoSettings={ProcessStore.videoSettings}
               /> :
               null
           }
         </Paper>
         <Display
           className={css.display}
-          file={file}
+          file={AppState.file}
           ref={videoElementRef}
         >
           <Box className={css.children}>
@@ -209,25 +119,25 @@ const App = () => {
           </Box>
         </Display>
         <Paper className={css.footer} elevation={3} square={true}>
-          {file ?
+          {AppState.file ?
             <DurationInfo
               className={css.info}
-              start={range.start}
-              end={range.end}
+              start={AppState.trimRange.start}
+              end={AppState.trimRange.end}
             /> :
             null
           }
 
           <Box>
             <TrimSlider
-              step={videoDetails ? 1 / videoDetails.fps : 0}
-              disabled={!file}
-              duration={videoDetails ? videoDetails.duration : 100}
+              step={ProcessStore.simpleVideoDetails ? 1 / ProcessStore.simpleVideoDetails.fps : 0}
+              disabled={!AppState.file}
+              duration={ProcessStore.simpleVideoDetails ? ProcessStore.simpleVideoDetails.duration : 100}
               onChange={(begin, end, current) => {
                 if (videoElementRef.current) {
                   videoElementRef.current.currentTime = current;
                 }
-                setRange({
+                AppState.setTrimRange({
                   start: begin,
                   end: end
                 });
@@ -243,16 +153,16 @@ const App = () => {
                       <InputLabel id="strategy-label">Output must</InputLabel>
                       <Select
                         labelId={"strategy-label"}
-                        value={strategyType}
+                        value={ProcessStore.strategyType}
                         variant={"standard"}
                         onChange={
                           e => {
                             if (e.target.value === 'max-file-size') {
-                              setStrategyType('max-file-size');
-                              setStrategyTune(defaultMaxFileSizeStrategy.tune);
+                              ProcessStore.setStrategyType('max-file-size');
+
                             } else {
-                              setStrategyType('constant-quality');
-                              setStrategyTune(defaultConstantQuality.tune);
+                              ProcessStore.setStrategyType('constant-quality');
+
                             }
                           }
                         }
@@ -262,19 +172,19 @@ const App = () => {
                       </Select>
                     </FormControl>
 
-                    {strategyType === 'max-file-size' ?
+                    {ProcessStore.strategyType === 'max-file-size' ?
                       <ConfigMaxFileSize onChange={size => {
-                        setStrategyTune(size)
+                        ProcessStore.setStrategyTune(size)
                       }}/> :
                       <ConfigConstantQuality onChange={quality => {
-                        setStrategyTune(quality)
+                        ProcessStore.setStrategyTune(quality)
                       }}/>
                     }
                   </div>
                   <div className={css.right}>
                     <ConfigVideoSettings
-                      onChange={setVideoSettings}
-                      details={videoDetails}
+                      onChange={ProcessStore.setVideoSettings}
+                      details={ProcessStore.simpleVideoDetails}
                     />
                   </div>
                 </div>
@@ -282,26 +192,23 @@ const App = () => {
                 <Box marginTop={2} style={{ display: 'flex' }}>
                   <SpeedSlider
                     className={css.speedSlider}
-                    highSpeedText={strategyType === 'max-file-size' ? 'Faster Processing' : 'Faster Processing'}
-                    lowSpeedText={strategyType === 'max-file-size' ? 'Better Quality' : 'Smaller File Size'}
+                    highSpeedText={ProcessStore.strategyType === 'max-file-size' ? 'Faster Processing' : 'Faster Processing'}
+                    lowSpeedText={ProcessStore.strategyType === 'max-file-size' ? 'Better Quality' : 'Smaller File Size'}
 
                     highSpeedTooltip={
-                      strategyType === 'max-file-size' ?
+                      ProcessStore.strategyType === 'max-file-size' ?
                         'Process will finish faster but video quality will suffer' :
                         'Process will finish faster but file size will be larger'
                     }
                     lowSpeedTooltip={
-                      strategyType === 'max-file-size' ?
+                      ProcessStore.strategyType === 'max-file-size' ?
                         'Process will finish slower but video will be at the best quality it can' :
                         'Process will finish slower but file will be at the lowest size quality'
                     }
 
 
                     onChange={
-                      useCallback(
-                        speedIndex => setStrategySpeed(speedIndex),
-                        [strategySpeed, setStrategySpeed]
-                      )
+                      ProcessStore.setStrategySpeed
                     }
                   />
                   <Box marginLeft={2}>
@@ -310,8 +217,8 @@ const App = () => {
                       variant="contained"
                       className={css.processBtn}
                       color={"secondary"}
-                      disabled={!file || !!mediaNoVideo}
-                      onClick={startProcessing}
+                      disabled={!AppState.file || !!mediaNoVideo}
+                      onClick={ProcessStore.startProcessing}
                     >Process
                     </Button>
                   </Box>
@@ -334,34 +241,34 @@ const App = () => {
           </Box>
         </Paper>
 
-        {processingID ?
+        {ProcessStore.processingID ?
           <ProcessingOverlay
-            fileIn={file}
-            fileOut={fileOut || ''}
-            id={processingID}
-            onDone={() => setProcessingID(null)}
-            onCancelRequest={() => TrimComms.cancelProcess(processingID)}
+            fileIn={AppState.file}
+            fileOut={ProcessStore.fileOut || ''}
+            id={ProcessStore.processingID}
+            onDone={() => ProcessStore.setProcessingID(null)}
+            onCancelRequest={() => TrimComms.cancelProcess(ProcessStore.processingID!)}
           /> :
           null
         }
 
         {
-          file && !videoDetails ? <Loading/> : null
+          AppState.file && !ProcessStore.simpleVideoDetails ? <Loading/> : null
         }
 
         {
-          error ? <ErrorDisplayModal error={error} onOk={() => {
-            setError(null);
+          ProcessStore.error ? <ErrorDisplayModal error={ProcessStore.error} onOk={() => {
+            ProcessStore.setError(null);
           }}/> : null
         }
 
-        <PreventClosing prevent={!!processingID}/>
+        <PreventClosing prevent={!!ProcessStore.processingID}/>
 
         <FeedbackModal open={showFeedback} onClose={() => setShowFeedback(false)}/>
 
       </div>
     </ThemeProvider>
   )
-}
+})
 
 ReactDom.render(<App/>, mainElement);

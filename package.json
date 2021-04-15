@@ -11,7 +11,7 @@
     "ffbin": "ffbinaries ffprobe ffmpeg -p linux-64 -o bin/linux-64 && ffbinaries ffprobe ffmpeg -p windows-64 -o bin/windows-64 && ffbinaries ffprobe ffmpeg -p osx-64 -o bin/osx-64",
     "build:js-win": "yarn install && set NODE_ENV=production && webpack --config webpack.electron.config.js --mode production && set NODE_ENV=production && webpack --config webpack.react.config.js --mode production",
     "build:js": "yarn install && NODE_ENV=production webpack --config webpack.electron.config.js --mode production && NODE_ENV=production webpack --config webpack.react.config.js --mode production",
-    "build:win": "yarn build:js-win && electron-builder --win -p never",
+    "build:win": "yarn build:js && electron-builder --win -p always",
     "build:linux": "yarn build:js && electron-builder --linux -p always",
     "build:mac": "yarn build:js && electron-builder --mac -p always"
   },
@@ -59,6 +59,8 @@
     "webpack-dev-server": "^3.11.0"
   },
   "dependencies": {
+    "@babel/plugin-proposal-class-properties": "^7.13.0",
+    "@babel/plugin-proposal-decorators": "^7.13.15",
     "@sentry/electron": "^2.4.0",
     "@sentry/integrations": "^6.2.5",
     "@types/classnames": "^2.2.11",
@@ -66,6 +68,8 @@
     "classnames": "^2.3.0",
     "electron-log": "^4.2.2",
     "ffmpeg-progress-wrapper": "^2.0.0",
+    "mobx": "^6.2.0",
+    "mobx-react": "^7.1.0",
     "otplib": "^12.0.1",
     "react-merge-refs": "^1.1.0",
     "source-map-support": "^0.5.19"
