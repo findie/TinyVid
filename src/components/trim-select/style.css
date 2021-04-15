@@ -1,3 +1,30 @@
 .noUi-pips-horizontal {
     height: 10px;
 }
+
+.root {
+    position: relative;
+}
+
+.wiper {
+    width: 2px;
+    height: 22px;
+    transform: translateY(-100%) translateX(-1px);
+    background: white;
+    position: absolute;
+
+    cursor: pointer;
+}
+
+.wiper > span {
+}
+.wiper > span > svg {
+    padding: 60px 10px;
+    transform:
+            translateY(-100%)
+            translateY(+8px)
+            translateY(+60px)
+            translateX(-50%)
+            translateX(+1px)
+            rotate(90deg);
+}

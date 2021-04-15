@@ -20,3 +20,6 @@ class AppStateClass {
 }
 
 export const AppState = new AppStateClass();
+
+// @ts-ignore
+window.AppState = AppState;

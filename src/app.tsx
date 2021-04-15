@@ -19,7 +19,7 @@ import {
   Button,
   Divider,
   FormControl,
-  Icon,
+  Icon, IconButton,
   InputLabel,
   Link,
   MenuItem,
@@ -34,7 +34,7 @@ import {ErrorDisplayModal} from "./components/error";
 import {ThemeSwitch} from "./components/theme-switch";
 import {BitrateWarnings} from "./components/bitrate-warnings";
 import {PreventClosing} from "./components/prevent-closing";
-import {BrokenImage, Videocam} from "@material-ui/icons";
+import {BrokenImage, PauseRounded, PlayArrowRounded, Videocam} from "@material-ui/icons";
 import {FooterBranding} from "./components/footer-branding";
 
 import '../common/sentry';
@@ -44,6 +44,7 @@ import {AppState} from "./AppState.store";
 import {observer} from "mobx-react";
 import {ProcessStore} from "./Process.store";
 import {toJS} from "mobx";
+import {PlaybackStore} from "./Playback.store";
 
 const mainElement = document.createElement('div');
 document.body.appendChild(mainElement);
@@ -71,10 +72,8 @@ const App = observer(() => {
           <ThemeSwitch theme={Theme.currentName} onClick={Theme.setNext}/>
           <BitrateWarnings className={css.alert}/>
         </Paper>
-        <Display
-          className={css.display}
-          file={AppState.file}
-        >
+        <Display className={css.display}>
+
           <Box className={css.children}>
 
             {mediaNoVideo && (
@@ -101,6 +100,20 @@ const App = observer(() => {
 
             )}
           </Box>
+
+          {!!ProcessStore.videoDetails && !mediaNoVideo && !mediaNotSupported && (
+            <div
+              className={css.controlsContainer}
+            >
+              <IconButton
+                onClick={PlaybackStore.togglePlayback}
+                style={{fontSize: '100px'}}
+              >
+                {PlaybackStore.isPlaying ? <PauseRounded fontSize="inherit"/> : <PlayArrowRounded fontSize="inherit"/>}
+              </IconButton>
+            </div>
+          )}
+
         </Display>
         <Paper className={css.footer} elevation={3} square={true}>
           {AppState.file ?

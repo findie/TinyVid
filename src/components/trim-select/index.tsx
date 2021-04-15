@@ -1,4 +1,4 @@
-import React from "react";
+import React, {useState} from "react";
 import Nouislider from "nouislider-react";
 import "nouislider/distribute/nouislider.css";
 import {makeStyles} from "@material-ui/core/styles";
@@ -7,11 +7,14 @@ import color from 'color'
 import * as css from './style.css';
 import './style.css'
 import {arrIsConsistent} from "../../helpers/math";
-import {Box} from "@material-ui/core"
+import {Box, Icon} from "@material-ui/core"
 import {observer} from "mobx-react";
 import {AppState} from "../../AppState.store";
 import {ProcessStore} from "../../Process.store";
 import classNames from "classnames";
+import {PlaybackStore} from "../../Playback.store";
+import {PlayArrow} from "@material-ui/icons";
+
 
 export interface TrimSliderProps {
 }
@@ -61,6 +64,9 @@ export const TrimSlider = observer(function TrimSlider(props: TrimSliderProps) {
   let lastUpdates: number[] = [];
   let to_detect_drag: NodeJS.Timeout | null = null;
 
+  const [startDrag, setStartDrag] = useState<number | null>(null);
+  const [startDragTime, setStartDragTime] = useState<number>(0);
+
   function update(values: any[], handle: number, unencodedValues: number[], tap: boolean, positions: number[]) {
 
     const val = unencodedValues[handle];
@@ -86,8 +92,8 @@ export const TrimSlider = observer(function TrimSlider(props: TrimSliderProps) {
       AppState.setLastTrimValue(unencodedValues[0]);
     }
 
-    AppState.setTrimRangeComponent('start',  unencodedValues[0]);
-    AppState.setTrimRangeComponent('end',  unencodedValues[1]);
+    AppState.setTrimRangeComponent('start', unencodedValues[0]);
+    AppState.setTrimRangeComponent('end', unencodedValues[1]);
 
     if (!to_detect_drag) {
       to_detect_drag = setTimeout(() => {
@@ -100,7 +106,12 @@ export const TrimSlider = observer(function TrimSlider(props: TrimSliderProps) {
   }
 
   return (
-    <Box marginY={2} marginX={2} className={classNames(classes.root, disabled && classes.rootDisabled )}>
+    <Box
+      marginY={2}
+      marginX={2}
+      className={classNames(classes.root, css.root, disabled && classes.rootDisabled)}
+    >
+
       <Nouislider
         className={css.slider}
         disabled={disabled}
@@ -122,6 +133,34 @@ export const TrimSlider = observer(function TrimSlider(props: TrimSliderProps) {
         behaviour={'drag'}
         // behaviour={'drag-snap'}
       />
+
+      {!!ProcessStore.simpleVideoDetails?.duration && (
+        <div
+          className={css.wiper}
+          onMouseDown={(e) => {
+            PlaybackStore.pause();
+            setStartDrag(e.clientX);
+            setStartDragTime(PlaybackStore.currentVideoTimestamp);
+          }}
+          onMouseUp={(e) => setStartDrag(null)}
+          onMouseOut={(e) => setStartDrag(null)}
+
+          onMouseMove={e => {
+            if (startDrag === null) return;
+            const diff = e.clientX - startDrag;
+
+            const track = e.currentTarget.parentElement;
+            const trackLen = track!.offsetWidth
+
+            const percentageOfTrackMoved = diff / trackLen;
+
+            PlaybackStore.setTime(startDragTime + percentageOfTrackMoved * ProcessStore.simpleVideoDetails!.duration)
+          }}
+          style={{ left: `${PlaybackStore.currentVideoTimestamp / ProcessStore.simpleVideoDetails.duration * 100}%` }}
+        >
+          <Icon><PlayArrow/></Icon>
+        </div>
+      )}
     </Box>
   );
 
