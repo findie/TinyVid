@@ -1,9 +1,10 @@
 import React from "react";
 import {Theme} from "../../helpers/theme";
-import Logo from './kamua.png'
+import Logo from './kamua.png';
+
 export function Kamua(props: { className?: string }) {
 
-  const fill: string = Theme.shouldUseDarkTheme() ?
+  const fill: string = Theme.shouldUseDarkTheme ?
     '#e2e2e4' :
     '#1d1d1b';
 

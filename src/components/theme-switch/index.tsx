@@ -1,10 +1,10 @@
-import {Theme} from "../../helpers/theme";
+import {ThemeNames} from "../../helpers/theme";
 import {Brightness2 as DarkIcon, Brightness5 as LightIcon, BrightnessAuto as AutoIcon} from "@material-ui/icons";
 import {IconButton, Tooltip} from "@material-ui/core";
 import React from "react";
 
 interface ThemeSwitchProps {
-  theme: Theme.ThemeNames,
+  theme: ThemeNames,
   onClick: () => void
 }
 

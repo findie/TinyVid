@@ -1,20 +1,29 @@
-import React, {forwardRef, VideoHTMLAttributes} from "react";
+import React, {useEffect, VideoHTMLAttributes} from "react";
 import css from './style.css'
+import {observer} from "mobx-react";
+import {AppState} from "../AppState.store";
+import {PlaybackStore} from "../Playback.store";
 
 export interface DisplayProps extends VideoHTMLAttributes<HTMLVideoElement> {
-  file: string
 }
 
-export const Display = forwardRef<HTMLVideoElement, DisplayProps>(function Display(props: DisplayProps, ref) {
+export const Display = observer(function Display(props: DisplayProps) {
 
-  const { file, className, ...p } = props;
+  const { className, ...p } = props;
+
+  useEffect(() => {
+    if (PlaybackStore.videoRef.current) {
+      PlaybackStore.videoRef.current.currentTime = AppState.lastTrimValue;
+    }
+  }, [AppState.lastTrimValue]);
 
   return <div className={className}>
-    <video className={css.video}
-           ref={ref}
-           src={props.file ? 'video://' + encodeURIComponent(props.file) : ''}
-           controls={false}
-           {...p}
+    <video
+      className={css.video}
+      ref={PlaybackStore.videoRef}
+      src={AppState.file ? 'video://' + encodeURIComponent(AppState.file) : ''}
+      controls={false}
+      {...p}
     >
     </video>
 

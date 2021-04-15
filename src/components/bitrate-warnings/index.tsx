@@ -5,8 +5,10 @@ import {Collapse} from "@material-ui/core";
 import {Alert, AlertProps, AlertTitle} from "@material-ui/lab"
 import {FFHelpers} from "../../../electron/helpers/ff";
 import {between} from "../../helpers/math";
+import {observer} from "mobx-react";
+import {ProcessStore} from "../../Process.store";
+import {AlertVariants, BitrateWarningStore} from "./BitrateWarning.store";
 
-type AlertVariants = 'corrupt' | 'bad' | 'artifacts' | 'ok' | 'waste';
 
 const alertMessages: ({ [s in AlertVariants]: { title: string, text: string, severity: AlertProps['severity'], type: AlertVariants } }) = {
   corrupt: {
@@ -41,71 +43,39 @@ const alertMessages: ({ [s in AlertVariants]: { title: string, text: string, sev
   }
 }
 
-function getAlertType(videoDetails: DetailsComms.SimpleVideoDetails, videoSettings: VideoSettings, fileSizeInBytes: number, duration: number) {
-  const bitrateThresholds = FFHelpers.optimalBitrateCalculator(videoDetails, videoSettings);
-  const averageBitrateInKb = FFHelpers.computeAverageBPS(fileSizeInBytes, duration);
-
-  const averageVideoBitrateInBits = averageBitrateInKb.videoBitrateInKb * 1024;
-
-  // bad quality
-  if (between(bitrateThresholds.mayCorrupt[0], averageVideoBitrateInBits, bitrateThresholds.mayCorrupt[1])) {
-    return alertMessages.corrupt;
-  }
-  if (between(bitrateThresholds.veryBad[0], averageVideoBitrateInBits, bitrateThresholds.veryBad[1])) {
-    return alertMessages.bad;
-  }
-  if (between(bitrateThresholds.blockingArtifacts[0], averageVideoBitrateInBits, bitrateThresholds.blockingArtifacts[1])) {
-    return alertMessages.artifacts;
-  }
-
-  // ok
-  if (
-    between(bitrateThresholds.good[0], averageVideoBitrateInBits, bitrateThresholds.good[1]) ||
-    between(bitrateThresholds.diminishingReturns[0], averageVideoBitrateInBits, bitrateThresholds.diminishingReturns[1])
-  ) {
-    return alertMessages.ok;
-  }
-
-  // too big
-  if (between(bitrateThresholds.wastedSpace[0], averageVideoBitrateInBits, bitrateThresholds.wastedSpace[1])) {
-    return alertMessages.waste;
-  }
-
-  console.trace('you should not be here');
-  return alertMessages.ok;
-}
-
 export interface BitrateWarningsProps {
-  videoDetails: DetailsComms.SimpleVideoDetails | null,
-  videoSettings: VideoSettings
-  duration: number
-  fileSizeInBytes: number
   className?: string
 }
 
-export function BitrateWarnings(props: BitrateWarningsProps) {
-
-  if (!props.videoDetails) {
-    return null;
-  }
+export const BitrateWarnings = observer(function BitrateWarnings(props: BitrateWarningsProps) {
 
   const [suppress, setSuppress] = useState(false);
   const [lastAlert, setLastAlert] = useState<AlertVariants>("ok");
-  const alertData = getAlertType(props.videoDetails, props.videoSettings, props.fileSizeInBytes, props.duration);
+
+  const videoDetails = ProcessStore.simpleVideoDetails;
+  const alertData = alertMessages[BitrateWarningStore.alertType]
+
+  useEffect(() => {
+
+    if (lastAlert !== alertData?.type) {
+      setLastAlert(alertData?.type || 'ok');
+      setSuppress(false);
+    }
+
+  }, [alertData])
+
+
+  if (!videoDetails) {
+    return null;
+  }
+  if (ProcessStore.strategyType !== "max-file-size") {
+    return null;
+  }
 
   function temp_close_alert() {
     console.log('should suppress alert')
     setSuppress(true);
   }
-
-  useEffect(() => {
-
-    if (lastAlert !== alertData.type) {
-      setLastAlert(alertData.type);
-      setSuppress(false);
-    }
-
-  }, [props])
 
   if (suppress) {
     return null;
@@ -124,4 +94,4 @@ export function BitrateWarnings(props: BitrateWarningsProps) {
       </Collapse>
     </div>
   );
-}
+});

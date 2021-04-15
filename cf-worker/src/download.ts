@@ -5,9 +5,10 @@
 import {respondJSON} from "./helpers/respond";
 import * as YAML from 'js-yaml';
 import {cacheHoF} from "./helpers/cache";
+import {corsHoF} from "./helpers/cors";
 
 
-const cachedHandler = cacheHoF(handleRequest, 60);
+const cachedHandler = cacheHoF(corsHoF(handleRequest), 60);
 addEventListener('fetch', async event => {
   event.respondWith(cachedHandler(event));
 });

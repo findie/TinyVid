@@ -1,4 +1,4 @@
-import React from "react";
+import React, {useState} from "react";
 import Nouislider from "nouislider-react";
 import "nouislider/distribute/nouislider.css";
 import {makeStyles} from "@material-ui/core/styles";
@@ -7,53 +7,65 @@ import color from 'color'
 import * as css from './style.css';
 import './style.css'
 import {arrIsConsistent} from "../../helpers/math";
-import {Box} from "@material-ui/core"
+import {Box, Icon} from "@material-ui/core"
+import {observer} from "mobx-react";
+import {AppState} from "../../AppState.store";
+import {ProcessStore} from "../../Process.store";
+import classNames from "classnames";
+import {PlaybackStore} from "../../Playback.store";
+import {PlayArrow} from "@material-ui/icons";
+
 
 export interface TrimSliderProps {
-  duration: number
-  onChange: (begin: number, end: number, current: number) => void
-  disabled: boolean
-  step: number
 }
 
 const sliderTheme = () => makeStyles({
   'root': {
     '& .noUi-connects': {
-      background: Theme.current().palette.background.default,
+      background: Theme.current.palette.background.default,
     },
 
     '& .noUi-connect': {
-      background: Theme.current().palette.primary.main,
+      background: Theme.current.palette.primary.main,
     },
     '& .noUi-handle': {
-      background: color(Theme.current().palette.primary.main).saturate(0.5).toString()
+      background: color(Theme.current.palette.primary.main).saturate(0.5).toString()
     },
 
     '& .noUi-tooltip': {
-      background: Theme.current().palette.background.paper,
-      color: Theme.current().palette.text.primary,
-      ...Theme.current().typography.body1
+      background: Theme.current.palette.background.paper,
+      color: Theme.current.palette.text.primary,
+      ...Theme.current.typography.body1
     }
   },
   'rootDisabled': {
     '& .noUi-connect': {
-      background: Theme.disabledColor(Theme.current().palette.primary.main),
+      background: Theme.disabledColor(Theme.current.palette.primary.main),
     },
     '& .noUi-handle': {
-      background: Theme.disabledColor(Theme.current().palette.primary.main),
+      background: Theme.disabledColor(Theme.current.palette.primary.main),
     }
   }
 });
 
-export const TrimSlider = (props: TrimSliderProps) => {
+export const TrimSlider = observer(function TrimSlider(props: TrimSliderProps) {
   const classes = sliderTheme()();
 
-  let start = props.duration * .33;
-  let end = props.duration * .66;
-  let current = props.duration * .5;
+  const disabled = !AppState.file;
+  const duration = ProcessStore.simpleVideoDetails ?
+    ProcessStore.simpleVideoDetails.duration || 0.04 :
+    100;
+  const step = ProcessStore.simpleVideoDetails ? 1 / ProcessStore.simpleVideoDetails.fps : 0;
+
+  let start = duration * .33;
+  let end = duration * .66;
+  let current = duration * .5;
 
   let lastUpdates: number[] = [];
   let to_detect_drag: NodeJS.Timeout | null = null;
+
+  const [startDrag, setStartDrag] = useState<number | null>(null);
+  const [startDragTime, setStartDragTime] = useState<number>(0);
 
   function update(values: any[], handle: number, unencodedValues: number[], tap: boolean, positions: number[]) {
 
@@ -73,12 +85,15 @@ export const TrimSlider = (props: TrimSliderProps) => {
     if (arrIsConsistent(lastUpdates)) {
       // console.log('dragging head', unencodedValues.findIndex(x => x === val), val);
       // it's a slider drag
-      props.onChange(unencodedValues[0], unencodedValues[1], val);
+      AppState.setLastTrimValue(val);
     } else {
       // it's a connect drag, just update head (first slider)
-      console.log('dragging connect', 0, unencodedValues[0]);
-      props.onChange(unencodedValues[0], unencodedValues[1], unencodedValues[0]);
+      // console.log('dragging connect', 0, unencodedValues[0]);
+      AppState.setLastTrimValue(unencodedValues[0]);
     }
+
+    AppState.setTrimRangeComponent('start', unencodedValues[0]);
+    AppState.setTrimRangeComponent('end', unencodedValues[1]);
 
     if (!to_detect_drag) {
       to_detect_drag = setTimeout(() => {
@@ -91,16 +106,21 @@ export const TrimSlider = (props: TrimSliderProps) => {
   }
 
   return (
-    <Box marginY={2} marginX={2} className={classes.root + ' ' + (props.disabled ? classes.rootDisabled : '')}>
+    <Box
+      marginY={2}
+      marginX={2}
+      className={classNames(classes.root, css.root, disabled && classes.rootDisabled)}
+    >
+
       <Nouislider
         className={css.slider}
-        disabled={props.disabled}
+        disabled={disabled}
         keyboardSupport
         onSlide={update}
         onSet={update}
-        step={isNaN(props.step) || !isFinite(props.step) ? 0 : props.step}
-        range={{ min: 0, max: props.duration || 0 }}
-        start={[0, props.duration || 0]}
+        step={isNaN(step) || !isFinite(step) ? 0 : step}
+        range={{ min: 0, max: duration || 0.04 }}
+        start={[0, duration || 0.04]}
         connect={[false, true, false]}
         format={{
           from(val: string): number {
@@ -113,7 +133,35 @@ export const TrimSlider = (props: TrimSliderProps) => {
         behaviour={'drag'}
         // behaviour={'drag-snap'}
       />
+
+      {!!ProcessStore.simpleVideoDetails?.duration && (
+        <div
+          className={css.wiper}
+          onMouseDown={(e) => {
+            PlaybackStore.pause();
+            setStartDrag(e.clientX);
+            setStartDragTime(PlaybackStore.currentVideoTimestamp);
+          }}
+          onMouseUp={(e) => setStartDrag(null)}
+          onMouseOut={(e) => setStartDrag(null)}
+
+          onMouseMove={e => {
+            if (startDrag === null) return;
+            const diff = e.clientX - startDrag;
+
+            const track = e.currentTarget.parentElement;
+            const trackLen = track!.offsetWidth
+
+            const percentageOfTrackMoved = diff / trackLen;
+
+            PlaybackStore.setTime(startDragTime + percentageOfTrackMoved * ProcessStore.simpleVideoDetails!.duration)
+          }}
+          style={{ left: `${PlaybackStore.currentVideoTimestamp / ProcessStore.simpleVideoDetails.duration * 100}%` }}
+        >
+          <Icon><PlayArrow/></Icon>
+        </div>
+      )}
     </Box>
   );
 
-}
+});

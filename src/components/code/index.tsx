@@ -13,10 +13,10 @@ export interface CodeDisplayProps {
 
 const styles = () => makeStyles({
   'root': {
-    background: color(Theme.current().palette.background.paper).lighten(0.3).toString()
+    background: color(Theme.current.palette.background.paper).lighten(0.3).toString()
   },
   'niceText': {
-    ...Theme.current().typography.body1
+    ...Theme.current.typography.body1
   }
 })
 
