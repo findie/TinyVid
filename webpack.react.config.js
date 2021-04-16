@@ -1,6 +1,7 @@
 const path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
+const pkg = require('./package.json');
 
 module.exports = {
   resolve: {
@@ -74,7 +75,7 @@ module.exports = {
   plugins: [
     new HtmlWebpackPlugin({
       minify: false,
-      title: "TinyVid",
+      title: `TinyVid - v${pkg.version}`,
       template: "index.html",
     }),
     new MiniCssExtractPlugin({
