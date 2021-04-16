@@ -1,7 +1,7 @@
 import React from "react";
 import * as css from './style.css';
 import {Link} from "@material-ui/core";
-import {Favorite} from "@material-ui/icons";
+import Favorite from "@material-ui/icons/Favorite";
 import {makeStyles} from "@material-ui/core/styles";
 import {Theme} from "../../helpers/theme";
 import {Kamua} from "./kamua";

@@ -13,9 +13,8 @@ import {AppState} from "../../AppState.store";
 import {ProcessStore} from "../../Process.store";
 import classNames from "classnames";
 import {PlaybackStore} from "../../Playback.store";
-import {PlayArrow} from "@material-ui/icons";
+import PlayArrow from "@material-ui/icons/PlayArrow";
 import {eventList} from "../../helpers/events";
-
 
 export interface TrimSliderProps {
 }

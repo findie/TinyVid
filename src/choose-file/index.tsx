@@ -5,7 +5,9 @@ import {remote} from 'electron'
 import {Box, Button, Icon, Tooltip, Typography} from "@material-ui/core";
 import {makeStyles} from "@material-ui/core/styles";
 import {Theme} from "../helpers/theme";
-import {InsertDriveFile, VideoLibrary} from "@material-ui/icons"
+
+import InsertDriveFile from '@material-ui/icons/InsertDriveFile'
+import VideoLibrary from '@material-ui/icons/VideoLibrary'
 
 import classNames from 'classnames';
 import {AppState} from "../AppState.store";

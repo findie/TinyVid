@@ -1,5 +1,9 @@
 import {ThemeNames} from "../../helpers/theme";
-import {Brightness2 as DarkIcon, Brightness5 as LightIcon, BrightnessAuto as AutoIcon} from "@material-ui/icons";
+
+import DarkIcon from '@material-ui/icons/Brightness2'
+import LightIcon from '@material-ui/icons/Brightness5'
+import AutoIcon from '@material-ui/icons/BrightnessAuto'
+
 import {IconButton, Tooltip} from "@material-ui/core";
 import React from "react";
 

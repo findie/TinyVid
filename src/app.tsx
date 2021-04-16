@@ -19,7 +19,8 @@ import {
   Button,
   Divider,
   FormControl,
-  Icon, IconButton,
+  Icon,
+  IconButton,
   InputLabel,
   Link,
   MenuItem,
@@ -34,8 +35,12 @@ import {ErrorDisplayModal} from "./components/error";
 import {ThemeSwitch} from "./components/theme-switch";
 import {BitrateWarnings} from "./components/bitrate-warnings";
 import {PreventClosing} from "./components/prevent-closing";
-import {BrokenImage, PauseRounded, PlayArrowRounded, Videocam} from "@material-ui/icons";
 import {FooterBranding} from "./components/footer-branding";
+
+import BrokenImage from '@material-ui/icons/BrokenImage'
+import PauseRounded from '@material-ui/icons/PauseRounded'
+import PlayArrowRounded from '@material-ui/icons/PlayArrowRounded'
+import Videocam from '@material-ui/icons/Videocam'
 
 import '../common/sentry';
 import {VideoHelpers} from "./helpers/video";
@@ -108,7 +113,7 @@ const App = observer(() => {
             >
               <IconButton
                 onClick={PlaybackStore.togglePlayback}
-                style={{fontSize: '100px'}}
+                style={{ fontSize: '100px' }}
               >
                 {PlaybackStore.isPlaying ? <PauseRounded fontSize="inherit"/> : <PlayArrowRounded fontSize="inherit"/>}
               </IconButton>
