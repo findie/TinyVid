@@ -83,14 +83,11 @@ export const BitrateWarnings = observer(function BitrateWarnings(props: BitrateW
 
   return (
     <div className={props.className}>
-      <Collapse in={alertData.type !== 'ok'} timeout={{ exit: 3000 }}>
+      <Collapse in={alertData.type !== 'ok'} timeout={{ exit: 6000 }} style={{ transitionDelay: alertData.type === 'ok' ? '3s' : '0ms' }}>
         <Alert elevation={6} severity={alertData.severity} variant={'standard'} onClose={temp_close_alert}>
           <AlertTitle>{alertData.title}</AlertTitle>
           {alertData.text}
         </Alert>
-        <div style={{ height: '100px' }}>
-          {/* add some extra height to act as a delay for the collapse to exit */}
-        </div>
       </Collapse>
     </div>
   );
