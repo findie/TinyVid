@@ -31,6 +31,10 @@ function createWindow() {
     },
   });
 
+  if (app.isPackaged) {
+    mainWindow.removeMenu();
+  }
+
   mainWindow.setBackgroundColor(
     RendererSettings.settings.theme === "dark" || nativeTheme.shouldUseDarkColors ?
       '#303030' :
