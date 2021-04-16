@@ -27,8 +27,9 @@ function DocumentDropZone() {
   const handleDrop = useCallback((e: React.DragEvent<HTMLElement>) => {
     e.preventDefault();
     e.stopPropagation();
+    setIsHovering(false);
 
-    const files: File[] = (e as any).dataTransfer.files;
+    const files = e.dataTransfer?.files;
     const firstFile = files[0];
 
     if (!firstFile) return;
@@ -36,10 +37,10 @@ function DocumentDropZone() {
     eventList.file.choose({ type: 'dnd' });
     AppState.setFile(firstFile.path);
 
-    for (const f of files) {
+    for (let i = 0; i < files.length; i++) {
+      const f = files[i];
       console.log('File Path of dragged files: ', f.path)
     }
-    setIsHovering(false);
   }, [setIsHovering]);
 
   useEffect(() => {
@@ -50,7 +51,9 @@ function DocumentDropZone() {
       setIsHovering(true);
     });
 
-    document.body.addEventListener('dragenter', (e)=> {
+    ////
+
+    document.body.addEventListener('dragenter', (e) => {
       e.preventDefault();
       e.stopPropagation();
       setIsHovering(true);
@@ -67,7 +70,7 @@ function DocumentDropZone() {
           onDrop={handleDrop}
         >
           <Icon color="primary" fontSize="large">
-            <InsertDriveFile fontSize="large" />
+            <InsertDriveFile fontSize="large"/>
           </Icon>
           <Typography variant="h4" color="textPrimary">Drop your file here</Typography>
         </div>,
