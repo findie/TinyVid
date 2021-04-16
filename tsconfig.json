@@ -20,7 +20,7 @@
     "skipLibCheck": true
   },
   "include": [
-    "src/types.d.ts",
+    "src/types.ts",
   ],
   "exclude": [
     "node_modules",

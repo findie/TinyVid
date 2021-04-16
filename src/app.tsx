@@ -1,3 +1,4 @@
+import './types'
 import '../electron/helpers/log'
 import './helpers/events';
 
