@@ -1,3 +1,6 @@
+* {
+    user-select: none;
+}
 
 :local .display {
     flex-grow: 2;
