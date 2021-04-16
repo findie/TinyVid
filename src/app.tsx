@@ -1,4 +1,5 @@
 import '../electron/helpers/log'
+import './helpers/events';
 
 import React, {useState} from 'react';
 import ReactDom from 'react-dom';
@@ -44,6 +45,7 @@ import {observer} from "mobx-react";
 import {ProcessStore} from "./Process.store";
 import {toJS} from "mobx";
 import {PlaybackStore} from "./Playback.store";
+import {eventList} from "./helpers/events";
 
 const mainElement = document.createElement('div');
 document.body.appendChild(mainElement);
@@ -207,7 +209,10 @@ const App = observer(() => {
 
                 <Box marginBottom={-1}>
                   <FooterBranding>
-                    <Link onClick={() => setShowFeedback(true)}>
+                    <Link onClick={() => {
+                      setShowFeedback(true);
+                      eventList.global.sendFeedback();
+                    }}>
                       Send Feedback 👋
                     </Link>
                   </FooterBranding>

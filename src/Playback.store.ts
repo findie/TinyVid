@@ -4,6 +4,7 @@
 import {action, computed, makeObservable, observable, reaction} from "mobx";
 import {createRef} from "react";
 import {AppState} from "./AppState.store";
+import {eventList} from "./helpers/events";
 
 class PlaybackStoreClass {
 
@@ -57,6 +58,8 @@ class PlaybackStoreClass {
   @action play = () => {
     if (!this.videoRef.current) return;
 
+    eventList.preview.play();
+
     // this.videoRef.current.currentTime = AppState.trimRange.start;
     this.videoRef.current.play();
     if (!this.updateTimer)
@@ -69,6 +72,7 @@ class PlaybackStoreClass {
       this.updateTimer = null;
     }
 
+    eventList.preview.pause();
     this.videoRef.current?.pause();
   }
 

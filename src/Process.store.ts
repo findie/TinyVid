@@ -12,6 +12,8 @@ import {
 import {ConfigVideoSettingsData} from "./config/video-settings";
 import {remote} from "electron";
 import {RendererFileHelpers} from "./helpers/file";
+import {eventList} from "./helpers/events";
+import {FFHelpers} from "../electron/helpers/ff";
 
 /**
  Copyright Findie 2021
@@ -113,7 +115,7 @@ class ProcessStoreClass {
     }
 
     // box in the range by one frame to account for browser frame inaccuracy
-    const frameTime = (1 / (ProcessStore.simpleVideoDetails?.fps || 60));
+    const frameTime = (1 / (this.simpleVideoDetails?.fps || 60));
     const start = AppState.trimRange.start + frameTime;
     const end = Math.max(start + frameTime, AppState.trimRange.end - frameTime);
 
@@ -123,11 +125,21 @@ class ProcessStoreClass {
         fout,
         { start, end },
         strategy,
-        ProcessStore.videoSettings
+        this.videoSettings
       );
 
+      eventList.global.process({
+        type: strategy.type,
+        tune: strategy.tune,
+        resolution: this.videoSettings.height === 'original' ? this.simpleVideoDetails!.height : this.videoSettings.height,
+        isResolutionChanged: this.videoSettings.height !== 'original',
+        fps: this.videoSettings.fps === 'original' ? this.simpleVideoDetails!.fps : this.videoSettings.fps,
+        isFPSChanged: this.videoSettings.fps !== 'original',
+        processSpeed: FFHelpers.encodingSpeedPresets[strategy.speed],
+      });
+
       this.setFileOut(fout);
-      ProcessStore.setProcessingID(data.id);
+      this.setProcessingID(data.id);
     } catch (e) {
       this.setError(e);
     }

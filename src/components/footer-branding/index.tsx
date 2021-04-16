@@ -39,7 +39,7 @@ export function FooterBranding({ children }: FooterBrandingProps) {
 
       <Link
         className={css.right}
-        href={'https://kamua.com'}
+        href={'https://kamua.com/?utm_source=TinyVid&utm_medium=footer'}
         target={'_blank'}
       >
         Made with

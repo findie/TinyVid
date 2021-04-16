@@ -14,6 +14,7 @@ import {ProcessStore} from "../../Process.store";
 import classNames from "classnames";
 import {PlaybackStore} from "../../Playback.store";
 import {PlayArrow} from "@material-ui/icons";
+import {eventList} from "../../helpers/events";
 
 
 export interface TrimSliderProps {
@@ -141,6 +142,7 @@ export const TrimSlider = observer(function TrimSlider(props: TrimSliderProps) {
             PlaybackStore.pause();
             setStartDrag(e.clientX);
             setStartDragTime(PlaybackStore.currentVideoTimestamp);
+            eventList.preview.dragPlayhead();
           }}
           onMouseUp={(e) => setStartDrag(null)}
           onMouseOut={(e) => setStartDrag(null)}
