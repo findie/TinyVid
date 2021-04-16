@@ -104,7 +104,8 @@
       "category": "public.app-category.video",
       "target": [
         "dir",
-        "dmg"
+        "dmg",
+        "zip"
       ],
       "icon": "icon.icns",
       "darkModeSupport": true,
@@ -118,7 +119,8 @@
     "win": {
       "target": [
         "dir",
-        "nsis"
+        "nsis",
+        "zip"
       ],
       "sign": "build/scripts/eSigner.js",
       "icon": "icon.ico",
