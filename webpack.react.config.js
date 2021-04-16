@@ -74,7 +74,8 @@ module.exports = {
   plugins: [
     new HtmlWebpackPlugin({
       minify: false,
-      title: "TinyVid"
+      title: "TinyVid",
+      template: "index.html",
     }),
     new MiniCssExtractPlugin({
       filename: '[name].css',

@@ -4,6 +4,7 @@ import {RendererSettings} from "./settings";
 import color from "color";
 import {objectMergeDeep} from "./js";
 import {action, computed, makeObservable, observable} from "mobx";
+import {eventList} from "./events";
 
 export type ThemeNames = 'dark' | 'light' | 'system';
 
@@ -112,6 +113,7 @@ class ThemeClass {
       t = 'system';
     }
     this.set(t);
+    eventList.global.switchTheme({ type: t });
     return t;
   }
 

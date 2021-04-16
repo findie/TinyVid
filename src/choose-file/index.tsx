@@ -10,6 +10,7 @@ import {InsertDriveFile, VideoLibrary} from "@material-ui/icons"
 import classNames from 'classnames';
 import {AppState} from "../AppState.store";
 import {createPortal} from "react-dom";
+import {eventList} from "../helpers/events";
 
 function DocumentDropZone() {
 
@@ -30,6 +31,7 @@ function DocumentDropZone() {
 
     if (!firstFile) return;
 
+    eventList.file.choose({ type: 'dnd' });
     AppState.setFile(firstFile.path);
 
     for (const f of files) {
@@ -97,6 +99,7 @@ export const ChooseFile = (props: ChooseFileProps) => {
       });
 
     if (!files.canceled && files.filePaths[0]) {
+      eventList.file.choose({ type: 'click' });
       AppState.setFile(files.filePaths[0]);
     }
   }
