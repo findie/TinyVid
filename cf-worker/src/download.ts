@@ -42,6 +42,8 @@ type BuildData = {
   }[]
 };
 
+const zipCheck = /\.zip$/i;
+
 async function fetchData(p: Platforms, a: Arch): Promise<BuildData | null> {
   const latestYML = supportTree[p]?.[a];
 
@@ -61,7 +63,14 @@ async function fetchData(p: Platforms, a: Arch): Promise<BuildData | null> {
     // }
   })).text();
 
-  return YAML.load(YAML_TEXT) as BuildData;
+  const data: BuildData = YAML.load(YAML_TEXT) as BuildData;
+
+  const notZIPFileHopefully = data.files.find(x => !zipCheck.test(x.url)) || data.files[0];
+
+  data.path = notZIPFileHopefully.url;
+  data.sha512 = notZIPFileHopefully.sha512;
+
+  return data;
 }
 
 const handleDownloadRegex = /^\/(\w+)\/(\w+)\/?/;
@@ -116,7 +125,14 @@ async function handleMetadata(request: Request) {
     }
   }
 
-  const metadata: { [p in Platforms]?: { [a in Arch]?: BuildData & { url: string } } } = {};
+  const metadata: {
+    [p in Platforms]?: {
+      [a in Arch]?: BuildData & {
+      url: string,
+      files: (BuildData['files'][number] & { path: string })[]
+    }
+    }
+  } = {};
 
   for (let i = 0; i < platforms.length; i++) {
     const p = platforms[i];
@@ -129,6 +145,10 @@ async function handleMetadata(request: Request) {
 
       (metadata[p][a] as BuildData) = await metadataPromise[p][a];
       metadata[p][a].url = baseURL + '/' + 'latest' + '/' + p + '/' + a + '/' + metadata[p][a].path;
+      metadata[p][a].files.forEach((f: (typeof metadata)[Platforms][Arch]['files'][number]) => {
+        f.path = f.url;
+        f.url = baseURL + '/' + 'latest' + '/' + p + '/' + a + '/' + f.url
+      })
     }
   }
 
