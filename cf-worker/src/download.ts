@@ -8,7 +8,7 @@ import {cacheHoF} from "./helpers/cache";
 import {corsHoF} from "./helpers/cors";
 
 
-const cachedHandler = cacheHoF(corsHoF(handleRequest), 60);
+const cachedHandler = cacheHoF(corsHoF(handleRequest), 3600);
 addEventListener('fetch', async event => {
   event.respondWith(cachedHandler(event));
 });
