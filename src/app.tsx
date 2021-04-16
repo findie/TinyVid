@@ -1,5 +1,4 @@
 import '../electron/helpers/log'
-import './types'
 
 import React, {useState} from 'react';
 import ReactDom from 'react-dom';

@@ -1,7 +1,7 @@
 import {JSONProtocol} from "../base-protocols";
 import {TrimPostData} from "../../types";
 import {FFMpegError, FFMpegProgress} from "ffmpeg-progress-wrapper";
-import {IFFMpegProgressData} from "ffmpeg-progress-wrapper/src/index";
+import {IFFMpegProgressData} from "ffmpeg-progress-wrapper";
 import {v4 as uuid} from 'uuid'
 import {VideoProcess} from "../../helpers/ff/process";
 import {logError} from "../../../common/sentry";

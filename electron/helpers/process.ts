@@ -9,7 +9,7 @@ export namespace ProcessHelpers {
     code: number;
     signal: Signals | null;
 
-    constructor(message: string, code?: number, sig?: Signals) {
+    constructor(message: string, code?: number | null, sig?: Signals | null) {
       super(message);
       this.code = code || 0;
       this.signal = sig || null;

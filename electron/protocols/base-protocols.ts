@@ -27,7 +27,7 @@ abstract class Protocol {
     };
   }
 
-  abstract async onRequest(req: Request, ...data: any[]): Promise<any>
+  abstract onRequest(req: Request, ...data: any[]): Promise<any>
 }
 
 export abstract class FileProtocol extends Protocol {
@@ -40,7 +40,7 @@ export abstract class FileProtocol extends Protocol {
     });
   }
 
-  abstract async onRequest(req: Request): Promise<FilePathWithHeaders>
+  abstract onRequest(req: Request): Promise<FilePathWithHeaders>
 }
 
 export abstract class StringProtocol extends Protocol {
@@ -56,7 +56,7 @@ export abstract class StringProtocol extends Protocol {
     });
   }
 
-  abstract async onRequest(req: Request): Promise<string>
+  abstract onRequest(req: Request): Promise<string>
 }
 
 
@@ -110,5 +110,5 @@ export abstract class JSONProtocol extends Protocol {
     });
   }
 
-  abstract async onRequest(req: Request, payload: any): Promise<any>
+  abstract onRequest(req: Request, payload: any): Promise<any>
 }

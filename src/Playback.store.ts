@@ -11,7 +11,7 @@ class PlaybackStoreClass {
 
   @observable currentVideoTimestamp: number = 0;
 
-  @observable private updateTimer: NodeJS.Timeout | null = null;
+  @observable private updateTimer: number | null = null;
 
   @action private updateTime = () => {
     const video = this.videoRef.current
@@ -60,7 +60,7 @@ class PlaybackStoreClass {
     // this.videoRef.current.currentTime = AppState.trimRange.start;
     this.videoRef.current.play();
     if (!this.updateTimer)
-      this.updateTimer = setInterval(this.updateTime, 1000 / 30);
+      this.updateTimer = setInterval(this.updateTime, 1000 / 30) as unknown as number;
   }
 
   @action pause = () => {

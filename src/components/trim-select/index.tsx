@@ -62,7 +62,7 @@ export const TrimSlider = observer(function TrimSlider(props: TrimSliderProps) {
   let current = duration * .5;
 
   let lastUpdates: number[] = [];
-  let to_detect_drag: NodeJS.Timeout | null = null;
+  let to_detect_drag: number | null = null;
 
   const [startDrag, setStartDrag] = useState<number | null>(null);
   const [startDragTime, setStartDragTime] = useState<number>(0);

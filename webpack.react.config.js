@@ -12,12 +12,17 @@ module.exports = {
   devtool: 'source-map',
   module: {
     rules: [
+      // {
+      //   test: /\.(js|ts|tsx)$/,
+      //   exclude: /node_modules/,
+      //   use: {
+      //     loader: 'babel-loader',
+      //   },
+      // },
       {
-        test: /\.(js|ts|tsx)$/,
+        test: /\.tsx?$/,
+        use: 'ts-loader',
         exclude: /node_modules/,
-        use: {
-          loader: 'babel-loader',
-        },
       },
       {
         test: /\.css$/,
