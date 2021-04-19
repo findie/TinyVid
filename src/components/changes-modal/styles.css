@@ -15,6 +15,9 @@
     position: relative;
     padding-right: 18px;
 }
+.text.hidden {
+    display: none;
+}
 
 :global #HW_badge_cont {
     position: absolute!important;
