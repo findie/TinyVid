@@ -52,6 +52,9 @@ function createWindow() {
     {
       label: 'File',
       submenu: [
+        ...(isMac ? [] : [
+          { role: 'about', click:  app.showAboutPanel }
+        ]),
         isMac ? { role: 'close' } : { role: 'quit' }
       ]
     },
@@ -105,6 +108,16 @@ function createWindow() {
   // fixme maybe have a look on why it doesn't like the menu list
   const menu = Menu.buildFromTemplate(template as Array<(MenuItemConstructorOptions) | (MenuItem)>);
   Menu.setApplicationMenu(menu);
+
+  app.setAboutPanelOptions({
+    applicationName: 'TinyVid',
+    applicationVersion: app.getVersion(),
+    website: 'https://kamua.com/tinyvid/?utm_source=TinyVid&amp;utm_medium=about',
+    iconPath: 'icon.png',
+    version: app.getVersion(),
+    copyright: `Kamua ${new Date().getFullYear()}`,
+    authors: ['stefan@kamua.com']
+  });
 
 
   mainWindow.setBackgroundColor(
