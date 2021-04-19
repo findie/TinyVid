@@ -1,6 +1,6 @@
 import "source-map-support/register"
 import "./helpers/log"
-import {app, BrowserWindow, nativeTheme, session, shell} from 'electron';
+import {app, BrowserWindow, Menu, MenuItem, MenuItemConstructorOptions, nativeTheme, session, shell} from 'electron';
 import * as path from 'path';
 import * as url from 'url';
 import * as os from 'os';
@@ -10,6 +10,7 @@ import {update} from "./update";
 
 import "../common/sentry";
 import {RendererSettings} from "../src/helpers/settings";
+import {isMac} from "./helpers";
 
 let mainWindow: Electron.BrowserWindow | null;
 
@@ -31,9 +32,80 @@ function createWindow() {
     },
   });
 
-  if (app.isPackaged) {
-    mainWindow.removeMenu();
-  }
+  const template = [
+    // { role: 'appMenu' }
+    ...(isMac ? [{
+      label: app.name,
+      submenu: [
+        { role: 'about' },
+        { type: 'separator' },
+        { role: 'services' },
+        { type: 'separator' },
+        { role: 'hide' },
+        { role: 'hideothers' },
+        { role: 'unhide' },
+        { type: 'separator' },
+        { role: 'quit' }
+      ]
+    }] : []),
+    // { role: 'fileMenu' }
+    {
+      label: 'File',
+      submenu: [
+        isMac ? { role: 'close' } : { role: 'quit' }
+      ]
+    },
+    // { role: 'viewMenu' }
+    {
+      label: 'View',
+      submenu: [
+        ...(!app.isPackaged ? [
+          { role: 'reload' },
+          { role: 'forceReload' },
+          { role: 'toggleDevTools' },
+          { type: 'separator' },
+        ] : []),
+        { role: 'resetZoom' },
+        { role: 'zoomIn' },
+        { role: 'zoomOut' },
+        { type: 'separator' },
+        { role: 'togglefullscreen' }
+      ]
+    },
+    // { role: 'windowMenu' }
+    {
+      label: 'Window',
+      submenu: [
+        { role: 'minimize' },
+        { role: 'zoom' },
+        ...(isMac ? [
+          { type: 'separator' },
+          { role: 'front' },
+          { type: 'separator' },
+          { role: 'window' }
+        ] : [
+          { role: 'close' }
+        ])
+      ]
+    },
+    {
+      role: 'help',
+      submenu: [
+        {
+          label: 'Learn More',
+          click: async () => {
+            const { shell } = require('electron')
+            await shell.openExternal('https://kamua.com/tinyvid/?utm_source=TinyVid&utm_medium=menu')
+          }
+        }
+      ]
+    }
+  ]
+
+  // fixme maybe have a look on why it doesn't like the menu list
+  const menu = Menu.buildFromTemplate(template as Array<(MenuItemConstructorOptions) | (MenuItem)>);
+  Menu.setApplicationMenu(menu);
+
 
   mainWindow.setBackgroundColor(
     RendererSettings.settings.theme === "dark" || nativeTheme.shouldUseDarkColors ?
