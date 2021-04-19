@@ -20,7 +20,7 @@ class PlaybackStoreClass {
 
     this.currentVideoTimestamp = video.currentTime ?? 0;
 
-    if(this.isPlaying) {
+    if (this.isPlaying) {
       if (video.currentTime >= AppState.trimRange.end) {
         video.currentTime = AppState.trimRange.start;
       }
@@ -37,12 +37,12 @@ class PlaybackStoreClass {
     reaction(() => this.videoRef.current, (v, prev) => {
       if (prev) {
         prev.removeEventListener("timeupdate", this.updateTime);
-        prev.removeEventListener('ended', this.play);
+        prev.removeEventListener('ended', this.handleEndedVideo);
       }
 
       if (v) {
         v.addEventListener('timeupdate', this.updateTime);
-        v.addEventListener('ended', this.play);
+        v.addEventListener('ended', this.handleEndedVideo);
       }
     });
 
@@ -53,6 +53,10 @@ class PlaybackStoreClass {
         this.togglePlayback();
       }
     })
+  }
+
+  handleEndedVideo = () => {
+    if (this.isPlaying) this.play();
   }
 
   @action play = () => {
