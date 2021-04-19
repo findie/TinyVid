@@ -6,7 +6,7 @@ import {Theme} from "../../helpers/theme";
 import color from 'color'
 import * as css from './style.css';
 import './style.css'
-import {arrIsConsistent} from "../../helpers/math";
+import {arrIsConsistent, seconds2time} from "../../helpers/math";
 import {Box, Icon} from "@material-ui/core"
 import {observer} from "mobx-react";
 import {AppState} from "../../AppState.store";
@@ -45,7 +45,17 @@ const sliderTheme = makeStyles(theme => ({
     '& .noUi-handle': {
       background: Theme.disabledColor(theme.palette.primary.main),
     }
-  }
+  },
+  'wiper': {
+    background: theme.palette.primary.main,
+    color: theme.palette.primary.main,
+  },
+  'time': {
+    ...theme.typography.body1,
+
+    background: theme.palette.primary.main,
+    color: theme.palette.getContrastText(theme.palette.primary.main)
+  },
 }));
 
 export const TrimSlider = observer(function TrimSlider(props: TrimSliderProps) {
@@ -136,7 +146,7 @@ export const TrimSlider = observer(function TrimSlider(props: TrimSliderProps) {
 
       {!!ProcessStore.simpleVideoDetails?.duration && (
         <div
-          className={css.wiper}
+          className={classNames(css.wiper, classes.wiper, startDrag !== null && css.drag)}
           onMouseDown={(e) => {
             PlaybackStore.pause();
             setStartDrag(e.clientX);
@@ -159,7 +169,9 @@ export const TrimSlider = observer(function TrimSlider(props: TrimSliderProps) {
           }}
           style={{ left: `${PlaybackStore.currentVideoTimestamp / ProcessStore.simpleVideoDetails.duration * 100}%` }}
         >
-          <Icon><PlayArrow/></Icon>
+          <Icon><PlayArrow className={css.icon} color="inherit"/></Icon>
+          <div className={classNames(css.time, classes.time)}>{seconds2time(PlaybackStore.currentVideoTimestamp)}</div>
+          <div className={css.handle}/>
         </div>
       )}
     </Box>

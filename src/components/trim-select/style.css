@@ -15,16 +15,39 @@
 
     cursor: pointer;
 }
-
-.wiper > span {
+.wiper.drag {
+    z-index: 10;
 }
-.wiper > span > svg {
-    padding: 60px 20px;
-    transform:
-            translateY(-100%)
-            translateY(+8px)
-            translateY(+60px)
-            translateX(-50%)
-            translateX(+1px)
-            rotate(90deg);
+
+.wiper .icon {
+    transform: translateY(-100%) translateY(+8px) translateX(-50%) translateX(+1px) rotate(90deg);
+}
+
+.wiper .time {
+    border-radius: 12px;
+
+    position: absolute;
+    top: 0;
+    left: 0;
+
+    transform: translateY(-100%) translateX(-50%) translateY(-8px);
+    padding: 8px;
+
+    white-space: nowrap;
+}
+
+.wiper .handle {
+    /*background: red;*/
+    position: absolute;
+    width: 100px;
+    height: 50px;
+    transform: translateX(-50%) translateY(-100%);
+}
+
+.wiper.drag .handle {
+    /*background: green;*/
+    width: 100vw;
+    height: 300px;
+    z-index: 100;
+    transform: translateX(-50%) translateY(-50%);
 }
