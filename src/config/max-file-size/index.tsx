@@ -37,9 +37,9 @@ export function ConfigMaxFileSize(props: ConfigMaxFileSizeProps) {
       >
         <MenuItem value={8}> 8 MB (Discord Free)</MenuItem>
         <MenuItem value={10}>10 MB</MenuItem>
-        <MenuItem value={50}>50 MB (Discord Nitro)</MenuItem>
+        <MenuItem value={50}>50 MB (Discord Nitro Classic)</MenuItem>
         <MenuItem value={64}>64 MB (WhatsApp)</MenuItem>
-        <MenuItem value={100}>100 MB</MenuItem>
+        <MenuItem value={100}>100 MB (Discord Nitro)</MenuItem>
         <MenuItem value={'custom'}>Custom</MenuItem>
       </Select>
     </FormControl>
