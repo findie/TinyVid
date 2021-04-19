@@ -9,7 +9,8 @@ module.exports = {
   target: 'webworker',
   mode: isProd ? 'production' : 'development',
   // devtool: 'source-map',
-  devtool: 'inline-source-map',
+  // devtool: 'inline-source-map',
+  devtool: false,
   resolve: {
     extensions: ['.ts', '.js'],
     mainFields: ['main', 'module', 'browser'],
@@ -40,5 +41,8 @@ module.exports = {
       /size limit/,
       /limit the size/
     ]
-  }
+  },
+  optimization: {
+    usedExports: true,
+  },
 };

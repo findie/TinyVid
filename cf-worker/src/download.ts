@@ -3,9 +3,11 @@
  */
 
 import {respondJSON} from "./helpers/respond";
-import * as YAML from 'js-yaml';
+import type {load as YAMLLoad} from 'js-yaml';
 import {cacheHoF} from "./helpers/cache";
 import {corsHoF} from "./helpers/cors";
+
+const { load: YAML_Load } = require('js-yaml/lib/loader') as { load: typeof YAMLLoad };
 
 
 const cachedHandler = cacheHoF(corsHoF(handleRequest), 3600);
@@ -63,7 +65,7 @@ async function fetchData(p: Platforms, a: Arch): Promise<BuildData | null> {
     // }
   })).text();
 
-  const data: BuildData = YAML.load(YAML_TEXT) as BuildData;
+  const data: BuildData = YAML_Load(YAML_TEXT) as BuildData;
 
   const notZIPFileHopefully = data.files.find(x => !zipCheck.test(x.url)) || data.files[0];
 
