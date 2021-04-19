@@ -9,34 +9,34 @@ import {Theme} from "../../helpers/theme";
 import color from "color";
 import {Box, Tooltip, Typography} from "@material-ui/core";
 
-const sliderTheme = () => makeStyles({
+const sliderTheme = makeStyles(theme => ({
   'root': {
     '& .noUi-connects': {
-      background: Theme.current.palette.background.default,
+      background: theme.palette.background.default,
     },
 
     '& .noUi-connect': {
-      background: Theme.current.palette.primary.main,
+      background: theme.palette.primary.main,
     },
     '& .noUi-handle': {
-      background: color(Theme.current.palette.primary.main).saturate(0.5).toString()
+      background: color(theme.palette.primary.main).saturate(0.5).toString()
     },
 
     '& .noUi-tooltip': {
-      background: Theme.current.palette.background.paper,
-      color: Theme.current.palette.text.primary,
-      ...Theme.current.typography.body1
+      background: theme.palette.background.paper,
+      color: theme.palette.text.primary,
+      ...theme.typography.body1
     }
   },
   'rootDisabled': {
     '& .noUi-connect': {
-      background: Theme.disabledColor(Theme.current.palette.primary.main),
+      background: Theme.disabledColor(theme.palette.primary.main),
     },
     '& .noUi-handle': {
-      background: Theme.disabledColor(Theme.current.palette.primary.main),
+      background: Theme.disabledColor(theme.palette.primary.main),
     }
   }
-});
+}));
 
 interface SpeedSliderProps {
   highSpeedText: string
@@ -73,7 +73,7 @@ function wrapPresetNameInBenchmarks(preset: FFHelpers.EncodingSpeedPresetsType):
 }
 
 export function SpeedSlider(props: SpeedSliderProps) {
-  const classes = sliderTheme()();
+  const classes = sliderTheme();
 
   return (
     <div

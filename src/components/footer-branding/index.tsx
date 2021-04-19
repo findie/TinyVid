@@ -3,14 +3,13 @@ import * as css from './style.css';
 import {Link} from "@material-ui/core";
 import Favorite from "@material-ui/icons/Favorite";
 import {makeStyles} from "@material-ui/core/styles";
-import {Theme} from "../../helpers/theme";
 import {Kamua} from "./kamua";
 
-const styles = makeStyles({
+const styles = makeStyles(theme => ({
   'root': {
-    ...Theme.current.typography.body1
+    ...theme.typography.body1
   }
-})
+}));
 
 export type FooterBrandingProps = {
   children?: React.ReactNode

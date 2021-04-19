@@ -1,10 +1,11 @@
-import {createMuiTheme, ThemeOptions} from "@material-ui/core";
+import {createMuiTheme, ThemeOptions, withStyles} from "@material-ui/core";
 import {remote} from 'electron';
 import {RendererSettings} from "./settings";
 import color from "color";
 import {objectMergeDeep} from "./js";
 import {action, computed, makeObservable, observable} from "mobx";
 import {eventList} from "./events";
+import {Theme as DefaultTheme} from "@material-ui/core/styles/createMuiTheme";
 
 export type ThemeNames = 'dark' | 'light' | 'system';
 

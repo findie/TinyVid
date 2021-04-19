@@ -4,7 +4,6 @@ import {remote} from 'electron'
 
 import {Box, Button, Icon, Tooltip, Typography} from "@material-ui/core";
 import {makeStyles} from "@material-ui/core/styles";
-import {Theme} from "../helpers/theme";
 
 import InsertDriveFile from '@material-ui/icons/InsertDriveFile'
 import VideoLibrary from '@material-ui/icons/VideoLibrary'
@@ -84,15 +83,15 @@ export interface ChooseFileProps {
   className?: string
 }
 
-const styles = () => makeStyles({
+const styles = makeStyles(theme => ({
   'textField': {
-    background: Theme.current.palette.background.default
+    background: theme.palette.background.default
   }
-})
+}));
 
 export const ChooseFile = (props: ChooseFileProps) => {
 
-  const classes = styles()();
+  const classes = styles();
 
   const file = AppState.file;
 

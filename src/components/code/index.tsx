@@ -11,17 +11,17 @@ export interface CodeDisplayProps {
   mono?: boolean
 }
 
-const styles = () => makeStyles({
+const styles = makeStyles(theme => ({
   'root': {
-    background: color(Theme.current.palette.background.paper).lighten(0.3).toString()
+    background: color(theme.palette.background.paper).lighten(0.3).toString()
   },
   'niceText': {
-    ...Theme.current.typography.body1
+    ...theme.typography.body1
   }
-})
+}))
 
 export function CodeDisplay(props: CodeDisplayProps) {
-  const classes = styles()();
+  const classes = styles();
 
   return (
     <Box
