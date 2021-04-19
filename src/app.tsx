@@ -52,6 +52,7 @@ import {ProcessStore} from "./Process.store";
 import {toJS} from "mobx";
 import {PlaybackStore} from "./Playback.store";
 import {eventList} from "./helpers/events";
+import {Changelog} from "./components/changes-modal/changelog";
 
 const mainElement = document.createElement('div');
 document.body.appendChild(mainElement);
@@ -221,6 +222,9 @@ const App = observer(() => {
                     }}>
                       Send Feedback 👋
                     </Link>
+                    &nbsp;|&nbsp;
+                    <Changelog />
+
                   </FooterBranding>
                 </Box>
               </div>

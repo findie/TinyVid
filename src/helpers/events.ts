@@ -73,6 +73,9 @@ export const eventList = {
         sendFeedback: enclose('global', {
             action: 'Send Feedback',
         }),
+        viewChanges: enclose('global', {
+            action: 'View Changelog',
+        }),
         switchTheme: enclose<{
             type: ThemeNames,
         }>('global', {
