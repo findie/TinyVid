@@ -14,6 +14,7 @@ import {remote} from "electron";
 import {RendererFileHelpers} from "./helpers/file";
 import {eventList} from "./helpers/events";
 import {FFHelpers} from "../electron/helpers/ff";
+import {PlaybackStore} from "./Playback.store";
 
 /**
  Copyright Findie 2021
@@ -99,6 +100,7 @@ class ProcessStoreClass {
       return console.warn('refusing to start process with empty video field');
     }
     const strategy = ProcessStore.strategy;
+    PlaybackStore.pause();
 
     const fout = remote.dialog.showSaveDialogSync(
       remote.getCurrentWindow(),
