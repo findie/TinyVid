@@ -90,6 +90,7 @@ export function SpeedSlider(props: SpeedSliderProps) {
             '50%': [2, 1],
             max: FFHelpers.encodingSpeedPresets.length - 1
           }}
+          step={1}
           tooltips={true}
           disabled={props.disabled}
           format={{
@@ -101,7 +102,7 @@ export function SpeedSlider(props: SpeedSliderProps) {
             }
           }}
           start={['medium']}
-          onUpdate={(values, handler, unencodedValues) => props.onChange(unencodedValues[0])}
+          onUpdate={(values, handler, unencodedValues) => props.onChange(Math.round(unencodedValues[0]))}
         />
       </Box>
       <Tooltip title={props.lowSpeedTooltip} arrow>
