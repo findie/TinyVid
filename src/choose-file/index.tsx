@@ -67,6 +67,7 @@ function DocumentDropZone() {
           className={css.dropArea}
           onDragLeave={handleDragLeave}
           onDrop={handleDrop}
+          onClick={() => setIsHovering(false)}
         >
           <Icon color="primary" fontSize="large">
             <InsertDriveFile fontSize="large"/>
