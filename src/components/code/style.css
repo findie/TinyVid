@@ -1,6 +1,8 @@
 :local .pre {
     margin: 0;
     overflow: auto;
+
+    user-select: text;
 }
 
 :local .pre-container {

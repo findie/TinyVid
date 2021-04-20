@@ -1,7 +1,6 @@
 import React from "react";
 import {Box} from "@material-ui/core";
 import {makeStyles} from "@material-ui/core/styles";
-import {Theme} from "../../helpers/theme";
 import color from 'color'
 import * as css from './style.css'
 
