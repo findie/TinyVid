@@ -1,6 +1,6 @@
 {
   "name": "TinyVid",
-  "version": "0.15.8",
+  "version": "0.15.9",
   "main": "./dist/main.js",
   "author": "Kamua<hello@kamua.com>",
   "description": "Simple to use video trimmer & compressor",
@@ -11,9 +11,12 @@
     "ffbin": "ffbinaries ffprobe ffmpeg -p linux-64 -o bin/linux-64 && ffbinaries ffprobe ffmpeg -p windows-64 -o bin/windows-64 && ffbinaries ffprobe ffmpeg -p osx-64 -o bin/osx-64",
     "build:js-win": "yarn install && set NODE_ENV=production && webpack --config webpack.electron.config.js --mode production && set NODE_ENV=production && webpack --config webpack.react.config.js --mode production",
     "build:js": "yarn install && NODE_ENV=production webpack --config webpack.electron.config.js --mode production && NODE_ENV=production webpack --config webpack.react.config.js --mode production",
-    "build:win": "yarn build:js && electron-builder --win -p always",
-    "build:linux": "yarn build:js && electron-builder --linux -p always",
-    "build:mac": "yarn build:js && electron-builder --mac -p always"
+    "build:win": "yarn build:js && electron-builder --win -p never",
+    "build:linux": "yarn build:js && electron-builder --linux -p never",
+    "build:mac": "yarn build:js && electron-builder --mac -p never",
+    "deploy:win": "yarn build:js && electron-builder --win -p always",
+    "deploy:linux": "yarn build:js && electron-builder --linux -p always",
+    "deploy:mac": "yarn build:js && electron-builder --mac -p always"
   },
   "private": true,
   "devDependencies": {
