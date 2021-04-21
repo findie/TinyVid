@@ -15,6 +15,7 @@ import {
   TextField
 } from "@material-ui/core";
 import * as css from './style.css';
+import {RendererSettings} from "../../helpers/settings";
 
 export function FeedbackModal({ onClose, open }: { onClose?: () => void, open: boolean }) {
 
@@ -65,6 +66,7 @@ export function FeedbackModal({ onClose, open }: { onClose?: () => void, open: b
         'Content-type': 'application/json'
       },
       body: JSON.stringify({
+        ID: RendererSettings.settings.ID,
         Email: email || '<unset>',
         Type: type,
         Text: text
