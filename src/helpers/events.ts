@@ -131,7 +131,7 @@ declare global {
     }
 }
 
-
+// Reactions to send events when things change within the App.
 reaction(() => ProcessStore.simpleVideoDetails, data => {
     if (!data) return;
 
@@ -148,3 +148,6 @@ reaction(
         eventList.global.qualityAlert({ type: currentData });
     })
 );
+
+// runs only once, at init.
+eventList.global.openedApp();
