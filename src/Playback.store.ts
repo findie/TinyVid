@@ -47,6 +47,15 @@ class PlaybackStoreClass {
     });
 
     document.addEventListener('keydown', (e) => {
+      if (
+        e.currentTarget instanceof HTMLTextAreaElement ||
+        e.currentTarget instanceof HTMLInputElement ||
+        e.target instanceof HTMLTextAreaElement ||
+        e.target instanceof HTMLInputElement
+      ) {
+        return;
+      }
+
       if (e.code === 'Space') {
         e.preventDefault();
         e.stopPropagation();
