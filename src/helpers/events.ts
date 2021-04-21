@@ -4,6 +4,16 @@ import {DetailsComms} from "./comms";
 import {AlertVariants, BitrateWarningStore} from "../components/bitrate-warnings/BitrateWarning.store";
 import {debounce} from "throttle-debounce";
 import {ThemeNames} from "./theme";
+import mixpanel from 'mixpanel-browser';
+import {RendererSettings} from "./settings";
+
+mixpanel.init(
+    "b621e6cd8fa327206ceee9ecd52e0916",
+    { "api_host": "https://api-eu.mixpanel.com" },
+    "",
+);
+
+mixpanel.identify(RendererSettings.settings.ID);
 
 type TrackingEvent = {
     action: string,
@@ -40,9 +50,10 @@ function trackEvent(category: EventCategories, data: TrackingEvent) {
         eventName = `${categoryDetails.title} - ${eventName}`;
     }
 
-    if (window.gtag) {
-        window.gtag('event', eventName, {...data.extraParams});
-    }
+    console.log('Mixpanel track', eventName, data.extraParams);
+    mixpanel.track(eventName, {
+        ...data.extraParams
+    });
 }
 
 function enclose<T extends object = never>(
@@ -86,6 +97,9 @@ export const eventList = {
         }>('global', {
             action: 'Show Quality Alert',
         }),
+        openedApp: enclose('global', {
+            action: 'Opened App',
+        })
     },
     preview: {
         play: enclose('preview', {

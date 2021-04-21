@@ -63,6 +63,9 @@ window.toJS = toJS
 const App = observer(() => {
   mainElement.style.background = Theme.current.palette.background.default;
 
+  // only once on mount
+  React.useEffect(eventList.global.openedApp, []);
+
   const [showFeedback, setShowFeedback] = useState(false);
 
   const mediaNoVideo = ProcessStore.simpleVideoDetails && !ProcessStore.simpleVideoDetails.videoCodec;
