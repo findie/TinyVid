@@ -56,7 +56,7 @@ export namespace VideoProcess {
     }
 
     if (filters.length === 0) {
-      filters.push('null')
+      filters.push('anull')
     }
     return filters;
   }
