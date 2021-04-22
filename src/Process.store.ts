@@ -146,6 +146,7 @@ class ProcessStoreClass {
         fps: this.videoSettings.fps === 'original' ? this.simpleVideoDetails!.fps : this.videoSettings.fps,
         isFPSChanged: this.videoSettings.fps !== 'original',
         processSpeed: FFHelpers.encodingSpeedPresets[strategy.speed],
+        volume: this.volume,
       });
 
       this.setFileOut(fout);

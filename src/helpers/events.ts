@@ -82,6 +82,7 @@ export const eventList = {
             fps: number,
             isFPSChanged: boolean,
             processSpeed: string,
+            volume: number,
         }>('global', {
             action: 'Process',
         }),
