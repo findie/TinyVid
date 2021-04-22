@@ -1,7 +1,7 @@
 /**
  Copyright Findie 2021
  */
-import React, {useCallback} from "react";
+import React, {ChangeEvent, useCallback} from "react";
 import {Icon, Mark, Paper, Slider, Tooltip} from "@material-ui/core";
 import * as css from './style.css'
 import {ProcessStore} from "../../Process.store";
@@ -15,6 +15,7 @@ import {observer} from "mobx-react";
 import {AppState} from "../../AppState.store";
 import classNames from "classnames";
 import {Theme} from "../../helpers/theme";
+import {eventList} from "../../helpers/events";
 
 const sliderMarks: Mark[] = [
   { value: 2, label: '200%' },
@@ -56,8 +57,19 @@ export const VolumeControl = observer(function VolumeControl() {
 
   const toggleVolume = useCallback(() => {
     if (disabled) return;
-    ProcessStore.setVolume(ProcessStore.volume > 0 ? 0 : 1);
+    if (ProcessStore.volume > 0) {
+      eventList.audio.mute();
+      ProcessStore.setVolume(0);
+    } else {
+      eventList.audio.unmute();
+      ProcessStore.setVolume(1);
+    }
   }, [disabled]);
+
+  const setVolume = useCallback((e: ChangeEvent<{}>, v: number | number[]) => {
+    eventList.audio.volume({ volume: v as number });
+    ProcessStore.setVolume(v as number);
+  }, []);
 
   return (
     <div className={classNames(css.root, disabled && css.disabled)}>
@@ -74,7 +86,7 @@ export const VolumeControl = observer(function VolumeControl() {
             min={0}
             max={2}
             step={0.05}
-            onChange={(e, v) => ProcessStore.setVolume(v as number)}
+            onChange={setVolume}
             orientation="vertical"
             valueLabelDisplay="auto"
             valueLabelFormat={sliderFormat}
