@@ -4,6 +4,8 @@
 
 .root {
     position: relative;
+    width: 100%;
+    margin: 16px;
 }
 
 .wiper {

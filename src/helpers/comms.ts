@@ -1,5 +1,5 @@
 import type {TrimProtocol} from "../../electron/protocols/proto/trim";
-import {RenderStrategy, VideoSettings} from "../../electron/types";
+import {AudioSettings, RenderStrategy, VideoSettings} from "../../electron/types";
 import {DetailsProtocol} from "../../electron/protocols/proto/details";
 import {VideoDetails} from "../../electron/helpers/ff/details";
 import {round} from "./math";
@@ -26,7 +26,7 @@ export namespace TrimComms {
     return getJSONProtocolDataOrThrow(data);
   }
 
-  export async function startProcess(fileIn: string, fileOut: string, range: { start: number, end: number }, strategy: RenderStrategy, settings: VideoSettings): Promise<TrimProtocol.TrimStartResponse> {
+  export async function startProcess(fileIn: string, fileOut: string, range: { start: number, end: number }, strategy: RenderStrategy, settings: VideoSettings, audio: AudioSettings ): Promise<TrimProtocol.TrimStartResponse> {
 
     const f = await fetch('trim://' + encodeURIComponent(fileIn), {
       method: 'post',
@@ -35,7 +35,8 @@ export namespace TrimComms {
         end: range.end,
         out: fileOut,
         strategy,
-        settings
+        settings,
+        audio
       }),
       headers: { 'content-type': 'application/json' }
     });

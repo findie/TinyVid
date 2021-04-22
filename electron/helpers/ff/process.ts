@@ -1,6 +1,6 @@
 import {FFMpegProgress, IFFMpegProgressData} from "ffmpeg-progress-wrapper";
 import {FFHelpers} from "./index";
-import {RenderStrategy, VideoSettings} from "../../types";
+import {AudioSettings, RenderStrategy, VideoSettings} from "../../types";
 
 export namespace VideoProcess {
 
@@ -49,12 +49,25 @@ export namespace VideoProcess {
     return filters;
   }
 
+  function audio2filters(audio: AudioSettings) {
+    const filters = [];
+    if (audio.volume !== 1) {
+      filters.push(`volume=${audio.volume ?? 1}`)
+    }
+
+    if (filters.length === 0) {
+      filters.push('null')
+    }
+    return filters;
+  }
+
   export function process(file: string,
                           start: number,
                           end: number,
                           out: string,
                           strategy: RenderStrategy,
                           settings: VideoSettings,
+                          audio: AudioSettings,
                           progress: (p: IFFMpegProgressData) => void
   ) {
 
@@ -69,6 +82,7 @@ export namespace VideoProcess {
         '-to', end.toFixed(6),
         '-i', file,
         '-vf', settings2filters(settings).join(','),
+        '-af', audio2filters(audio).join(','),
         ...strategy2params(strategy, end - start),
         '-c:v', 'libx264',
         out, '-y'

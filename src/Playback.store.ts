@@ -9,6 +9,11 @@ import {eventList} from "./helpers/events";
 class PlaybackStoreClass {
 
   @observable videoRef = createRef<HTMLVideoElement>();
+  audio: {
+    context: AudioContext,
+    gain: GainNode,
+    source: null | MediaElementAudioSourceNode
+  };
 
   @observable currentVideoTimestamp: number = 0;
 
@@ -34,15 +39,32 @@ class PlaybackStoreClass {
   constructor() {
     makeObservable(this);
 
+    const audioContext = new AudioContext();
+    this.audio = {
+      context: audioContext,
+      gain: audioContext.createGain(),
+      source: null
+    };
+    this.audio.gain.connect(audioContext.destination);
+
     reaction(() => this.videoRef.current, (v, prev) => {
       if (prev) {
         prev.removeEventListener("timeupdate", this.updateTime);
         prev.removeEventListener('ended', this.handleEndedVideo);
+
+        console.log('disconnected source')
+        this.audio.source?.disconnect();
+        this.audio.source = null;
       }
 
       if (v) {
         v.addEventListener('timeupdate', this.updateTime);
         v.addEventListener('ended', this.handleEndedVideo);
+
+        this.audio.source = this.audio.context.createMediaElementSource(v);
+        console.log('created source');
+        this.audio.source.connect(this.audio.gain);
+        console.log('connected source to gain')
       }
     });
 
@@ -63,6 +85,8 @@ class PlaybackStoreClass {
       }
     })
   }
+
+  setVolume = (v: number) => this.audio.gain.gain.value = v;
 
   handleEndedVideo = () => {
     if (this.isPlaying) this.play();

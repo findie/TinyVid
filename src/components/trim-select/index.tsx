@@ -116,9 +116,7 @@ export const TrimSlider = observer(function TrimSlider(props: TrimSliderProps) {
   }
 
   return (
-    <Box
-      marginY={2}
-      marginX={2}
+    <div
       className={classNames(classes.root, css.root, disabled && classes.rootDisabled)}
     >
 
@@ -174,7 +172,7 @@ export const TrimSlider = observer(function TrimSlider(props: TrimSliderProps) {
           <div className={css.handle}/>
         </div>
       )}
-    </Box>
+    </div>
   );
 
 });
