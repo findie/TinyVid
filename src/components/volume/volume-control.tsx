@@ -73,10 +73,23 @@ export const VolumeControl = observer(function VolumeControl() {
 
   return (
     <div className={classNames(css.root, disabled && css.disabled)}>
-      <Icon className={classNames(css.icon, disabled && css.disabled)} onClick={toggleVolume}>
-        {icon}
-        {boost && <Add className={css.extra}/>}
-      </Icon>
+
+      <Tooltip
+        title={
+          volume > 1.25 ?
+            'Volume is above 125%, audio may distort!' :
+            volume <= 0 ?
+              'Audio is muted, this will slightly increase your video quality' :
+              ''
+        }
+        placement="left"
+      >
+        <Icon className={classNames(css.icon, disabled && css.disabled)} onClick={toggleVolume}>
+          {icon}
+          {boost && <Add className={css.extra}/>}
+        </Icon>
+      </Tooltip>
+
       <div className={css.popup}>
         <Paper elevation={2} className={css.paper}>
           <Slider

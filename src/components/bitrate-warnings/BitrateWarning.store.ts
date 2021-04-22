@@ -26,7 +26,7 @@ class BitrateWarningStoreClass {
     const fileSizeInBytes = ProcessStore.strategyTune;
 
     const bitrateThresholds = FFHelpers.optimalBitrateCalculator(videoDetails, videoSettings);
-    const averageBitrateInKb = FFHelpers.computeAverageBPS(fileSizeInBytes, duration);
+    const averageBitrateInKb = FFHelpers.computeAverageBPS(fileSizeInBytes, duration, ProcessStore.volume > 0);
 
     const averageVideoBitrateInBits = averageBitrateInKb.videoBitrateInKb * 1024;
 

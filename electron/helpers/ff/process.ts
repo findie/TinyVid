@@ -4,7 +4,7 @@ import {AudioSettings, RenderStrategy, VideoSettings} from "../../types";
 
 export namespace VideoProcess {
 
-  function strategy2params(strategy: RenderStrategy, duration: number) {
+  function strategy2params(strategy: RenderStrategy, duration: number, hasAudio: boolean) {
 
     switch (strategy.type) {
       case "constant-quality":
@@ -14,7 +14,7 @@ export namespace VideoProcess {
         ];
 
       case "max-file-size":
-        const { audioBitrateInKb, videoBitrateInKb } = FFHelpers.computeAverageBPS(strategy.tune, duration);
+        const { audioBitrateInKb, videoBitrateInKb } = FFHelpers.computeAverageBPS(strategy.tune, duration, hasAudio);
 
         return [
           '-qmin:v', '-1',
@@ -83,7 +83,8 @@ export namespace VideoProcess {
         '-i', file,
         '-vf', settings2filters(settings).join(','),
         '-af', audio2filters(audio).join(','),
-        ...strategy2params(strategy, end - start),
+        ...strategy2params(strategy, end - start, audio?.volume > 0),
+        ...(audio?.volume > 0 ? [] : ['-an']),
         '-c:v', 'libx264',
         out, '-y'
       ],
@@ -93,6 +94,8 @@ export namespace VideoProcess {
         hideFFConfig: true
       }
     );
+
+    console.log('ffmpeg', p.args);
 
     p.on('progress', (p: IFFMpegProgressData) => {
       console.log(file, p.progress, p.eta);
