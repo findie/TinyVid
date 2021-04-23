@@ -28,7 +28,16 @@ const sliderMarks: Mark[] = [
   { value: 0.25, label: '25%' },
   { value: 0, label: '0%' },
 ];
-const sliderFormat = (n: number) => `${(n * 100).toFixed(0)}%`
+const sliderFormat = (n: number) => {
+ return (
+   <div className={css.sliderTooltip}>
+     {(n * 100).toFixed(0)}%
+     {n >= 1.25 && (<><br/><br/>Volume is above 125%, audio may distort!</>)}
+     {n === 0 && (<><br/><br/>Audio is muted, this will slightly increase your video quality</>)}
+   </div>
+ )
+
+}
 
 
 function SliderValueLabelComponent(props: { children: React.ReactElement, open: boolean, value: number }) {
@@ -51,7 +60,7 @@ export const VolumeControl = observer(function VolumeControl() {
         <VolumeUp/>
   );
 
-  const boost = volume > 1.25;
+  const boost = volume >= 1.25;
 
   const disabled = !AppState.file;
 
