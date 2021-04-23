@@ -36,6 +36,10 @@ export const categoryList = {
         title: 'Preview',
         includeCategory: true,
     },
+    audio: {
+        title: 'Audio',
+        includeCategory: true
+    }
 };
 
 export type EventCategories = keyof typeof categoryList;
@@ -78,6 +82,7 @@ export const eventList = {
             fps: number,
             isFPSChanged: boolean,
             processSpeed: string,
+            volume: number,
         }>('global', {
             action: 'Process',
         }),
@@ -111,6 +116,17 @@ export const eventList = {
         dragPlayhead: enclose('preview', {
             action: 'Drag Playhead',
         }),
+    },
+    audio: {
+        mute: enclose('audio', {
+            action: 'Mute Audio'
+        }),
+        unmute: enclose('audio', {
+            action: 'Unmute Audio'
+        }),
+        volume: debounce(1000, false, enclose<{volume: number}>('audio', {
+            action: 'Set Volume'
+        }))
     },
     file: {
         choose: enclose<{

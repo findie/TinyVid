@@ -14,6 +14,7 @@ import {remote} from "electron";
 import {RendererFileHelpers} from "./helpers/file";
 import {eventList} from "./helpers/events";
 import {FFHelpers} from "../electron/helpers/ff";
+import {clip} from "./helpers/math";
 import {PlaybackStore} from "./Playback.store";
 
 /**
@@ -30,7 +31,6 @@ const defaultConstantQuality: RenderStrategy = {
   tune: ConfigConstantQualityDefaultQuality,
   speed: ConfigConstantQualityDefaultSpeedOrQuality
 }
-
 
 class ProcessStoreClass {
   @observable error: Error | ErrorLike | null = null;
@@ -72,6 +72,13 @@ class ProcessStoreClass {
 
   @observable fileOut: string = '';
   @action setFileOut = (f: string) => this.fileOut = f;
+
+  @observable volume: number = 1;
+  @action setVolume = (v: number) => {
+    v = clip(0, v, 2);
+    PlaybackStore.setVolume(v);
+    return this.volume = v;
+  }
 
   constructor() {
     makeObservable(this);
@@ -127,7 +134,8 @@ class ProcessStoreClass {
         fout,
         { start, end },
         strategy,
-        this.videoSettings
+        this.videoSettings,
+        { volume: this.volume }
       );
 
       eventList.global.process({
@@ -138,6 +146,7 @@ class ProcessStoreClass {
         fps: this.videoSettings.fps === 'original' ? this.simpleVideoDetails!.fps : this.videoSettings.fps,
         isFPSChanged: this.videoSettings.fps !== 'original',
         processSpeed: FFHelpers.encodingSpeedPresets[strategy.speed],
+        volume: this.volume,
       });
 
       this.setFileOut(fout);

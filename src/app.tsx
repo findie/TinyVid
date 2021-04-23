@@ -53,6 +53,7 @@ import {toJS} from "mobx";
 import {PlaybackStore} from "./Playback.store";
 import {eventList} from "./helpers/events";
 import {Changelog} from "./components/changes-modal/changelog";
+import {VolumeControl} from "./components/volume/volume-control";
 
 const mainElement = document.createElement('div');
 document.body.appendChild(mainElement);
@@ -123,6 +124,7 @@ const App = observer(() => {
           )}
 
         </Display>
+
         <Paper className={css.footer} elevation={3} square={true}>
           {AppState.file ?
             <DurationInfo className={css.info}/> :
@@ -130,8 +132,10 @@ const App = observer(() => {
           }
 
           <Box>
-            <TrimSlider/>
-
+            <div className={css.trimAndVolume}>
+              <TrimSlider/>
+              <VolumeControl/>
+            </div>
             <Box marginX={2} marginY={1} className={css.controls}>
               <div className={css.rows + ' ' + css.flexGrow}>
 
@@ -223,7 +227,7 @@ const App = observer(() => {
                       Send Feedback 👋
                     </Link>
                     &nbsp;|&nbsp;
-                    <Changelog />
+                    <Changelog/>
 
                   </FooterBranding>
                 </Box>

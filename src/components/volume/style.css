@@ -1,0 +1,140 @@
+
+.root {
+    position: relative;
+    padding: 4px;
+}
+
+.disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.icon {
+    cursor: pointer;
+}
+
+.icon.disabled {
+    cursor: not-allowed;
+    opacity: 1;
+}
+
+.icon .extra {
+    position: absolute;
+    right: 0;
+    top: 0;
+    color: #ff4800;
+    transform: scale(0.75) translate(50%, -50%);
+}
+
+.root .popup {
+    display: none;
+
+    padding-top: 48px;
+    padding-left: 24px;
+    padding-right: 24px;
+    padding-bottom: 12px;
+
+    position: absolute;
+    height: 300px;
+
+    right: 0;
+    bottom: 28px;
+
+
+    transform: translateX(+24px);
+
+}
+
+.root:hover .popup {
+    display: flex;
+}
+
+.popup .paper {
+    padding: 16px 8px;
+    width: 72px;
+}
+
+.sliderTooltip {
+    text-align: center;
+}
+
+/* DARK SLIDER */
+
+.slider :global .MuiSlider-markLabelActive[data-index="0"] {
+    color: #ff5900;
+}
+
+.slider :global .MuiSlider-markLabelActive[data-index="1"] {
+    color: #f27a00;
+}
+
+.slider :global .MuiSlider-markLabelActive[data-index="2"] {
+    color: #e4ff00;
+}
+
+.slider :global .MuiSlider-markLabelActive[data-index="3"] {
+    color: #6dff07;
+}
+
+.slider :global .MuiSlider-markLabelActive[data-index="4"] {
+    color: #00ff0e;
+}
+
+.slider :global .MuiSlider-markLabelActive[data-index="5"] {
+    color: #00ff54;
+}
+
+.slider :global .MuiSlider-markLabelActive[data-index="6"] {
+    color: #00ff9f;
+}
+
+.slider :global .MuiSlider-markLabelActive[data-index="7"] {
+    color: #00ffef;
+}
+
+.slider :global .MuiSlider-markLabelActive[data-index="8"] {
+    color: #00b3ff;
+}
+
+.slider :global .MuiSlider-rail {
+    background: linear-gradient(0deg, rgba(0, 179, 255, 1) 0%, rgba(0, 255, 239, 1) 13%, rgba(0, 255, 159, 1) 25%, rgba(0, 255, 84, 1) 38%, rgba(0, 255, 14, 1) 50%, rgba(109, 255, 7, 1) 62%, rgba(228, 255, 0, 1) 75%, rgba(242, 122, 0, 1) 88%, rgba(255, 89, 0, 1) 100%);
+    opacity: 1;
+}
+
+.slider :global .MuiSlider-track {
+    background: none;
+}
+
+.slider :global .MuiSlider-thumb {
+    background: white;
+}
+
+.slider :global .MuiSlider-mark {
+    background: black;
+}
+
+/* WHITE SLIDER */
+
+.slider.white :global .MuiSlider-markLabelActive {
+    filter: brightness(0.6);
+}
+
+.slider.white :global .MuiSlider-rail {
+    filter: brightness(0.7);
+    opacity: 1;
+}
+
+.slider.white :global .MuiSlider-track {
+    background: none;
+}
+
+.slider.white :global .MuiSlider-thumb {
+    background: black;
+}
+
+.slider.white :global .MuiSlider-mark {
+    background: white;
+}
+
+
+

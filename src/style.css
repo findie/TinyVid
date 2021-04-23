@@ -5,8 +5,14 @@
 :local .display {
     flex-grow: 2;
     display: flex;
-    max-height: calc(100% - 232px);
+    max-height: calc(100% - 244px);
     position: relative;
+}
+
+:local .trimAndVolume {
+    margin: 4px 8px;
+    display: flex;
+    align-items: center;
 }
 
 :local .display .children {

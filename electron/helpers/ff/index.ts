@@ -102,12 +102,14 @@ export namespace FFHelpers {
     };
   }
 
-  export function computeAverageBPS(fileSizeInBytes: number, durationInSeconds: number) {
+  export function computeAverageBPS(fileSizeInBytes: number, durationInSeconds: number, hasAudio: boolean) {
     const fileSizeInKB = fileSizeInBytes * 1000;
 
     const bitrateInKb = fileSizeInKB / durationInSeconds * 8;
 
-    const audioBitrateInKb = Math.min(bitrateInKb * 0.1, 196); // 10% or at most 128k
+    const audioBitrateInKb = hasAudio
+      ? Math.min(bitrateInKb * 0.1, 196) // 10% or at most 196k
+      : 0;
     const videoBitrateInKb = bitrateInKb - audioBitrateInKb;
 
     return {

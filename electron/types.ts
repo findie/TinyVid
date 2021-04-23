@@ -14,11 +14,15 @@ export type VideoSettings = {
   height: 'original' | number
 }
 
+export type AudioSettings = {
+  volume: number
+}
 
 export interface TrimPostData {
   start: number,
   end: number,
   out: string,
   strategy: RenderStrategy,
-  settings: VideoSettings
+  settings: VideoSettings,
+  audio: AudioSettings,
 }
