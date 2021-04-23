@@ -1,7 +1,7 @@
 /**
  Copyright Findie 2021
  */
-import React, {ChangeEvent, useCallback} from "react";
+import React, {ChangeEvent, useCallback, useState} from "react";
 import {Icon, Mark, Paper, Slider, Tooltip} from "@material-ui/core";
 import * as css from './style.css'
 import {ProcessStore} from "../../Process.store";
@@ -54,6 +54,8 @@ export const VolumeControl = observer(function VolumeControl() {
 
   const volume = ProcessStore.volume;
 
+  const [lastNonMutedVolume, setLastNonMutedVolume] = useState(1);
+
   const icon = (
     volume === 0 ? <VolumeOff/> :
       volume < 0.75 ? <VolumeDown/> :
@@ -71,14 +73,18 @@ export const VolumeControl = observer(function VolumeControl() {
       ProcessStore.setVolume(0);
     } else {
       eventList.audio.unmute();
-      ProcessStore.setVolume(1);
+      ProcessStore.setVolume(lastNonMutedVolume);
     }
-  }, [disabled]);
+  }, [disabled, lastNonMutedVolume]);
 
   const setVolume = useCallback((e: ChangeEvent<{}>, v: number | number[]) => {
     eventList.audio.volume({ volume: v as number });
     ProcessStore.setVolume(v as number);
-  }, []);
+    if (v as number > 0) {
+      // never set lastNonMutedVolume to 0 as mute/unmute will then appear to do nothing
+      setLastNonMutedVolume(v as number);
+    }
+  }, [setLastNonMutedVolume]);
 
   return (
     <div className={classNames(css.root, disabled && css.disabled)}>
