@@ -3,6 +3,7 @@
  */
 import 'source-map-support/register'
 import {corsHoF} from "./helpers/cors";
+import {extname} from 'path';
 
 const corsedHandler = corsHoF(handleRequest);
 addEventListener('fetch', event => {
@@ -58,6 +59,9 @@ async function handleRequest(event: FetchEvent) {
     })
   }
 
+  const _files: { filename: string, contents: string }[] = data._files;
+  delete data._files;
+
   data.Requester = {
     Country: request.headers.get('cf-ipcountry'),
     City: request.cf?.city,
@@ -69,7 +73,11 @@ async function handleRequest(event: FetchEvent) {
 
   const text = prettify(data).join('\n');
 
-  await send2slack('```' + text + '```');
+  const message = await send2slack('```' + text + '```');
+
+  await Promise.all((_files || []).map(({ filename, contents }) =>
+    upload2slack(filename, contents, message.ts))
+  );
 
   return new Response(JSON.stringify({ success: true }), {
     status: 200,
@@ -81,14 +89,39 @@ async function handleRequest(event: FetchEvent) {
 
 async function send2slack(text: string) {
 
-  await fetch('https://hooks.slack.com/services/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', {
+  const fd = new FormData();
+  fd.append('token', 'xoxb-2925235932-1921709302278-JWuuVtOQlSwV3m60EWp1V8qP');
+  fd.append('channel', 'C01U08AF74Y');
+  fd.append('text', text);
 
+  const r = await fetch('https://slack.com/api/chat.postMessage\n', {
     method: 'post',
-    headers: {
-      'Content-type': 'application/json',
-    },
-    body: JSON.stringify({ text })
-
+    body: fd
   });
 
+  return await r.json();
+}
+
+async function upload2slack(filename: string, data: string, thread?: string) {
+  const fd = new FormData();
+  fd.append('content', data);
+  fd.append('channels', 'C01U08AF74Y');
+  fd.append('filename', filename);
+  if (extname(filename) === '.log' || extname(filename) === '.txt') {
+    fd.append('filetype', 'text');
+  }
+
+  if (thread) {
+    fd.append('thread_ts', thread);
+  }
+
+  const r = await fetch('https://slack.com/api/files.upload', {
+    method: 'post',
+    headers: {
+      Authorization: 'Bearer xoxb-2925235932-1921709302278-JWuuVtOQlSwV3m60EWp1V8qP'
+    },
+    body: fd
+  });
+
+  console.log(await r.text());
 }

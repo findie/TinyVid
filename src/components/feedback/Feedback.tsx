@@ -16,6 +16,9 @@ import {
 } from "@material-ui/core";
 import * as css from './style.css';
 import {RendererSettings} from "../../helpers/settings";
+import {remote} from 'electron';
+import {readAllLogs} from "../../../electron/helpers/log";
+import * as path from "path";
 
 export function FeedbackModal({ onClose, open }: { onClose?: () => void, open: boolean }) {
 
@@ -60,12 +63,20 @@ export function FeedbackModal({ onClose, open }: { onClose?: () => void, open: b
     }
 
     setLoading(true);
+
+    const logs = readAllLogs().map(x => ({
+      filename: path.basename(x.path),
+      contents: x.lines.join('\n')
+    }));
+
     fetch('https://feedback.tinyvid.io', {
       method: 'post',
       headers: {
         'Content-type': 'application/json'
       },
       body: JSON.stringify({
+        _files: logs,
+        Version: remote.app.getVersion(),
         ID: RendererSettings.settings.ID,
         Email: email || '<unset>',
         Type: type,
