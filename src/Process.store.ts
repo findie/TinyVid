@@ -106,6 +106,10 @@ class ProcessStoreClass {
     if (!AppState.file) {
       return console.warn('refusing to start process with empty video field');
     }
+    if(!this.videoDetails) {
+      return console.warn('refusing to start process with empty video details');
+    }
+
     const strategy = ProcessStore.strategy;
     PlaybackStore.pause();
 
@@ -135,7 +139,8 @@ class ProcessStoreClass {
         { start, end },
         strategy,
         this.videoSettings,
-        { volume: this.volume }
+        { volume: this.volume },
+        this.videoDetails
       );
 
       eventList.global.process({

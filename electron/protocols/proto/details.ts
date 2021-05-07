@@ -1,10 +1,10 @@
 import {JSONProtocol} from "../base-protocols";
-import {strictEqual} from "assert";
 import {VideoDetails} from "../../helpers/ff/details";
+import {MediaDetails} from "../../../common/ff/types";
 
 export namespace DetailsProtocol {
 
-  export type DetailsProtocolResponse = VideoDetails.MediaDetails;
+  export type DetailsProtocolResponse = MediaDetails;
 
   export class DetailsProtocol extends JSONProtocol {
     constructor() {
