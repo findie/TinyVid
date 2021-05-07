@@ -53,7 +53,7 @@ function createWindow() {
       label: 'File',
       submenu: [
         ...(isMac ? [] : [
-          { role: 'about', click:  app.showAboutPanel }
+          { role: 'about', click: app.showAboutPanel }
         ]),
         isMac ? { role: 'close' } : { role: 'quit' }
       ]
@@ -145,9 +145,13 @@ function createWindow() {
   }
 
   mainWindow.on('close', (e) => {
-    mainWindow?.webContents.executeJavaScript('window.dispatchEvent(new Event("x-closing-window"))');
-    e.preventDefault();
-    e.returnValue = true;
+    if (Protocols.trimProtocol.getRunningTasks().length > 0) {
+      console.log('sending close event to show close dialog');
+      mainWindow?.webContents.send('x-closing-window');
+      e.preventDefault();
+      e.returnValue = true;
+    }
+    console.log('closing window as no task is running');
   });
 
   mainWindow.on('closed', () => {

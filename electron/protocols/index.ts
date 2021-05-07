@@ -5,10 +5,14 @@ import {protocol} from 'electron';
 
 export namespace Protocols {
 
+  export const detailProtocol = new DetailsProtocol.DetailsProtocol();
+  export const videoProtocol = new VideoProtocol.VideoProtocol();
+  export const trimProtocol = new TrimProtocol.TrimProtocol();
+
   export const list = [
-    new DetailsProtocol.DetailsProtocol(),
-    new VideoProtocol.VideoProtocol(),
-    new TrimProtocol.TrimProtocol()
+    detailProtocol,
+    videoProtocol,
+    trimProtocol,
   ]
 
   export function grantPrivileges() {

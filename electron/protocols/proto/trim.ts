@@ -1,7 +1,6 @@
 import {JSONProtocol} from "../base-protocols";
 import {TrimPostData} from "../../types";
-import {FFMpegError, FFMpegProgress} from "ffmpeg-progress-wrapper";
-import {IFFMpegProgressData} from "ffmpeg-progress-wrapper";
+import {FFMpegError, FFMpegProgress, IFFMpegProgressData} from "ffmpeg-progress-wrapper";
 import {v4 as uuid} from 'uuid'
 import {VideoProcess} from "../../helpers/ff/process";
 import {logError} from "../../../common/sentry";
@@ -117,6 +116,10 @@ export namespace TrimProtocol {
           x.process.kill('SIGINT')
         }
       });
+    }
+
+    getRunningTasks() {
+      return this.tasks.filter(x => !(x.done || x.cancelled));
     }
   }
 

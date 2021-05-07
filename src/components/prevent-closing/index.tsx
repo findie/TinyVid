@@ -1,7 +1,7 @@
 import React, {useEffect, useState} from "react";
 import {Modal} from "../modal";
 import {Box, Button, Grid, Paper, Typography} from "@material-ui/core";
-import {remote} from 'electron';
+import {ipcRenderer, remote} from 'electron';
 
 export interface PreventClosingProps {
   prevent: boolean
@@ -33,9 +33,9 @@ export function PreventClosing(props: PreventClosingProps) {
       }
     };
 
-    window.addEventListener('x-closing-window', myCloseFn);
+    ipcRenderer.addListener('x-closing-window', myCloseFn)
     return function cleanup() {
-      window.removeEventListener('x-closing-window', myCloseFn);
+      ipcRenderer.removeListener('x-closing-window', myCloseFn);
     }
   }, [props.prevent]);
 
