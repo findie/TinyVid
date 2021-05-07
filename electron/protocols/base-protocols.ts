@@ -35,8 +35,6 @@ export abstract class FileProtocol extends Protocol {
     protocol.registerFileProtocol(this.protocolName, async (request, callback) => {
       const data = await this.onRequest(request);
       callback(data);
-    }, (error) => {
-      if (error) console.error(`Failed to register ${this.protocolName}:// protocol`)
     });
   }
 
@@ -51,8 +49,6 @@ export abstract class StringProtocol extends Protocol {
         data,
         mimeType: 'plain/text'
       });
-    }, (error) => {
-      if (error) console.error(`Failed to register ${this.protocolName}:// protocol`)
     });
   }
 
@@ -106,8 +102,6 @@ export abstract class JSONProtocol extends Protocol {
           mimeType: 'application/json'
         })
       }
-    }, (error) => {
-      if (error) console.error(`Failed to register ${this.protocolName}:// protocol`)
     });
   }
 
