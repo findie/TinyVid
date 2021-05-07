@@ -92,6 +92,7 @@ export abstract class JSONProtocol extends Protocol {
       } catch (e) {
 
         logError(e);
+        console.error(e);
 
         callback({
           data: JSON.stringify({

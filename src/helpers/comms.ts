@@ -1,9 +1,10 @@
 import type {TrimProtocol} from "../../electron/protocols/proto/trim";
-import {AudioSettings, RenderStrategy, VideoSettings} from "../../electron/types";
+import {AudioSettings, RenderStrategy, TrimPostData, VideoSettings} from "../../electron/types";
 import {DetailsProtocol} from "../../electron/protocols/proto/details";
 import {VideoDetails} from "../../electron/helpers/ff/details";
 import {round} from "./math";
 import {isJSONProtocolError, JSONProtocolResponse} from "../../electron/protocols/base-protocols";
+import {AudioStream, MediaDetails, StringFraction, VideoStream} from "../../common/ff/types";
 
 function getJSONProtocolDataOrThrow<T>(data: JSONProtocolResponse<T>): T {
   if (isJSONProtocolError(data)) {
@@ -26,18 +27,21 @@ export namespace TrimComms {
     return getJSONProtocolDataOrThrow(data);
   }
 
-  export async function startProcess(fileIn: string, fileOut: string, range: { start: number, end: number }, strategy: RenderStrategy, settings: VideoSettings, audio: AudioSettings ): Promise<TrimProtocol.TrimStartResponse> {
+  export async function startProcess(fileIn: string, fileOut: string, range: { start: number, end: number }, strategy: RenderStrategy, settings: VideoSettings, audio: AudioSettings, mediaDetails: MediaDetails): Promise<TrimProtocol.TrimStartResponse> {
+
+    const body: TrimPostData = {
+      start: range.start,
+      end: range.end,
+      out: fileOut,
+      strategy,
+      settings,
+      audio,
+      mediaDetails
+    }
 
     const f = await fetch('trim://' + encodeURIComponent(fileIn), {
       method: 'post',
-      body: JSON.stringify({
-        start: range.start,
-        end: range.end,
-        out: fileOut,
-        strategy,
-        settings,
-        audio
-      }),
+      body: JSON.stringify(body),
       headers: { 'content-type': 'application/json' }
     });
 
@@ -74,19 +78,18 @@ export namespace DetailsComms {
   export async function getDetails(file: string): Promise<DetailsProtocol.DetailsProtocolResponse> {
     const f = await fetch('details://' + encodeURIComponent(file), {
       method: 'get',
-
     });
     const data: JSONProtocolResponse<DetailsProtocol.DetailsProtocolResponse> = await f.json();
 
     return getJSONProtocolDataOrThrow(data);
   }
 
-  export function videoStream(data: DetailsProtocol.DetailsProtocolResponse): VideoDetails.VideoStream | null {
-    return data.streams.find((x): x is VideoDetails.VideoStream => x.codec_type === 'video') || null;
+  export function videoStream(data: DetailsProtocol.DetailsProtocolResponse): VideoStream | null {
+    return data.streams.find((x): x is VideoStream => x.codec_type === 'video') || null;
   }
 
-  export function audioStream(data: DetailsProtocol.DetailsProtocolResponse): VideoDetails.VideoStream | null {
-    return data.streams.find((x): x is VideoDetails.VideoStream => x.codec_type === 'audio') || null;
+  export function audioStream(data: DetailsProtocol.DetailsProtocolResponse): AudioStream | null {
+    return data.streams.find((x): x is AudioStream => x.codec_type === 'audio') || null;
   }
 
   export function duration(data: DetailsProtocol.DetailsProtocolResponse): number {
@@ -109,8 +112,8 @@ export namespace DetailsComms {
 
     return round(
       (
-        VideoDetails.parseStringFraction(video.avg_frame_rate || '0/0') ||
-        VideoDetails.parseStringFraction(video.r_frame_rate || '0/0') ||
+        VideoDetails.parseStringFraction(video.avg_frame_rate || ('0/0' as StringFraction)) ||
+        VideoDetails.parseStringFraction(video.r_frame_rate || ('0/0' as StringFraction)) ||
         0
       ),
       2

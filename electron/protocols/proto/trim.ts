@@ -65,6 +65,7 @@ export namespace TrimProtocol {
         data.strategy,
         data.settings,
         data.audio,
+        data.mediaDetails,
         p => task.progress = p
       );
       task.promise = task.process.onDone();

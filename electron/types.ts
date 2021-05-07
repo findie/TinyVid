@@ -1,3 +1,5 @@
+import {MediaDetails} from "../common/ff/types";
+
 export type RenderStrategy = {
   type: 'max-file-size' | 'constant-quality'
 
@@ -25,4 +27,5 @@ export interface TrimPostData {
   strategy: RenderStrategy,
   settings: VideoSettings,
   audio: AudioSettings,
+  mediaDetails: MediaDetails,
 }
