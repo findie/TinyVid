@@ -6,9 +6,8 @@ import {TrimComms} from "../helpers/comms";
 import {Modal} from "../components/modal";
 import {Box, Button, CircularProgress, Grid, LinearProgress, Paper, Typography} from '@material-ui/core';
 import * as path from 'path';
-import moment from "moment";
 import {CodeDisplay} from "../components/code";
-import {bps2text} from "../helpers/math";
+import {bps2text, seconds2time} from "../helpers/math";
 import {AppState} from "../AppState.store";
 import {ProcessStore} from "../Process.store";
 
@@ -42,6 +41,8 @@ const Progress = (props: ProgressProps) => {
 
   console.log(props.progress);
 
+  const eta = props?.progress?.eta || 0;
+
   return (
     <div className={css.progressContainer}>
       <LinearProgress
@@ -57,7 +58,7 @@ const Progress = (props: ProgressProps) => {
             <Typography noWrap>Cancelling the process</Typography> :
             props?.progress?.eta ?
               <Typography noWrap>Finishing
-                in {moment(Date.now() + (props?.progress?.eta || 0) * 1000).fromNow(true)}</Typography> :
+                in {eta > 10 ? seconds2time(eta, 0, true) : 'a few seconds'}</Typography> :
               <Typography noWrap>Starting the process</Typography>
         }
         <Button

@@ -1,3 +1,5 @@
+import {plural} from "./language";
+
 export function clip(min: number, val: number, max: number): number {
   if (min > val) return min;
   if (max < val) return max;
@@ -53,13 +55,28 @@ export function arrIsConsistent(arr: number[]): boolean {
 }
 
 function pad2(n: number, decimals = 0): string {
+  if (decimals === 0) {
+    return n >= 10 ? Math.floor(n).toString() : `0${Math.floor(n)}`;
+  }
   return n >= 10 ? n.toFixed(decimals) : `0${n.toFixed(decimals)}`;
 }
 
-export function seconds2time(seconds: number): string {
+export function seconds2time(seconds: number, precision = 2, extended = false): string {
   const h = Math.floor(seconds / 3600);
   const m = Math.floor(seconds / 60) % 60;
   const s = seconds % 60;
 
-  return `${h ? `${pad2(h)}h ` : ''}${m ? `${pad2(m)}m ` : ''}${pad2(s, 2)}s`
+  if (extended) {
+    return `\
+${h ? `${pad2(h)} ${plural('hour', h)} ` : ''}\
+${m ? `${pad2(m)} ${plural('minute', m)} ` : ''}\
+${pad2(s, precision)} ${plural('second', s)}\
+`;
+  }
+
+  return `\
+${h ? `${pad2(h)}h ` : ''}\
+${m ? `${pad2(m)}m ` : ''}\
+${pad2(s, precision)}s\
+`;
 }
