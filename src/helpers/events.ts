@@ -7,6 +7,8 @@ import {ThemeNames} from "./theme";
 import mixpanel from 'mixpanel-browser';
 import {RendererSettings} from "./settings";
 
+const { version }: { version: string } = require('../../package.json');
+
 mixpanel.init(
     "b621e6cd8fa327206ceee9ecd52e0916",
     { "api_host": "https://api-eu.mixpanel.com" },
@@ -102,9 +104,9 @@ export const eventList = {
         }>('global', {
             action: 'Show Quality Alert',
         }),
-        openedApp: enclose('global', {
+        openedApp: enclose<{ version: string }>('global', {
             action: 'Opened App',
-        })
+        }),
     },
     preview: {
         play: enclose('preview', {
@@ -166,4 +168,4 @@ reaction(
 );
 
 // runs only once, at init.
-eventList.global.openedApp();
+eventList.global.openedApp({ version });
