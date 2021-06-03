@@ -17,7 +17,6 @@ export namespace VideoDetails {
       '-hide_banner',
       '-show_format',
       '-show_streams',
-      '-count_packets',
       '-of', 'json'
     ]);
 

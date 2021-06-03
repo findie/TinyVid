@@ -28,8 +28,8 @@ export type MediaStream = {
 
   bit_rate: StringNumber
 
-  nb_frames: StringNumber
-  nb_read_packets: StringNumber
+  nb_frames?: StringNumber
+  nb_read_packets?: StringNumber
 
   tags: ({ [s: string]: string })
 }
