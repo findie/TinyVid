@@ -16,15 +16,15 @@ abstract class Protocol {
     this._register();
   }
 
-  get privileges(): CustomScheme {
-    return {
+  get privileges(): CustomScheme[] {
+    return [{
       scheme: this.protocolName,
       privileges: {
         standard: false,
         supportFetchAPI: true,
         corsEnabled: true
       }
-    };
+    }];
   }
 
   abstract onRequest(req: Request, ...data: any[]): Promise<any>
@@ -106,4 +106,46 @@ export abstract class JSONProtocol extends Protocol {
   }
 
   abstract onRequest(req: Request, payload: any): Promise<any>
+}
+
+
+export abstract class JSONAndStreamProtocol extends JSONProtocol {
+
+  readonly streamProtocolName: string
+  protected constructor(protocolName: string) {
+    super(protocolName);
+    this.streamProtocolName = `${this.protocolName}-stream`;
+  }
+
+  _register() {
+    super._register();
+
+    protocol.registerStreamProtocol(this.streamProtocolName, async (request, cb) => {
+      const jsonData = request?.uploadData?.length > 0 ? JSON.parse(request.uploadData[0].bytes.toString()) : null;
+
+      const stream = await this.onRequestStream(request, jsonData);
+
+      return cb(stream);
+    })
+  }
+
+  abstract onRequestStream(req: Request, payload: any): Promise<any>
+
+  get privileges(): CustomScheme[] {
+    return [{
+      scheme: this.protocolName,
+      privileges: {
+        standard: false,
+        supportFetchAPI: true,
+        corsEnabled: true
+      }
+    }, {
+      scheme: this.streamProtocolName,
+      privileges: {
+        standard: false,
+        supportFetchAPI: true,
+        corsEnabled: true
+      }
+    }];
+  }
 }
