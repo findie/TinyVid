@@ -1,26 +1,35 @@
 import React, {FormEvent, useState} from "react";
 import * as css from './style.css';
 import {clip} from "../../helpers/math";
-import {FormControl, InputBaseComponentProps, InputLabel, MenuItem, Select, TextField} from "@material-ui/core";
+import {
+  FormControl,
+  IconButton,
+  InputBaseComponentProps,
+  InputLabel,
+  MenuItem,
+  Select,
+  TextField,
+  Tooltip
+} from "@material-ui/core";
 import NumberFormat from 'react-number-format';
 import {ProcessStore} from "../../Process.store";
 import {observer} from "mobx-react";
+import {RendererSettings} from "../../helpers/settings";
+import Delete from "@material-ui/icons/Delete";
+import Add from "@material-ui/icons/Add";
+import {ModalTrigger} from "../../components/modals";
+import {TextFieldCard} from "../../components/TextFieldCard";
+import {action} from "mobx";
 
 export interface ConfigMaxFileSizeProps {
 }
 
-const defaultSizes = [
-  { size: 8, text: ' 8 MB (Discord Free)' },
-  { size: 10, text: '10 MB' },
-  { size: 50, text: '50 MB (Discord Nitro Classic)' },
-  { size: 64, text: '64 MB (WhatsApp)' },
-  { size: 100, text: '100 MB (Discord Nitro)' },
-]
-
 export const ConfigMaxFileSize = observer(function ConfigMaxFileSize(props: ConfigMaxFileSizeProps) {
 
   const size = ProcessStore.strategyTune;
-  const [sizeIsCustom, setSizeIsCustom] = useState(!defaultSizes.find(x => x.size === size));
+  const fileSizePresets = RendererSettings.settings.UI.fileSizePresets;
+
+  const [sizeIsCustom, setSizeIsCustom] = useState(!fileSizePresets.find(x => x.size === size));
 
   // @ts-ignore
   return (<div className={css.maxFileSizeConfig}>
@@ -38,9 +47,28 @@ export const ConfigMaxFileSize = observer(function ConfigMaxFileSize(props: Conf
         }}
         value={sizeIsCustom ? 'custom' : size}
         labelId={'size'}
+        className={css.select}
       >
-        {defaultSizes.map(({ size, text }) =>
-          <MenuItem value={size} key={size}>{text}</MenuItem>
+        {fileSizePresets.map(({ size, text }, index) =>
+          <MenuItem value={size} key={`${text} ${index} ${size}`} className={css.menuItem}>
+            {text}
+            <IconButton
+              size="small"
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                action(() => {
+                  const [spliced] = fileSizePresets.splice(index, 1);
+                  if(spliced.size === size) {
+                    setSizeIsCustom(true);
+                  }
+                })();
+              }}
+              disabled={fileSizePresets.length <= 1}
+            >
+              <Delete/>
+            </IconButton>
+          </MenuItem>
         )}
         <MenuItem value={'custom'}>Custom</MenuItem>
       </Select>
@@ -58,6 +86,31 @@ export const ConfigMaxFileSize = observer(function ConfigMaxFileSize(props: Conf
             inputComponent: MBNumberFormatCustom,
           }}
         />
+        <ModalTrigger
+          trigger={(
+            <Tooltip title="Add to presets">
+              <IconButton size="small">
+                <Add/>
+              </IconButton>
+            </Tooltip>
+          )}
+        >
+          {({ closeModal }) => (
+            <TextFieldCard
+              title="Set preset name"
+              onCancel={closeModal}
+              onSave={action(text => {
+                closeModal();
+                fileSizePresets.push({
+                  text,
+                  size
+                });
+                setSizeIsCustom(false);
+              })}
+            />
+          )}
+        </ModalTrigger>
+
       </div> :
       null
     }
@@ -66,6 +119,7 @@ export const ConfigMaxFileSize = observer(function ConfigMaxFileSize(props: Conf
 
 
 interface MBNumberFormatCustomProps extends InputBaseComponentProps {
+// noop
 }
 
 function MBNumberFormatCustom(props: MBNumberFormatCustomProps) {

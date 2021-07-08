@@ -19,7 +19,6 @@ export const ConfigVideoSettings = observer(function ConfigVideoSettings(props: 
   const originalVideoHeight: number | null = details?.height || null;
   const originalVideoFPS: number | null = details?.fps || null;
 
-  console.log('video settings', toJS(ProcessStore.videoSettings));
   const videoHeight = ProcessStore.videoSettings.height;
   const videoFPS = ProcessStore.videoSettings.fps;
 

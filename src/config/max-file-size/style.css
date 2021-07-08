@@ -6,3 +6,14 @@
     display: flex;
     align-items: flex-end;
 }
+
+.select {
+    min-width: 100px;
+}
+.select button {
+    display: none;
+}
+
+.menu-item button {
+    margin-left: auto;
+}

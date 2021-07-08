@@ -26,6 +26,13 @@ export interface RendererSettings {
   }
 
   processingVideoSettings: VideoSettings
+
+  UI: {
+    fileSizePresets: {
+      text: string,
+      size: number
+    }[]
+  }
 }
 
 class RendererSettingsClass {
@@ -45,6 +52,16 @@ class RendererSettingsClass {
     processingVideoSettings: {
       fps: "original",
       height: "original"
+    },
+
+    UI: {
+      fileSizePresets: [
+        { size: ConfigMaxFileSizeDefaultSize, text: ' 8 MB (Discord Free)' },
+        { size: 10, text: '10 MB' },
+        { size: 50, text: '50 MB (Discord Nitro Classic)' },
+        { size: 64, text: '64 MB (WhatsApp)' },
+        { size: 100, text: '100 MB (Discord Nitro)' },
+      ]
     }
   }
 
@@ -60,7 +77,8 @@ class RendererSettingsClass {
     try {
       objectMergeDeep(
         this.settings,
-        JSON.parse(readFileSync(this.settings_file).toString())
+        JSON.parse(readFileSync(this.settings_file).toString()),
+        {replaceArrays: true}
       );
     } catch (e) {
       console.error('failed to load settings file', e);
@@ -95,22 +113,18 @@ class RendererSettingsClass {
     reaction(
       () => this.settings.processingParams.strategyType,
       (type, prevType) => {
-        if(!prevType) return;
+        if (!prevType) return;
 
-        if(type===prevType){
+        if (type === prevType) {
           return;
         }
 
         this.settings.processingParams.strategyTune = type === 'max-file-size' ?
-          ConfigMaxFileSizeDefaultSize :
+          this.settings.UI.fileSizePresets[0].size :
           ConfigConstantQualityDefaultQuality
       },
       { fireImmediately: true }
     );
-
-    reaction(() => this.settings.processingParams.strategyTune, (arg, prev, r) => {
-      console.trace('tune changed', arg, prev);
-    });
 
     console.log('tune is', this.settings.processingParams.strategyTune);
   }
