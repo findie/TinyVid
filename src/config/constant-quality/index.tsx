@@ -1,15 +1,12 @@
-import React, {useState} from "react";
+import React from "react";
 import * as css from './style.css';
 import {clip, range} from "../../helpers/math";
-import {FFHelpers} from "../../../electron/helpers/ff";
 import {FormControl, InputLabel, MenuItem, Select} from "@material-ui/core";
+import {ProcessStore} from "../../Process.store";
+import {observer} from "mobx-react";
 
 export interface ConfigConstantQualityProps {
-  onChange: (quality: number) => void
 }
-
-export const ConfigConstantQualityDefaultQuality = 18;
-export const ConfigConstantQualityDefaultSpeedOrQuality = FFHelpers.encodingSpeedPresets.indexOf('medium');
 
 export function quality2name(q: number, flavored: boolean = true) {
   // most people don't know the x264 has crf from 0 to 51
@@ -42,19 +39,18 @@ export function quality2name(q: number, flavored: boolean = true) {
     }
   }
 
-  if(better_than_100){
+  if (better_than_100) {
     return `${q_percentage}% +`;
   }
-  if(worse_than_5){
+  if (worse_than_5) {
     return `< 5% (oh boy)`;
   }
   return `${q_percentage}%`;
 }
 
-export function ConfigConstantQuality(props: ConfigConstantQualityProps) {
+export const ConfigConstantQuality = observer(function ConfigConstantQuality(props: ConfigConstantQualityProps) {
 
-  const [qualityPreset, setQualityPreset] = useState<number>(ConfigConstantQualityDefaultQuality);
-
+  const qualityPreset = ProcessStore.strategyTune;
 
   return (<div className={css.maxFileSizeConfig}>
     <FormControl>
@@ -62,8 +58,7 @@ export function ConfigConstantQuality(props: ConfigConstantQualityProps) {
       <Select
         labelId={'quality-label'}
         onChange={e => {
-          setQualityPreset(parseInt(e.target.value as string));
-          props.onChange(parseInt(e.target.value as string));
+          ProcessStore.setStrategyTune(parseInt(e.target.value as string));
         }}
         value={qualityPreset}
       >
@@ -76,4 +71,4 @@ export function ConfigConstantQuality(props: ConfigConstantQualityProps) {
     </FormControl>
 
   </div>);
-}
+});
