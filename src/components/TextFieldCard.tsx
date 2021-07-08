@@ -5,9 +5,11 @@ type TextFieldCardProps = {
   onSave: (text: string) => void
   onCancel: () => void
   title: string
+  placeholder?: string
+  allowEmpty?: boolean
 }
 
-export function TextFieldCard({ onCancel, onSave, title }: TextFieldCardProps) {
+export function TextFieldCard({ onCancel, onSave, title, allowEmpty = false, placeholder }: TextFieldCardProps) {
   const [text, setText] = useState('');
   return (
     <Card>
@@ -17,10 +19,13 @@ export function TextFieldCard({ onCancel, onSave, title }: TextFieldCardProps) {
           autoFocus
           fullWidth
           value={text}
+          placeholder={placeholder}
           onChange={e => setText(e.target.value)}
           onKeyDown={e => {
             if (e.key === 'Enter') {
-              onSave(text);
+              if (!(!allowEmpty && text.length === 0)) {
+                onSave(text);
+              }
             }
           }}
         />
@@ -37,7 +42,7 @@ export function TextFieldCard({ onCancel, onSave, title }: TextFieldCardProps) {
           variant="contained"
           color="primary"
           onClick={() => onSave(text)}
-          disabled={text.length === 0}
+          disabled={!allowEmpty && text.length === 0}
         >
           Save
         </Button>

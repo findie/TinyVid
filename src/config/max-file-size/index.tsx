@@ -97,12 +97,14 @@ export const ConfigMaxFileSize = observer(function ConfigMaxFileSize(props: Conf
         >
           {({ closeModal }) => (
             <TextFieldCard
+              allowEmpty
               title="Set preset name"
+              placeholder="Add a name or leave empty"
               onCancel={closeModal}
               onSave={action(text => {
                 closeModal();
                 fileSizePresets.push({
-                  text,
+                  text: text ? `${size} MB (${text})` : `${size} MB`,
                   size
                 });
                 setSizeIsCustom(false);
