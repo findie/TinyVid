@@ -44,9 +44,11 @@ export const ConfigVideoSettings = observer(function ConfigVideoSettings(props: 
         )}
         value={videoHeight}
       >
-        <MenuItem value={'original'}>{originalVideoHeight ? originalVideoHeight + 'p' : 'Original Size'}</MenuItem>
+        <MenuItem value={'original'}>
+          {originalVideoHeight ? originalVideoHeight + 'p (original)' : 'Original Size'}
+        </MenuItem>
         {
-          [1440,1080, 720, 480, 360]
+          [1440, 1080, 720, 480, 360]
             .filter(x => x < (details?.height || Infinity))
             .map(x => <MenuItem value={x} key={x}>{x}p</MenuItem>)
         }
@@ -65,7 +67,9 @@ export const ConfigVideoSettings = observer(function ConfigVideoSettings(props: 
         value={videoFPS}
         labelId={'video-fps'}
       >
-        <MenuItem value={'original'}>{details?.fps ? details.fps + ' FPS' : 'Original FPS'}</MenuItem>
+        <MenuItem value={'original'}>
+          {details?.fps ? details.fps + ' FPS (original)' : 'Original FPS'}
+        </MenuItem>
         {
           [144, 120, 60, 48, 30, 24, 20, 15]
             .filter(x => x < (details?.fps || Infinity))
