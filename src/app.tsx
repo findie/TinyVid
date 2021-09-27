@@ -54,6 +54,7 @@ import {PlaybackStore} from "./Playback.store";
 import {eventList} from "./helpers/events";
 import {Changelog} from "./components/changes-modal/changelog";
 import {VolumeControl} from "./components/volume/volume-control";
+import {RendererEventComms} from "./helpers/event-comms-renderer";
 
 const mainElement = document.createElement('div');
 document.body.appendChild(mainElement);
@@ -255,3 +256,6 @@ const App = observer(() => {
 })
 
 ReactDom.render(<App/>, mainElement);
+
+// @ts-ignore
+window.RendererEventComms = RendererEventComms;

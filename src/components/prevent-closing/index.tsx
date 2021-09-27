@@ -1,7 +1,8 @@
 import React, {useEffect, useState} from "react";
 import {Modal} from "../modal";
 import {Box, Button, Grid, Paper, Typography} from "@material-ui/core";
-import {ipcRenderer, remote} from 'electron';
+import {ipcRenderer} from 'electron';
+import {getCurrentWindow} from '@electron/remote'
 
 export interface PreventClosingProps {
   prevent: boolean
@@ -12,7 +13,7 @@ export function PreventClosing(props: PreventClosingProps) {
   const [open, setOpen] = useState(false);
 
   function close() {
-    remote.getCurrentWindow().destroy();
+    getCurrentWindow().destroy();
     // console.trace('close called')
     setOpen(false);
   }

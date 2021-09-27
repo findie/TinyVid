@@ -2,7 +2,6 @@ import React from "react";
 import {ErrorLike} from "../../../electron/protocols/base-protocols";
 import {Box, Button, Grid, Paper, Typography} from "@material-ui/core";
 import {CodeDisplay} from "../code";
-import {remote} from "electron";
 import * as css from './style.css';
 import {Modal} from "../modal";
 
@@ -22,7 +21,7 @@ export function ErrorDisplay({ error, onOk }: ErrorDisplayProps) {
 
 {/*          <Grid item>*/}
 {/*            <Button variant={"contained"} color={"secondary"} onClick={() => {*/}
-{/*              remote.shell.openPath(`https://github.com/legraphista/QuickTrim/issues`);*/}
+{/*              shell.openPath(`https://github.com/legraphista/QuickTrim/issues`);*/}
 {/*            }}>*/}
 {/*              View existing reports*/}
 {/*            </Button>*/}
@@ -45,7 +44,7 @@ export function ErrorDisplay({ error, onOk }: ErrorDisplayProps) {
 {/*${error?.stack?.replace(error.message, '')}*/}
 {/*${codeBlock}*/}
 {/*`;*/}
-{/*              remote.shell.openPath(`https://github.com/legraphista/QuickTrim/issues/new?title=${encodeURIComponent(title)}&body=${encodeURIComponent(contents)}`);*/}
+{/*              shell.openPath(`https://github.com/legraphista/QuickTrim/issues/new?title=${encodeURIComponent(title)}&body=${encodeURIComponent(contents)}`);*/}
 {/*            }}>*/}
 {/*              Submit error report*/}
 {/*            </Button>*/}
