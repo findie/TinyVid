@@ -110,7 +110,7 @@ class ProcessStoreClass {
     const strategy = ProcessStore.strategy;
     PlaybackStore.pause();
 
-    const fout = dialog.showSaveDialogSync(
+    const { canceled, filePath: fout } = await dialog.showSaveDialog(
       getCurrentWindow(),
       {
         title: 'Output location',
@@ -120,7 +120,7 @@ class ProcessStoreClass {
         properties: ['createDirectory', 'showOverwriteConfirmation']
       });
 
-    if (!fout) {
+    if (!fout || canceled) {
       return console.warn('refusing to start process with empty output location');
     }
 
