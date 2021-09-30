@@ -63,6 +63,9 @@ class ThemeClass {
 
   private readonly nativeTheme = remote.nativeTheme;
 
+  readonly lightTheme = lightTheme;
+  readonly darkTheme = darkTheme;
+
   @observable private themeSource = remote.nativeTheme.themeSource;
   @observable private shouldUseDarkColors = remote.nativeTheme.shouldUseDarkColors;
 

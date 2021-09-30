@@ -1,0 +1,21 @@
+.theme-selector {
+  & > * {
+    margin: 8px;
+  }
+
+  .system-theme {
+    position: relative;
+
+    .flare {
+      position: absolute;
+      top: 0;
+      left: 50%;
+      right: 0;
+      bottom: 0;
+      transform: rotate(-25deg);
+      transform-origin: top left;
+      height: 400px;
+      backdrop-filter: contrast(0.5) invert(1);
+    }
+  }
+}

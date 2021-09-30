@@ -47,6 +47,25 @@ module.exports = {
         ]
       },
       {
+        test: /\.s[ac]ss$/i,
+        use: [
+          // Creates `style` nodes from JS strings
+          "style-loader",
+          // Translates CSS into CommonJS
+          {
+            loader: "css-loader",
+            options: {
+              importLoaders: 1,
+              modules: true,
+              localsConvention:'camelCase'
+              // localIdentName: "[name]__[local]___[hash:base64:5]"
+            }
+          },
+          // Compiles Sass to CSS
+          "sass-loader",
+        ],
+      },
+      {
         test: /node_modules.*\.css$/,
         use: [MiniCssExtractPlugin.loader, 'css-loader'],
       },

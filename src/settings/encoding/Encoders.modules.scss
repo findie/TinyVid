@@ -1,0 +1,72 @@
+.encoder-list {
+
+  display: flex;
+  flex-flow: row;
+  flex-wrap: wrap;
+
+  .encoder {
+    border-radius: 8px;
+    margin: 4px;
+    position: relative;
+
+    &.disabled {
+      &:after {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0, 0, 0, 0.7);
+
+        padding: 8px;
+
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: transparent;
+
+        font-size: 1.5rem;
+        text-align: center;
+        font-family: "Roboto", "Helvetica", "Arial", sans-serif;
+        transition-property: color;
+        transition-duration: 0.2s;
+      }
+      &:hover {
+        &:after {
+          color: white;
+        }
+      }
+
+      &.not-implemented {
+        &:after {
+          content: 'Not implemented yet!';
+        }
+      }
+      &.not-supported {
+        &:after {
+          content: 'Not supported!';
+        }
+      }
+      &.no-compatible-gpu {
+        &:after {
+          content: 'No compattible GPU found!';
+        }
+      }
+    }
+
+    .action-area {
+      display: flex;
+    }
+
+    .gpu {
+      background: forestgreen;
+      color: white;
+      padding: 8px;
+      border-radius: 0 0 0 8px;
+
+      position: absolute;
+      top: 0;
+      right: 0;
+    }
+  }
+}

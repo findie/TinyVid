@@ -27,7 +27,7 @@ import {
   MenuItem,
   Paper,
   Select,
-  ThemeProvider,
+  ThemeProvider, Tooltip,
   Typography
 } from "@material-ui/core";
 import {Theme} from "./helpers/theme";
@@ -55,6 +55,9 @@ import {eventList} from "./helpers/events";
 import {Changelog} from "./components/changes-modal/changelog";
 import {VolumeControl} from "./components/volume/volume-control";
 import {RendererEventComms} from "./helpers/event-comms-renderer";
+import {ModalTrigger} from "./components/modals";
+import {Settings} from "./settings/Settings";
+import SettingsIcon from "@material-ui/icons/Settings";
 
 const mainElement = document.createElement('div');
 document.body.appendChild(mainElement);
@@ -79,7 +82,17 @@ const App = observer(() => {
       <div className={css.app}>
         <Paper elevation={3} className={css.header} square={true}>
           <ChooseFile className={css.flexGrow + ' ' + css.fileSelect}/>
-          <ThemeSwitch theme={Theme.currentName} onClick={Theme.setNext}/>
+
+          <ModalTrigger
+            content={<Settings/>}
+          >
+            <Tooltip title="Preferences" arrow>
+              <IconButton>
+                <SettingsIcon/>
+              </IconButton>
+            </Tooltip>
+          </ModalTrigger>
+
           <BitrateWarnings className={css.alert}/>
         </Paper>
         <Display className={css.display}>
