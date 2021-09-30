@@ -1,4 +1,4 @@
-import {CustomScheme, FilePathWithHeaders, protocol, Request, ProtocolRequest} from 'electron';
+import {CustomScheme, FilePathWithHeaders, protocol, ProtocolRequest} from 'electron';
 import {logError} from "../../common/sentry";
 
 abstract class Protocol {
@@ -62,14 +62,23 @@ export type ErrorLike = {
   stack: string
 }
 
-export type JSONProtocolResponse<T> = {
+export type JSONProtocolResponseSuccess<T> = {
   success: T
-} | {
+}
+export type JSONProtocolResponseError = {
   error: ErrorLike
-};
+}
+
+export type JSONProtocolResponse<T> = JSONProtocolResponseSuccess<T> | JSONProtocolResponseError;
 
 export function isJSONProtocolError(data: JSONProtocolResponse<any>): data is ({ error: ErrorLike }) {
   return !!(data as any).error;
+}
+
+export function JSONProtocolResponseToError(data: JSONProtocolResponseError) {
+  const e = new Error(data.error.message);
+  Object.assign(e, data.error);
+  return e;
 }
 
 export abstract class JSONProtocol extends Protocol {
@@ -109,10 +118,24 @@ export abstract class JSONProtocol extends Protocol {
   abstract onRequest(req: ProtocolRequest, payload: any): Promise<any>
 }
 
+export enum StreamProtocolErrorCodes {
+  CONTEXT_SHUT_DOWN = -26
+}
+
+export class StreamProtocolError extends Error {
+  name = 'StreamProtocolError'
+  readonly code: number
+
+  constructor(code: number | StreamProtocolErrorCodes, message: string) {
+    super(message);
+    this.code = code;
+  }
+}
 
 export abstract class JSONAndStreamProtocol extends JSONProtocol {
 
   readonly streamProtocolName: string
+
   protected constructor(protocolName: string) {
     super(protocolName);
     this.streamProtocolName = `${this.protocolName}-stream`;
@@ -122,15 +145,22 @@ export abstract class JSONAndStreamProtocol extends JSONProtocol {
     super._register();
 
     protocol.registerStreamProtocol(this.streamProtocolName, async (request, cb) => {
-      const jsonData = request?.uploadData?.length > 0 ? JSON.parse(request.uploadData[0].bytes.toString()) : null;
+      const jsonData = (request?.uploadData?.length ?? 0) > 0 ? JSON.parse(request.uploadData![0].bytes.toString()) : null;
 
-      const stream = await this.onRequestStream(request, jsonData);
-
-      return cb(stream);
+      try {
+        const stream = await this.onRequestStream(request, jsonData);
+        return cb({ data: stream });
+      } catch (e) {
+        console.error(e);
+        // https://source.chromium.org/chromium/chromium/src/+/master:net/base/net_error_list.h
+        cb({
+          error: e
+        });
+      }
     })
   }
 
-  abstract onRequestStream(req: Request, payload: any): Promise<any>
+  abstract onRequestStream(req: ProtocolRequest, payload: any): Promise<NodeJS.ReadableStream | Buffer | string>
 
   get privileges(): CustomScheme[] {
     return [{

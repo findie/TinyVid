@@ -1,4 +1,4 @@
-import {JSONAndStreamProtocol} from "../base-protocols";
+import {JSONAndStreamProtocol, StreamProtocolError, StreamProtocolErrorCodes} from "../base-protocols";
 import {v4 as uuid} from 'uuid'
 import {logError} from "../../../common/sentry";
 import {ChildProcess, spawn, StdioOptions} from "child_process";
@@ -29,6 +29,9 @@ export namespace ExternalProgramProtocol {
     id: string,
     signal?: NodeJS.Signals
   }
+  export type ExternalProgramProtocolCheckPayload = {
+    id: string
+  }
 
   type Task = {
     id: string
@@ -37,7 +40,8 @@ export namespace ExternalProgramProtocol {
     error: ExternalProcessError | null
     cancelled: boolean
     promise: Promise<number> | null,
-    data: ExternalProgramProtocolRunPayload
+    data: ExternalProgramProtocolRunPayload,
+    stdData: (string | null)[];
   }
 
   export class ExternalProgramProtocol<ExternalExec extends string> extends JSONAndStreamProtocol {
@@ -50,7 +54,7 @@ export namespace ExternalProgramProtocol {
       this.exec = exec;
     }
 
-    async onRequest(req: Electron.Request, payload: any): Promise<any> {
+    async onRequest(req: Electron.ProtocolRequest, payload: any): Promise<any> {
       const pathname = decodeURIComponent(req.url.replace(`${this.protocolName}://`, ''));
 
       switch (pathname.toLowerCase()) {
@@ -58,11 +62,13 @@ export namespace ExternalProgramProtocol {
           return this.run(payload as ExternalProgramProtocolRunPayload);
         case 'stop':
           return this.stop(payload as ExternalProgramProtocolStopPayload);
+        case 'check':
+          return this.check(payload as ExternalProgramProtocolCheckPayload);
       }
       return {};
     }
 
-    async onRequestStream(req: Electron.Request, payload: { stdioPort: number }): Promise<any> {
+    async onRequestStream(req: Electron.ProtocolRequest, payload: { stdioPort: number }): Promise<NodeJS.ReadableStream | Buffer | string> {
       const taskID = decodeURIComponent(req.url.replace(`${this.streamProtocolName}://`, ''));
 
       return this.stream(taskID, payload.stdioPort);
@@ -82,7 +88,30 @@ export namespace ExternalProgramProtocol {
         done: false,
         cancelled: false,
         data,
-      }
+        stdData: []
+      };
+
+      // if (!data.stdio) {
+      //   data.stdio = [null, "pipe", "pipe"];
+      // }
+      //
+      // if(Array.isArray(data.stdio)) {
+      //   data.stdio.forEach((pipe, pipeIndex) => {
+      //     if (pipe === 'pipe') {
+      //       task.stdData.push('');
+      //
+      //       const pipe = (e: Buffer) => {
+      //         task.stdData[pipeIndex] += e.toString();
+      //       }
+      //       task.process.stdio[pipeIndex]!.on('data', pipe);
+      //       task.process.stdio[pipeIndex]!.once('close', () => {
+      //         task.process.stdio[pipeIndex]!.removeListener('data', pipe);
+      //       });
+      //     } else {
+      //       task.stdData.push(null);
+      //     }
+      //   })
+      // }
 
       task.promise = new Promise((res, rej) => {
         task.process.once('close', (code, sig) => {
@@ -126,14 +155,50 @@ export namespace ExternalProgramProtocol {
       return {};
     }
 
-    stream(taskID: string, which: 'stdout' | 'stderr' | number) {
+    check(data: ExternalProgramProtocolCheckPayload) {
+      const { id } = data;
+      const task = this.tasks.get(id);
+
+      if (!task) return null;
+
+      return {
+        id,
+        pid: task.process.pid,
+
+        done: task.done,
+        cancelled: task.cancelled,
+
+        exitCode: task.process.exitCode,
+        exitSig: task.process.signalCode,
+        error: task.error?.message
+      }
+    }
+
+    stream(taskID: string, which: 'stdout' | 'stderr' | number): NodeJS.ReadableStream | Buffer | string {
       if (which === "stdout") which = 1;
       if (which === "stderr") which = 2;
 
-      const task = this.tasks.get(taskID);
-      if (!task) throw new Error(`Cannot find task ${taskID}`);
+      if (which < 1) {
+        throw new StreamProtocolError(StreamProtocolErrorCodes.CONTEXT_SHUT_DOWN, `Cannot stream stdin  ${taskID}`);
+      }
 
-      return task.process.stdio[which];
+      const task = this.tasks.get(taskID);
+      if (!task) {
+        throw new StreamProtocolError(StreamProtocolErrorCodes.CONTEXT_SHUT_DOWN, `Cannot find task ${taskID}`);
+      }
+
+      const pipe = task.process.stdio[which]
+      if (!pipe) {
+        throw new StreamProtocolError(StreamProtocolErrorCodes.CONTEXT_SHUT_DOWN, `Cannot stream a null pipe ${taskID}`);
+      }
+
+      console.log('streaming', which, task.process.stdio[which]?.destroyed);
+      if (pipe.destroyed) {
+        return task.stdData[which] || '';
+        // throw new StreamProtocolError(StreamProtocolErrorCodes.CONTEXT_SHUT_DOWN, `Cannot stream a destroyed ${taskID}`);
+      }
+
+      return task.process.stdio[which] as NodeJS.ReadableStream;
     }
 
     terminateAll() {
