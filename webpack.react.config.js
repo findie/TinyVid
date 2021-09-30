@@ -7,6 +7,10 @@ module.exports = {
   resolve: {
     extensions: ['.tsx', '.ts', '.js'],
     mainFields: ['main', 'module', 'browser'],
+    // fallback: {
+    //   "fs": false,
+    //   "url": require.resolve("url-polyfill")
+    // }
   },
   entry: './src/app.tsx',
   target: 'electron-renderer',

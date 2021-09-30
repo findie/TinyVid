@@ -1,27 +1,27 @@
 import * as path from "path";
-import {app, remote} from 'electron';
+import type {App} from 'electron';
+
+const app: App = require('electron').app || require('@electron/remote').app;
 
 export namespace ResourceHelpers {
 
   export function userData_dir(...paths: string[]) {
-    return path.join((app || remote.app).getPath('userData'), ...paths);
+    return path.join(app.getPath('userData'), ...paths);
   }
+
   export function logs_dir(...paths: string[]) {
-    return path.join((app || remote.app).getPath('logs'), ...paths);
+    return path.join(app.getPath('logs'), ...paths);
   }
+
   export function temp_dir(...paths: string[]) {
-    return path.join((app || remote.app).getPath('temp'), ...paths);
+    return path.join(app.getPath('temp'), ...paths);
   }
 
   export function real_app_dir(...paths: string[]) {
     let appDir = '';
 
     // check to see if we're in the renderer or main process
-    if (!app) {
-      appDir = remote.app.getAppPath()
-    } else {
-      appDir = app.getAppPath();
-    }
+    appDir = app.getAppPath();
 
     // check if we are in an .asar package
     // aka we are a build

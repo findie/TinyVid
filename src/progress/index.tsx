@@ -1,7 +1,8 @@
 import React, {useCallback, useEffect, useState} from 'react';
 import css from './style.css'
 import {FFMpegError, IFFMpegProgressData} from "ffmpeg-progress-wrapper";
-import {remote} from 'electron';
+import {shell} from 'electron';
+import {getCurrentWindow} from '@electron/remote'
 import {TrimComms} from "../helpers/comms";
 import {Modal} from "../components/modal";
 import {Box, Button, CircularProgress, Grid, LinearProgress, Paper, Typography} from '@material-ui/core';
@@ -134,7 +135,7 @@ const Done = (props: DoneProps) => {
         <Grid container spacing={2} justify={"flex-end"}>
           <Grid item>
             <Button
-              onClick={() => remote.shell.openPath(props.file)}
+              onClick={() => shell.openPath(props.file)}
               variant={"contained"}
               color={"primary"}
             >
@@ -144,7 +145,7 @@ const Done = (props: DoneProps) => {
 
           <Grid item>
             <Button
-              onClick={() => remote.shell.openPath(path.dirname(props.file))}
+              onClick={() => shell.openPath(path.dirname(props.file))}
               variant={"contained"}
               color={"secondary"}
             >
@@ -199,13 +200,13 @@ export const ProcessingOverlay = (props: ProcessingOverlayProps) => {
 
       if (task?.error) {
         setError(task.error);
-        remote.getCurrentWindow().setProgressBar(1, { mode: "error" });
+        getCurrentWindow().setProgressBar(1, { mode: "error" });
         clearInterval(interval);
       }
 
       if (task?.progress) {
         setProgress(task.progress);
-        remote.getCurrentWindow().setProgressBar(
+        getCurrentWindow().setProgressBar(
           task.progress.progress || 0,
           {
             mode: "normal"
@@ -216,19 +217,19 @@ export const ProcessingOverlay = (props: ProcessingOverlayProps) => {
       if (!task || task.done) {
         setIsDone(true);
         clearInterval(interval);
-        remote.getCurrentWindow().setProgressBar(-1, { mode: "none" });
+        getCurrentWindow().setProgressBar(-1, { mode: "none" });
       }
 
       if (task && task.cancelled) {
         setCancelled(true);
-        remote.getCurrentWindow().setProgressBar(-1, { mode: "none" });
+        getCurrentWindow().setProgressBar(-1, { mode: "none" });
       }
 
     }, 1000);
 
     return function cleanup() {
       clearInterval(interval);
-      remote.getCurrentWindow().setProgressBar(0, { mode: "none" });
+      getCurrentWindow().setProgressBar(0, { mode: "none" });
     }
   }, [id])
 

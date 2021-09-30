@@ -1,6 +1,6 @@
 import React, {useCallback, useEffect, useState} from "react";
 import css from './style.css'
-import {remote} from 'electron'
+import {dialog, getCurrentWindow} from '@electron/remote'
 
 import {Box, Button, Icon, Tooltip, Typography} from "@material-ui/core";
 import {makeStyles} from "@material-ui/core/styles";
@@ -97,8 +97,8 @@ export const ChooseFile = (props: ChooseFileProps) => {
   const file = AppState.file;
 
   const chooseFileCallback = async () => {
-    const files = await remote.dialog.showOpenDialog(
-      remote.getCurrentWindow(),
+    const files = await dialog.showOpenDialog(
+      getCurrentWindow(),
       {
         properties: ['openFile'],
       });

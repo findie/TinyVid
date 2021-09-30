@@ -4,7 +4,7 @@ import {DetailsProtocol} from "../electron/protocols/proto/details";
 import {DetailsComms, TrimComms} from "./helpers/comms";
 import {AppState} from "./AppState.store";
 import {RenderStrategy} from "../electron/types";
-import {remote} from "electron";
+import {dialog, getCurrentWindow} from '@electron/remote';
 import {RendererFileHelpers} from "./helpers/file";
 import {eventList} from "./helpers/events";
 import {FFHelpers} from "../electron/helpers/ff";
@@ -110,8 +110,8 @@ class ProcessStoreClass {
     const strategy = ProcessStore.strategy;
     PlaybackStore.pause();
 
-    const fout = remote.dialog.showSaveDialogSync(
-      remote.getCurrentWindow(),
+    const { canceled, filePath: fout } = await dialog.showSaveDialog(
+      getCurrentWindow(),
       {
         title: 'Output location',
         defaultPath: RendererFileHelpers.generateFileOutName(AppState.file, AppState.trimRange, strategy, ProcessStore.videoSettings),
@@ -120,7 +120,7 @@ class ProcessStoreClass {
         properties: ['createDirectory', 'showOverwriteConfirmation']
       });
 
-    if (!fout) {
+    if (!fout || canceled) {
       return console.warn('refusing to start process with empty output location');
     }
 

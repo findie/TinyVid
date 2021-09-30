@@ -1,4 +1,4 @@
-import {CustomScheme, FilePathWithHeaders, protocol, Request} from 'electron';
+import {CustomScheme, FilePathWithHeaders, protocol, Request, ProtocolRequest} from 'electron';
 import {logError} from "../../common/sentry";
 
 abstract class Protocol {
@@ -27,7 +27,7 @@ abstract class Protocol {
     };
   }
 
-  abstract onRequest(req: Request, ...data: any[]): Promise<any>
+  abstract onRequest(req: ProtocolRequest, ...data: any[]): Promise<any>
 }
 
 export abstract class FileProtocol extends Protocol {
@@ -38,7 +38,7 @@ export abstract class FileProtocol extends Protocol {
     });
   }
 
-  abstract onRequest(req: Request): Promise<FilePathWithHeaders>
+  abstract onRequest(req: ProtocolRequest): Promise<FilePathWithHeaders>
 }
 
 export abstract class StringProtocol extends Protocol {
@@ -52,7 +52,7 @@ export abstract class StringProtocol extends Protocol {
     });
   }
 
-  abstract onRequest(req: Request): Promise<string>
+  abstract onRequest(req: ProtocolRequest): Promise<string>
 }
 
 
@@ -75,7 +75,8 @@ export function isJSONProtocolError(data: JSONProtocolResponse<any>): data is ({
 export abstract class JSONProtocol extends Protocol {
   _register() {
     protocol.registerStringProtocol(this.protocolName, async (request, callback) => {
-      const jsonData = request?.uploadData?.length > 0 ? JSON.parse(request.uploadData[0].bytes.toString()) : null;
+      const uploadData = request.uploadData ?? [];
+      const jsonData = uploadData.length > 0 ? JSON.parse(uploadData[0].bytes.toString()) : null;
 
       try {
         const data = await this.onRequest(request, jsonData);
@@ -105,5 +106,5 @@ export abstract class JSONProtocol extends Protocol {
     });
   }
 
-  abstract onRequest(req: Request, payload: any): Promise<any>
+  abstract onRequest(req: ProtocolRequest, payload: any): Promise<any>
 }
