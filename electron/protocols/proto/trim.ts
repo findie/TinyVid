@@ -29,7 +29,7 @@ export namespace TrimProtocol {
       this.tasks = [];
     }
 
-    async onRequest(req: Electron.Request, payload: TrimPostData): Promise<any> {
+    async onRequest(req: Electron.ProtocolRequest, payload: TrimPostData): Promise<any> {
       const pathname = decodeURIComponent(req.url.replace(`${this.protocolName}://`, ''));
 
       switch (req.method) {

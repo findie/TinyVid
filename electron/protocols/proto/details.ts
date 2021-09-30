@@ -11,7 +11,7 @@ export namespace DetailsProtocol {
       super('details');
     }
 
-    async onRequest(req: Electron.Request, payload: any): Promise<DetailsProtocolResponse> {
+    async onRequest(req: Electron.ProtocolRequest, payload: any): Promise<DetailsProtocolResponse> {
       const pathname = decodeURIComponent(req.url.replace(`${this.protocolName}://`, ''));
 
       return await VideoDetails.details(pathname);

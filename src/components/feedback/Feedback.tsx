@@ -16,7 +16,7 @@ import {
 } from "@material-ui/core";
 import * as css from './style.css';
 import {RendererSettings} from "../../helpers/settings";
-import {remote} from 'electron';
+import {app} from '@electron/remote';
 import {readAllLogs} from "../../../electron/helpers/log";
 import * as path from "path";
 
@@ -76,7 +76,7 @@ export function FeedbackModal({ onClose, open }: { onClose?: () => void, open: b
       },
       body: JSON.stringify({
         _files: logs,
-        Version: remote.app.getVersion(),
+        Version: app.getVersion(),
         ID: RendererSettings.settings.ID,
         Email: email || '<unset>',
         Type: type,

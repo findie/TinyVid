@@ -1,4 +1,4 @@
-import React from "react";
+import React, {useState} from "react";
 import * as css from './style.css'
 
 import Nouislider from "nouislider-react";
@@ -8,6 +8,7 @@ import {makeStyles} from "@material-ui/core/styles";
 import {Theme} from "../../helpers/theme";
 import color from "color";
 import {Box, Tooltip, Typography} from "@material-ui/core";
+import {ProcessStore} from "../../Process.store";
 
 const sliderTheme = makeStyles(theme => ({
   'root': {
@@ -39,6 +40,8 @@ const sliderTheme = makeStyles(theme => ({
 }));
 
 interface SpeedSliderProps {
+  initialValue: number
+
   highSpeedText: string
   lowSpeedText: string
 
@@ -75,6 +78,10 @@ function wrapPresetNameInBenchmarks(preset: FFHelpers.EncodingSpeedPresetsType):
 export function SpeedSlider(props: SpeedSliderProps) {
   const classes = sliderTheme();
 
+  // todo convert this component to use stores too
+
+  const [initialStart] = useState(FFHelpers.encodingSpeedPresets[Math.round(ProcessStore.strategySpeed)]);
+
   return (
     <div
       className={css.container + ' ' + props.className + ' ' + classes.root + ' ' + (props.disabled ? classes.rootDisabled : '')}>
@@ -98,11 +105,13 @@ export function SpeedSlider(props: SpeedSliderProps) {
               return wrapPresetNameInBenchmarks(FFHelpers.encodingSpeedPresets[Math.round(val)]);
             },
             from(val: FFHelpers.EncodingSpeedPresetsType): number {
-              return FFHelpers.encodingSpeedPresetsDisplay.findIndex(x => val.indexOf(x) === 0);
+              return FFHelpers.encodingSpeedPresets.findIndex(x => val.indexOf(x) === 0);
             }
           }}
-          start={['medium']}
-          onUpdate={(values, handler, unencodedValues) => props.onChange(Math.round(unencodedValues[0]))}
+          start={[initialStart]}
+          onUpdate={(values, handler, unencodedValues) => {
+            props.onChange(Math.round(unencodedValues[0]))
+          }}
         />
       </Box>
       <Tooltip title={props.lowSpeedTooltip} arrow>

@@ -4,33 +4,17 @@ import {DetailsProtocol} from "../electron/protocols/proto/details";
 import {DetailsComms, TrimComms} from "./helpers/comms";
 import {AppState} from "./AppState.store";
 import {RenderStrategy} from "../electron/types";
-import {ConfigMaxFileSizeDefaultSize, ConfigMaxFileSizeDefaultSpeedOrQuality} from "./config/max-file-size";
-import {
-  ConfigConstantQualityDefaultQuality,
-  ConfigConstantQualityDefaultSpeedOrQuality
-} from "./config/constant-quality";
-import {ConfigVideoSettingsData} from "./config/video-settings";
-import {remote} from "electron";
+import {dialog, getCurrentWindow} from '@electron/remote';
 import {RendererFileHelpers} from "./helpers/file";
 import {eventList} from "./helpers/events";
 import {FFHelpers} from "../electron/helpers/ff";
 import {clip} from "./helpers/math";
 import {PlaybackStore} from "./Playback.store";
+import {RendererSettings} from "./helpers/settings";
 
 /**
  Copyright Findie 2021
  */
-
-const defaultMaxFileSizeStrategy: RenderStrategy = {
-  type: 'max-file-size',
-  tune: ConfigMaxFileSizeDefaultSize,
-  speed: ConfigMaxFileSizeDefaultSpeedOrQuality
-}
-const defaultConstantQuality: RenderStrategy = {
-  type: 'constant-quality',
-  tune: ConfigConstantQualityDefaultQuality,
-  speed: ConfigConstantQualityDefaultSpeedOrQuality
-}
 
 class ProcessStoreClass {
   @observable error: Error | ErrorLike | null = null;
@@ -47,17 +31,25 @@ class ProcessStoreClass {
   @observable processingID: string | null = null;
   @action setProcessingID = (pid: string | null) => this.processingID = pid;
 
-  @observable strategyType: RenderStrategy['type'] = defaultMaxFileSizeStrategy.type;
-  @observable strategyTune: RenderStrategy['tune'] = defaultMaxFileSizeStrategy.tune;
-  @observable strategySpeed: RenderStrategy['speed'] = defaultMaxFileSizeStrategy.speed;
-  @action setStrategyType = (t: ProcessStoreClass['strategyType']) => {
-    this.strategyType = t;
-    this.strategyTune = t === 'max-file-size' ?
-      defaultMaxFileSizeStrategy.tune :
-      defaultConstantQuality.tune
+  @computed get strategyType() {
+    return RendererSettings.settings.processingParams.strategyType
   }
-  @action setStrategyTune = (t: ProcessStoreClass['strategyTune']) => this.strategyTune = t;
-  @action setStrategySpeed = (s: ProcessStoreClass['strategySpeed']) => this.strategySpeed = s;
+
+  @computed get strategyTune() {
+    return RendererSettings.settings.processingParams.strategyTune
+  }
+
+  @computed get strategySpeed() {
+    return RendererSettings.settings.processingParams.strategySpeed
+  }
+
+  @action setStrategyType = (t: ProcessStoreClass['strategyType']) =>
+    RendererSettings.settings.processingParams.strategyType = t;
+  @action setStrategyTune = (t: ProcessStoreClass['strategyTune']) =>
+    RendererSettings.settings.processingParams.strategyTune = t;
+  @action setStrategySpeed = (s: ProcessStoreClass['strategySpeed']) => {
+    RendererSettings.settings.processingParams.strategySpeed = s;
+  }
 
   @computed get strategy(): RenderStrategy {
     return {
@@ -67,8 +59,13 @@ class ProcessStoreClass {
     }
   }
 
-  @observable videoSettings: ConfigVideoSettingsData = { fps: 'original', height: 'original' }
-  @action setVideoSettings = (vs: ProcessStoreClass['videoSettings']) => this.videoSettings = vs;
+  @computed get videoSettings() {
+    return RendererSettings.settings.processingVideoSettings;
+  }
+
+  @action setVideoSettings = <K extends keyof ProcessStoreClass['videoSettings']>(key: K, val: ProcessStoreClass['videoSettings'][K]) => {
+    RendererSettings.settings.processingVideoSettings[key] = val;
+  }
 
   @observable fileOut: string = '';
   @action setFileOut = (f: string) => this.fileOut = f;
@@ -106,15 +103,15 @@ class ProcessStoreClass {
     if (!AppState.file) {
       return console.warn('refusing to start process with empty video field');
     }
-    if(!this.videoDetails) {
+    if (!this.videoDetails) {
       return console.warn('refusing to start process with empty video details');
     }
 
     const strategy = ProcessStore.strategy;
     PlaybackStore.pause();
 
-    const fout = remote.dialog.showSaveDialogSync(
-      remote.getCurrentWindow(),
+    const { canceled, filePath: fout } = await dialog.showSaveDialog(
+      getCurrentWindow(),
       {
         title: 'Output location',
         defaultPath: RendererFileHelpers.generateFileOutName(AppState.file, AppState.trimRange, strategy, ProcessStore.videoSettings),
@@ -123,7 +120,7 @@ class ProcessStoreClass {
         properties: ['createDirectory', 'showOverwriteConfirmation']
       });
 
-    if (!fout) {
+    if (!fout || canceled) {
       return console.warn('refusing to start process with empty output location');
     }
 

@@ -6,7 +6,7 @@ import * as css from './styles.css'
 import {eventList} from "../../helpers/events";
 import {Link} from "@material-ui/core";
 import classNames from "classnames";
-import {remote} from "electron";
+import {shell} from '@electron/remote';
 
 export function Changelog() {
 
@@ -14,7 +14,7 @@ export function Changelog() {
     <Link
       className={classNames(css.text)}
       onClick={() => {
-        remote.shell.openExternal('https://headwayapp.co/tinyvid-changelog').catch(console.error);
+        shell.openExternal('https://headwayapp.co/tinyvid-changelog').catch(console.error);
         eventList.global.viewChanges();
       }}
     >

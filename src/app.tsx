@@ -54,6 +54,7 @@ import {PlaybackStore} from "./Playback.store";
 import {eventList} from "./helpers/events";
 import {Changelog} from "./components/changes-modal/changelog";
 import {VolumeControl} from "./components/volume/volume-control";
+import {RendererEventComms} from "./helpers/event-comms-renderer";
 
 const mainElement = document.createElement('div');
 document.body.appendChild(mainElement);
@@ -163,24 +164,18 @@ const App = observer(() => {
                     </FormControl>
 
                     {ProcessStore.strategyType === 'max-file-size' ?
-                      <ConfigMaxFileSize onChange={size => {
-                        ProcessStore.setStrategyTune(size)
-                      }}/> :
-                      <ConfigConstantQuality onChange={quality => {
-                        ProcessStore.setStrategyTune(quality)
-                      }}/>
+                      <ConfigMaxFileSize/> :
+                      <ConfigConstantQuality/>
                     }
                   </div>
                   <div className={css.right}>
-                    <ConfigVideoSettings
-                      onChange={ProcessStore.setVideoSettings}
-                      details={ProcessStore.simpleVideoDetails}
-                    />
+                    <ConfigVideoSettings/>
                   </div>
                 </div>
 
                 <Box marginTop={2} style={{ display: 'flex' }}>
                   <SpeedSlider
+                    initialValue={ProcessStore.strategySpeed}
                     className={css.speedSlider}
                     highSpeedText={ProcessStore.strategyType === 'max-file-size' ? 'Faster Processing' : 'Faster Processing'}
                     lowSpeedText={ProcessStore.strategyType === 'max-file-size' ? 'Better Quality' : 'Smaller File Size'}
@@ -195,7 +190,6 @@ const App = observer(() => {
                         'Process will finish slower but video will be at the best quality it can' :
                         'Process will finish slower but file will be at the lowest size quality'
                     }
-
 
                     onChange={
                       ProcessStore.setStrategySpeed
@@ -262,3 +256,6 @@ const App = observer(() => {
 })
 
 ReactDom.render(<App/>, mainElement);
+
+// @ts-ignore
+window.RendererEventComms = RendererEventComms;

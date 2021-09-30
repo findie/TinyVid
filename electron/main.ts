@@ -1,5 +1,7 @@
 import "source-map-support/register"
 import "./helpers/log"
+import "../common/sentry";
+
 import {app, BrowserWindow, Menu, MenuItem, MenuItemConstructorOptions, nativeTheme, session, shell} from 'electron';
 import * as path from 'path';
 import * as url from 'url';
@@ -7,11 +9,12 @@ import * as os from 'os';
 import {Protocols} from "./protocols";
 import {TrimProtocol} from "./protocols/proto/trim";
 import {update} from "./update";
+import {initialize as initElectronMain, enable as enableRemote} from '@electron/remote/main';
 
-import "../common/sentry";
 import {RendererSettings} from "../src/helpers/settings";
 import {isMac} from "./helpers";
 
+initElectronMain();
 let mainWindow: Electron.BrowserWindow | null;
 
 function createWindow() {
@@ -26,11 +29,14 @@ function createWindow() {
     minWidth: 900,
     webPreferences: {
       nodeIntegration: true,
-      enableRemoteModule: true,
+      contextIsolation: false,
+      // enableRemoteModule: true,
       webSecurity: true,
       // preload: path.join(__dirname, "..", "common", "sentry"),
     },
   });
+
+  enableRemote(mainWindow.webContents);
 
   const template = [
     // { role: 'appMenu' }
@@ -205,7 +211,7 @@ app.on('ready', async () => {
 
   if (!app.isPackaged) {
     session.defaultSession.loadExtension(
-      path.join(os.homedir(), '.config/google-chrome/Default/Extensions/fmkadmapgofadopljbjfkapdkoienihi/4.13.1_0/')
+      path.join(os.homedir(), '.config/google-chrome/Default/Extensions/fmkadmapgofadopljbjfkapdkoienihi/4.13.5_0//')
     )
       .then(ex => console.log('Registered extension ' + ex.name))
       .catch(e => console.error('Failed to register extension fmkadmapgofadopljbjfkapdkoienihi (React Dev Tools)', e));
@@ -218,4 +224,4 @@ app.on('ready', async () => {
     console.error(e);
   }
 });
-app.allowRendererProcessReuse = true;
+// app.allowRendererProcessReuse = true;

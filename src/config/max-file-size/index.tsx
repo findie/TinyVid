@@ -1,69 +1,127 @@
-import React, {FormEvent, useEffect, useState} from "react";
+import React, {FormEvent, useState} from "react";
 import * as css from './style.css';
 import {clip} from "../../helpers/math";
-import {FFHelpers} from "../../../electron/helpers/ff";
-import {FormControl, InputBaseComponentProps, InputLabel, MenuItem, Select, TextField} from "@material-ui/core";
+import {
+  FormControl,
+  IconButton,
+  InputBaseComponentProps,
+  InputLabel,
+  MenuItem,
+  Select,
+  TextField,
+  Tooltip
+} from "@material-ui/core";
 import NumberFormat from 'react-number-format';
+import {ProcessStore} from "../../Process.store";
+import {observer} from "mobx-react";
+import {RendererSettings} from "../../helpers/settings";
+import Delete from "@material-ui/icons/Delete";
+import Add from "@material-ui/icons/Add";
+import {ModalTrigger} from "../../components/modals";
+import {TextFieldCard} from "../../components/TextFieldCard";
+import {action} from "mobx";
 
 export interface ConfigMaxFileSizeProps {
-  onChange: (size: number) => void
 }
 
-type SizePresets = number | 'custom'
+export const ConfigMaxFileSize = observer(function ConfigMaxFileSize(props: ConfigMaxFileSizeProps) {
 
-export const ConfigMaxFileSizeDefaultSize = 8;
-export const ConfigMaxFileSizeDefaultSpeedOrQuality = FFHelpers.encodingSpeedPresets.indexOf('medium');
+  const size = ProcessStore.strategyTune;
+  const fileSizePresets = RendererSettings.settings.UI.fileSizePresets;
 
-export function ConfigMaxFileSize(props: ConfigMaxFileSizeProps) {
+  const [sizeIsCustom, setSizeIsCustom] = useState(!fileSizePresets.find(x => x.size === size));
 
-  const [sizePreset, setSizePreset] = useState<SizePresets>(ConfigMaxFileSizeDefaultSize);
-  const [customSize, setCustomSize] = useState<number>(100);
-
-  useEffect(() => {
-    const value = sizePreset === 'custom' ? customSize : sizePreset;
-    props.onChange(value);
-  }, [sizePreset, customSize]);
-
-  // @ts-ignore
   // @ts-ignore
   return (<div className={css.maxFileSizeConfig}>
     <FormControl>
       <InputLabel id="size">Size</InputLabel>
 
       <Select
-        onChange={e => setSizePreset(e.target.value === 'custom' ? 'custom' : parseInt(e.target.value as string))}
-        value={sizePreset}
+        onChange={e => {
+          if (e.target.value === 'custom') {
+            setSizeIsCustom(true);
+          } else {
+            setSizeIsCustom(false);
+            ProcessStore.setStrategyTune(parseInt(e.target.value as string))
+          }
+        }}
+        value={sizeIsCustom ? 'custom' : size}
         labelId={'size'}
+        className={css.select}
       >
-        <MenuItem value={8}> 8 MB (Discord Free)</MenuItem>
-        <MenuItem value={10}>10 MB</MenuItem>
-        <MenuItem value={50}>50 MB (Discord Nitro Classic)</MenuItem>
-        <MenuItem value={64}>64 MB (WhatsApp)</MenuItem>
-        <MenuItem value={100}>100 MB (Discord Nitro)</MenuItem>
+        {fileSizePresets.map(({ size, text }, index) =>
+          <MenuItem value={size} key={`${text} ${index} ${size}`} className={css.menuItem}>
+            {text}
+            <IconButton
+              size="small"
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                action(() => {
+                  const [spliced] = fileSizePresets.splice(index, 1);
+                  if(spliced.size === size) {
+                    setSizeIsCustom(true);
+                  }
+                })();
+              }}
+              disabled={fileSizePresets.length <= 1}
+            >
+              <Delete/>
+            </IconButton>
+          </MenuItem>
+        )}
         <MenuItem value={'custom'}>Custom</MenuItem>
       </Select>
     </FormControl>
 
-      {sizePreset === 'custom' ?
-        <div>
+    {sizeIsCustom ?
+      <div>
 
-          <TextField
-            className={css.customInput}
-            onChange={e => setCustomSize(clip(1, parseInt(e.target.value), 10000))}
-            onBlur={e => !e.target.value && setCustomSize(10)}
-            value={customSize}
-            InputProps={{
-              inputComponent: MBNumberFormatCustom,
-            }}
-          />
-        </div> :
-        null
-      }
+        <TextField
+          className={css.customInput}
+          onChange={e => ProcessStore.setStrategyTune(clip(1, parseInt(e.target.value), 10000))}
+          onBlur={e => !e.target.value && ProcessStore.setStrategyTune(10)}
+          value={size}
+          InputProps={{
+            inputComponent: MBNumberFormatCustom,
+          }}
+        />
+        <ModalTrigger
+          trigger={(
+            <Tooltip title="Add to presets">
+              <IconButton size="small">
+                <Add/>
+              </IconButton>
+            </Tooltip>
+          )}
+        >
+          {({ closeModal }) => (
+            <TextFieldCard
+              allowEmpty
+              title="Set preset name"
+              placeholder="Add a name or leave empty"
+              onCancel={closeModal}
+              onSave={action(text => {
+                closeModal();
+                fileSizePresets.push({
+                  text: text ? `${size} MB (${text})` : `${size} MB`,
+                  size
+                });
+                setSizeIsCustom(false);
+              })}
+            />
+          )}
+        </ModalTrigger>
+
+      </div> :
+      null
+    }
   </div>);
-}
+});
 
 
 interface MBNumberFormatCustomProps extends InputBaseComponentProps {
+// noop
 }
 
 function MBNumberFormatCustom(props: MBNumberFormatCustomProps) {
