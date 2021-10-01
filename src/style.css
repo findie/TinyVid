@@ -3,9 +3,8 @@
 }
 
 :local .display {
-    flex-grow: 2;
-    display: flex;
-    max-height: calc(100% - 244px);
+    flex-grow: 1;
+    flex-shrink: 1;
     position: relative;
 }
 
@@ -32,6 +31,8 @@
 :local .header {
     display: flex;
     position: relative;
+    flex-grow: 0;
+    flex-shrink: 0;
 }
 
 :local .header .file-select {
@@ -49,6 +50,8 @@
 
 :local .footer {
     position: relative;
+    flex-grow: 0;
+    flex-shrink: 0;
 }
 
 :local .footer .info {
@@ -83,7 +86,8 @@
 }
 
 :local .controls .settings .right {
-    margin-right: 140px;
+    /*margin-right: 140px;*/
+    align-items: flex-end;
 }
 
 :local .controls .speed-slider {

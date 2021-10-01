@@ -169,7 +169,20 @@ const App = observer(() => {
                   </div>
                   <div className={css.right}>
                     <ConfigVideoSettings/>
+
+                    <Box marginLeft={2}>
+                      <Button
+                        startIcon={<Videocam/>}
+                        variant="contained"
+                        className={css.processBtn}
+                        color={"secondary"}
+                        disabled={!AppState.file || !!mediaNoVideo}
+                        onClick={ProcessStore.startProcessing}
+                      >Process
+                      </Button>
+                    </Box>
                   </div>
+
                 </div>
 
                 <Box marginTop={2} style={{ display: 'flex' }}>
@@ -194,17 +207,7 @@ const App = observer(() => {
                   {/*    ProcessStore.setStrategySpeed*/}
                   {/*  }*/}
                   {/*/>*/}
-                  <Box marginLeft={2}>
-                    <Button
-                      startIcon={<Videocam/>}
-                      variant="contained"
-                      className={css.processBtn}
-                      color={"secondary"}
-                      disabled={!AppState.file || !!mediaNoVideo}
-                      onClick={ProcessStore.startProcessing}
-                    >Process
-                    </Button>
-                  </Box>
+
                 </Box>
 
                 <Box paddingY={1}>
