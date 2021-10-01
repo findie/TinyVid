@@ -70,11 +70,11 @@ const App = observer(() => {
 
   const [showFeedback, setShowFeedback] = useState(false);
 
-  const mediaNoVideo = ProcessStore.simpleVideoDetails && !ProcessStore.simpleVideoDetails.videoCodec;
-  const mediaNotSupported = ProcessStore.simpleVideoDetails && (
-    !VideoHelpers.supportedVideoCodec(ProcessStore.simpleVideoDetails.videoCodec || '') ||
-    !VideoHelpers.supportedFormatContainer(ProcessStore.simpleVideoDetails.containerFormats) ||
-    !VideoHelpers.supportedPixelFormat(ProcessStore.simpleVideoDetails.pixelFormat || '')
+  const mediaNoVideo = ProcessStore.videoDetails && !ProcessStore.videoDetails.videoCodec;
+  const mediaNotSupported = ProcessStore.videoDetails && (
+    !VideoHelpers.supportedVideoCodec(ProcessStore.videoDetails.videoCodec || '') ||
+    !VideoHelpers.supportedFormatContainer(ProcessStore.videoDetails.containerFormats) ||
+    !VideoHelpers.supportedPixelFormat(ProcessStore.videoDetails.pixelFormat || '')
   );
 
   return (
@@ -250,7 +250,7 @@ const App = observer(() => {
         }
 
         {
-          AppState.file && !ProcessStore.simpleVideoDetails ? <Loading/> : null
+          AppState.file && !ProcessStore.videoDetails ? <Loading/> : null
         }
 
         {

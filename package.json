@@ -85,7 +85,8 @@
     "source-map-support": "^0.5.19",
     "throttle-debounce": "^3.0.1",
     "ts-loader": "^8.1.0",
-    "typescript": "^4.2.4"
+    "typescript": "^4.2.4",
+    "utility-types": "^3.10.0"
   },
   "build": {
     "appId": "com.kamua.tinyvid",

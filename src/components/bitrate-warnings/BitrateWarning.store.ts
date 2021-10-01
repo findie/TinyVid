@@ -16,7 +16,7 @@ class BitrateWarningStoreClass {
   }
 
   @computed get alertType(): AlertVariants {
-    const videoDetails = ProcessStore.simpleVideoDetails;
+    const videoDetails = ProcessStore.videoDetails;
     const videoSettings = ProcessStore.videoSettings;
 
     if (!videoDetails) return 'ok';

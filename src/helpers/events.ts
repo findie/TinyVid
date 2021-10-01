@@ -1,12 +1,12 @@
 import {reaction} from "mobx";
 import {ProcessStore} from "../Process.store";
-import {DetailsComms} from "./comms";
 import {AlertVariants, BitrateWarningStore} from "../components/bitrate-warnings/BitrateWarning.store";
 import {debounce} from "throttle-debounce";
 import {ThemeNames} from "./theme";
 import mixpanel from 'mixpanel-browser';
 import {RendererSettings} from "./settings";
 import {isProd} from "../../common/isProd";
+import {FFprobeData} from "../../common/ff/ffprobe";
 
 const { version }: { version: string } = require('../../package.json');
 
@@ -141,7 +141,7 @@ export const eventList = {
     }>('file', {
       action: 'Choose File'
     }),
-    details: enclose<Omit<DetailsComms.SimpleVideoDetails, 'containerFormats'>
+    details: enclose<Omit<FFprobeData, 'containerFormats'>
       & { containerFormats: string }>('file', {
       action: 'Details after Open',
     }),
@@ -155,7 +155,7 @@ declare global {
 }
 
 // Reactions to send events when things change within the App.
-reaction(() => ProcessStore.simpleVideoDetails, data => {
+reaction(() => ProcessStore.videoDetails, data => {
   if (!data) return;
 
   console.log('Got Details', data);

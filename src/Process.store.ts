@@ -1,7 +1,6 @@
 import {action, computed, makeObservable, observable, reaction} from "mobx";
 import {ErrorLike} from "../electron/protocols/base-protocols";
-import {DetailsProtocol} from "../electron/protocols/proto/details";
-import {DetailsComms, TrimComms} from "./helpers/comms";
+import { TrimComms} from "./helpers/comms";
 import {AppState} from "./AppState.store";
 import {RenderStrategy} from "../electron/types";
 import {dialog, getCurrentWindow} from '@electron/remote';
@@ -11,22 +10,20 @@ import {FFHelpers} from "../electron/helpers/ff";
 import {clip} from "./helpers/math";
 import {PlaybackStore} from "./Playback.store";
 import {RendererSettings} from "./helpers/settings";
+import {FFprobe, FFprobeData} from "../common/ff/ffprobe";
 
 /**
  Copyright Findie 2021
  */
 
+debugger;
+
 class ProcessStoreClass {
   @observable error: Error | ErrorLike | null = null;
   @action setError = (e: ProcessStoreClass['error']) => this.error = e;
 
-  @observable videoDetails: null | DetailsProtocol.DetailsProtocolResponse = null;
+  @observable.ref videoDetails: null | FFprobeData = null;
   @action setVideoDetails = (d: ProcessStoreClass['videoDetails']) => this.videoDetails = d;
-
-  @computed get simpleVideoDetails() {
-    if (!this.videoDetails) return null;
-    return DetailsComms.simplifyMediaDetails(this.videoDetails);
-  }
 
   @observable processingID: string | null = null;
   @action setProcessingID = (pid: string | null) => this.processingID = pid;
@@ -86,7 +83,7 @@ class ProcessStoreClass {
         return;
       }
 
-      DetailsComms.getDetails(file)
+      FFprobe.getDetails(file)
         .then(this.setVideoDetails)
         .catch(this.setError);
     });
@@ -125,7 +122,7 @@ class ProcessStoreClass {
     }
 
     // box in the range by one frame to account for browser frame inaccuracy
-    const frameTime = (1 / (this.simpleVideoDetails?.fps || 60));
+    const frameTime = (1 / (this.videoDetails?.fps || 60));
     const start = AppState.trimRange.start + frameTime;
     const end = Math.max(start + frameTime, AppState.trimRange.end - frameTime);
 
@@ -143,9 +140,9 @@ class ProcessStoreClass {
       eventList.global.process({
         type: strategy.type,
         tune: strategy.tune,
-        resolution: this.videoSettings.height === 'original' ? this.simpleVideoDetails!.height : this.videoSettings.height,
+        resolution: this.videoSettings.height === 'original' ? this.videoDetails!.height : this.videoSettings.height,
         isResolutionChanged: this.videoSettings.height !== 'original',
-        fps: this.videoSettings.fps === 'original' ? this.simpleVideoDetails!.fps : this.videoSettings.fps,
+        fps: this.videoSettings.fps === 'original' ? this.videoDetails!.fps : this.videoSettings.fps,
         isFPSChanged: this.videoSettings.fps !== 'original',
         processSpeed: FFHelpers.encodingSpeedPresets[strategy.speed],
         volume: this.volume,
