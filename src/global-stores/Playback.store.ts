@@ -4,7 +4,7 @@
 import {action, computed, makeObservable, observable, reaction} from "mobx";
 import {createRef} from "react";
 import {AppState} from "./AppState.store";
-import {eventList} from "./helpers/events";
+import {eventList} from "../helpers/events";
 
 class PlaybackStoreClass {
 

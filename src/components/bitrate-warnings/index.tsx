@@ -2,7 +2,7 @@ import React, {useEffect, useState} from "react";
 import {Collapse} from "@material-ui/core";
 import {Alert, AlertProps, AlertTitle} from "@material-ui/lab"
 import {observer} from "mobx-react";
-import {ProcessStore} from "../../Process.store";
+import {ProcessStore} from "../../global-stores/Process.store";
 import {AlertVariants, BitrateWarningStore} from "./BitrateWarning.store";
 
 

@@ -46,11 +46,11 @@ import Videocam from '@material-ui/icons/Videocam'
 import '../common/sentry';
 import {VideoHelpers} from "./helpers/video";
 import {FeedbackModal} from "./components/feedback/Feedback";
-import {AppState} from "./AppState.store";
+import {AppState} from "./global-stores/AppState.store";
 import {observer} from "mobx-react";
-import {ProcessStore} from "./Process.store";
+import {ProcessStore} from "./global-stores/Process.store";
 import {toJS} from "mobx";
-import {PlaybackStore} from "./Playback.store";
+import {PlaybackStore} from "./global-stores/Playback.store";
 import {eventList} from "./helpers/events";
 import {Changelog} from "./components/changes-modal/changelog";
 import {VolumeControl} from "./components/volume/volume-control";
@@ -174,27 +174,27 @@ const App = observer(() => {
                 </div>
 
                 <Box marginTop={2} style={{ display: 'flex' }}>
-                  <SpeedSlider
-                    initialValue={ProcessStore.strategySpeed}
-                    className={css.speedSlider}
-                    highSpeedText={ProcessStore.strategyType === 'max-file-size' ? 'Faster Processing' : 'Faster Processing'}
-                    lowSpeedText={ProcessStore.strategyType === 'max-file-size' ? 'Better Quality' : 'Smaller File Size'}
+                  {/*<SpeedSlider*/}
+                  {/*  initialValue={ProcessStore.strategySpeed}*/}
+                  {/*  className={css.speedSlider}*/}
+                  {/*  highSpeedText={ProcessStore.strategyType === 'max-file-size' ? 'Faster Processing' : 'Faster Processing'}*/}
+                  {/*  lowSpeedText={ProcessStore.strategyType === 'max-file-size' ? 'Better Quality' : 'Smaller File Size'}*/}
 
-                    highSpeedTooltip={
-                      ProcessStore.strategyType === 'max-file-size' ?
-                        'Process will finish faster but video quality will suffer' :
-                        'Process will finish faster but file size will be larger'
-                    }
-                    lowSpeedTooltip={
-                      ProcessStore.strategyType === 'max-file-size' ?
-                        'Process will finish slower but video will be at the best quality it can' :
-                        'Process will finish slower but file will be at the lowest size quality'
-                    }
+                  {/*  highSpeedTooltip={*/}
+                  {/*    ProcessStore.strategyType === 'max-file-size' ?*/}
+                  {/*      'Process will finish faster but video quality will suffer' :*/}
+                  {/*      'Process will finish faster but file size will be larger'*/}
+                  {/*  }*/}
+                  {/*  lowSpeedTooltip={*/}
+                  {/*    ProcessStore.strategyType === 'max-file-size' ?*/}
+                  {/*      'Process will finish slower but video will be at the best quality it can' :*/}
+                  {/*      'Process will finish slower but file will be at the lowest size quality'*/}
+                  {/*  }*/}
 
-                    onChange={
-                      ProcessStore.setStrategySpeed
-                    }
-                  />
+                  {/*  onChange={*/}
+                  {/*    ProcessStore.setStrategySpeed*/}
+                  {/*  }*/}
+                  {/*/>*/}
                   <Box marginLeft={2}>
                     <Button
                       startIcon={<Videocam/>}
@@ -231,10 +231,7 @@ const App = observer(() => {
           </Box>
         </Paper>
 
-        {ProcessStore.processingID ?
-          <ProcessingOverlay/> :
-          null
-        }
+        <ProcessingOverlay/>
 
         {
           AppState.file && !ProcessStore.videoDetails ? <Loading/> : null
@@ -246,7 +243,7 @@ const App = observer(() => {
           }}/> : null
         }
 
-        <PreventClosing prevent={!!ProcessStore.processingID}/>
+        <PreventClosing prevent={!!ProcessStore.processing}/>
 
         <FeedbackModal open={showFeedback} onClose={() => setShowFeedback(false)}/>
 

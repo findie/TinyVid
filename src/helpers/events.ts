@@ -1,5 +1,5 @@
 import {reaction} from "mobx";
-import {ProcessStore} from "../Process.store";
+import {ProcessStore} from "../global-stores/Process.store";
 import {AlertVariants, BitrateWarningStore} from "../components/bitrate-warnings/BitrateWarning.store";
 import {debounce} from "throttle-debounce";
 import {ThemeNames} from "./theme";
@@ -88,8 +88,8 @@ export const eventList = {
       isResolutionChanged: boolean,
       fps: number,
       isFPSChanged: boolean,
-      processSpeed: string,
       volume: number,
+      encoderSettings: object
     }>('global', {
       action: 'Process',
     }),

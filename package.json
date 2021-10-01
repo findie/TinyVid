@@ -73,7 +73,7 @@
     "await-lock": "^2.1.0",
     "classnames": "^2.3.0",
     "electron-log": "^4.2.2",
-    "ffmpeg-progress-wrapper": "^2.0.0",
+    "ffmpeg-progress-wrapper": "^2.0.1",
     "mixpanel-browser": "^2.41.0",
     "mobx": "^6.2.0",
     "mobx-react": "^7.1.0",

@@ -1,15 +1,12 @@
 import {VideoProtocol} from "./proto/video";
-import {TrimProtocol} from "./proto/trim";
 import {protocol} from 'electron';
 
 export namespace Protocols {
 
   export const videoProtocol = new VideoProtocol.VideoProtocol();
-  export const trimProtocol = new TrimProtocol.TrimProtocol();
 
   export const list = [
     videoProtocol,
-    trimProtocol,
   ]
 
   export function grantPrivileges() {
