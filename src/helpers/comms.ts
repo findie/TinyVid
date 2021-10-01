@@ -3,14 +3,18 @@ import {AudioSettings, RenderStrategy, TrimPostData, VideoSettings} from "../../
 import {DetailsProtocol} from "../../electron/protocols/proto/details";
 import {VideoDetails} from "../../electron/helpers/ff/details";
 import {round} from "./math";
-import {isJSONProtocolError, JSONProtocolResponse} from "../../electron/protocols/base-protocols";
+import {
+  isJSONProtocolError,
+  JSONProtocolResponse,
+  JSONProtocolResponseToError
+} from "../../electron/protocols/base-protocols";
 import {AudioStream, MediaDetails, StringFraction, VideoStream} from "../../common/ff/types";
+import type {ExternalProgramProtocol} from "../../electron/protocols/proto/external-program";
+import {streamToLineIterator} from "./stream";
 
 function getJSONProtocolDataOrThrow<T>(data: JSONProtocolResponse<T>): T {
   if (isJSONProtocolError(data)) {
-    const e = new Error(data.error.message);
-    Object.assign(e, data.error);
-    throw e;
+    throw JSONProtocolResponseToError(data);
   }
 
   return data.success;
@@ -151,3 +155,86 @@ export namespace DetailsComms {
     }
   }
 }
+
+
+class ExternalProgramInstance {
+  readonly comms: ExternalProgramComms<string>;
+  readonly taskID: string;
+
+  constructor(taskID: string, comms: ExternalProgramComms<string>) {
+    this.taskID = taskID;
+    this.comms = comms;
+  }
+
+  getPipe = async (pipe: number): Promise<ReadableStream<string> | null> => {
+    const sr = await fetch(`${this.comms.protoStreamName}://${this.taskID}`, {
+
+      method: 'post',
+      body: JSON.stringify({
+        stdioPort: pipe
+      })
+
+    });
+
+    if (!sr.body) return null;
+
+    const stream = sr.body
+      .pipeThrough(new TextDecoderStream())
+
+    return stream;
+  }
+
+  getPipeLineReader = async (pipe: number) => {
+    const stream = await this.getPipe(pipe);
+    if (!stream) return null;
+
+    return streamToLineIterator(stream);
+  }
+
+
+  waitExit = async () => {
+    while (true) {
+      const r = await fetch(`${this.comms.protoName}://check`, {
+        method: 'POST',
+        body: JSON.stringify({
+          id: this.taskID
+        })
+      });
+
+      const task = getJSONProtocolDataOrThrow<ReturnType<ExternalProgramProtocol.ExternalProgramProtocol<any>['check']>>(
+        await r.json()
+      );
+
+      if (task?.done || task?.cancelled || task?.exitSig || task?.exitCode || task?.error) {
+        return task;
+      }
+
+      await new Promise(_ => setTimeout(_, 500));
+    }
+  }
+
+}
+
+export class ExternalProgramComms<ProtocolName extends string> {
+  readonly protoName: ProtocolName;
+  readonly protoStreamName: `${ProtocolName}-stream`
+
+  constructor(protoName: ProtocolName) {
+    this.protoName = protoName;
+    this.protoStreamName = `${this.protoName}-stream` as ExternalProgramComms<ProtocolName>["protoStreamName"];
+  }
+
+  run = async (data: ExternalProgramProtocol.ExternalProgramProtocolRunPayload): Promise<ExternalProgramInstance> => {
+    const r = await fetch(`${this.protoName}://run`, {
+      method: 'post',
+      body: JSON.stringify(data)
+    });
+
+    const { id } = getJSONProtocolDataOrThrow<{ id: string }>(await r.json());
+
+    return new ExternalProgramInstance(id, this);
+  }
+}
+
+// @ts-ignore
+window.ExternalProgramComms = ExternalProgramComms;
