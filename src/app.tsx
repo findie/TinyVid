@@ -10,7 +10,6 @@ import {TrimSlider} from "./components/trim-select";
 import {ProcessingOverlay} from "./progress";
 import css from './style.css';
 import {ConfigMaxFileSize} from "./config/max-file-size";
-import {SpeedSlider} from "./config/speed-slider";
 import {ConfigConstantQuality} from "./config/constant-quality";
 import {ConfigVideoSettings} from "./config/video-settings";
 import {Loading} from "./components/loading";

@@ -10,11 +10,10 @@ import {debounce} from "throttle-debounce";
 import {RendererSettings} from "../../helpers/settings";
 import {VideoSettings} from "../../../electron/types";
 import {DeepReadonly} from "utility-types";
-import {FFprobe, FFprobeData} from "../../../common/ff/ffprobe";
-import {AppState} from "../AppState.store";
+import {FFprobeData} from "../../../common/ff/ffprobe";
 
 const settings_file = (processors: string) =>
-  ResourceHelpers.userData_dir(`processor_${processors.replace(/[^a-z09_]/gi, '_')}_settings.json`);
+  ResourceHelpers.userData_dir(`processor_${processors.replace(/[^a-z0-9_]/gi, '_')}_settings.json`);
 
 export type ProcessBaseGenericSettings<PROCESSOR> = {
   processorName: PROCESSOR
@@ -128,7 +127,7 @@ export abstract class ProcessBaseGeneric<PROCESSOR extends string, SETTINGS exte
     wastedSpace: [number, number]
   }>
 
-  static fixTrimRange(videoDetails: FFprobeData, start: number, end: number){
+  static fixTrimRange(videoDetails: FFprobeData, start: number, end: number) {
     const frameTime = (1 / (videoDetails?.fps || 60));
     const _start = start + frameTime;
     const _end = Math.max(_start + frameTime, end - frameTime);

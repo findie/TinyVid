@@ -2,9 +2,9 @@
  Copyright Findie 2021
  */
 
-export type StringFraction = string & {__StringFraction__: void};
-export type ColumnDivided = string & {__ColumnDivided__: void};
-export type StringNumber = string & {__StringNumber__: void};
+export type StringFraction = string & { __StringFraction__: void };
+export type ColumnDivided = string & { __ColumnDivided__: void };
+export type StringNumber = string & { __StringNumber__: void };
 
 export type MediaStream = {
   index: number

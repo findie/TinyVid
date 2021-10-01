@@ -1,5 +1,5 @@
 import {FFMpegProgress, IFFMpegProgressData} from "ffmpeg-progress-wrapper";
-import {action, makeObservable, observable} from "mobx";
+import {action, computed, makeObservable, observable} from "mobx";
 import type {FFMpegError} from "ffmpeg-progress-wrapper/dist/error";
 import {ResourceHelpers} from "../../electron/helpers/resources";
 
@@ -12,22 +12,24 @@ export namespace FFmpeg {
 
   export class FFmpegProcess {
 
+    @observable.ref
     protected p: FFMpegProgress | null = null;
     protected donePromise: Promise<string> = Promise.resolve('');
 
-    @observable.ref error: FFMpegError | null = null;
+    @observable.ref
+    error: FFMpegError | null = null;
 
-    @observable.ref progress: IFFMpegProgressData | null = null;
+    @observable.ref
+    progress: IFFMpegProgressData | null = null;
 
     @observable done: boolean = false;
     @observable cancelled: boolean = false;
+    @computed get started() {
+      return !!this.p;
+    }
 
     readonly args: string[];
     readonly duration: number;
-
-    get hasStarted() {
-      return !!this.p;
-    }
 
     constructor(args: string[], duration: number) {
       makeObservable(this);
@@ -35,6 +37,7 @@ export namespace FFmpeg {
       this.duration = duration;
     }
 
+    @action
     run = () => {
       if (this.p) {
         throw new Error('Process already started');
