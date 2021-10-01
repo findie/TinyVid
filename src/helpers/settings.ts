@@ -10,10 +10,7 @@ import {objectMergeDeep} from "./js";
 import type {Processors} from "../global-stores/process-codec-stores";
 
 export const ConfigMaxFileSizeDefaultSize = 8;
-// export const ConfigMaxFileSizeDefaultSpeedOrQuality = FFHelpers.encodingSpeedPresets.indexOf('medium');
-
 export const ConfigConstantQualityDefaultQuality = 22;
-// export const ConfigConstantQualityDefaultSpeedOrQuality = FFHelpers.encodingSpeedPresets.indexOf('medium');
 
 export interface RendererSettings {
   theme: ThemeNames

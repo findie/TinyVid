@@ -48,6 +48,8 @@ export class FFprobeData {
   readonly videoStream: DeepReadonly<VideoStream> | null;
   readonly audioStream: DeepReadonly<AudioStream> | null;
 
+  readonly audioTrackIndexes: number[];
+
   readonly duration: number;
 
   readonly width: number;
@@ -66,6 +68,8 @@ export class FFprobeData {
     this.streams = data.streams;
     this.videoStream = data.streams.find((x): x is VideoStream => x.codec_type === 'video') || null;
     this.audioStream = data.streams.find((x): x is AudioStream => x.codec_type === 'audio') || null;
+
+    this.audioTrackIndexes = data.streams.filter(x => x.codec_type === 'audio').map(x => x.index);
 
     this.duration = parseFloat(data.format.duration || this.videoStream?.duration || '0');
 

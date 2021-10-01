@@ -2,11 +2,10 @@
  Copyright Findie 2021
  */
 import {ProcessBaseGeneric, ProcessBaseGenericSettings} from "./ProcessBaseGeneric";
-import {AudioSettings, RenderStrategy, VideoSettings} from "../../../electron/types";
+import {AudioSettings, VideoSettings} from "../../../electron/types";
 import {RendererSettings} from "../../helpers/settings";
 import {ProcessStore} from "../Process.store";
 import {FFprobeData} from "../../../common/ff/ffprobe";
-import {ff_getAudioTrackIndexes} from "../../../common/ff";
 
 type H264Settings = ProcessBaseGenericSettings<'libx264'> & {
   preset: EncodingSpeedPresetsType
@@ -33,7 +32,7 @@ export class ProcessH264 extends ProcessBaseGeneric<'libx264', H264Settings> {
     });
   }
 
-  private strategy2params=(details: FFprobeData, durationOrTrimmedDuration: number) =>{
+  private strategy2params = (details: FFprobeData, durationOrTrimmedDuration: number) => {
 
     const strategyType = RendererSettings.settings.processingParams.strategyType;
     const strategyTune = RendererSettings.settings.processingParams.strategyTune;
@@ -69,7 +68,7 @@ export class ProcessH264 extends ProcessBaseGeneric<'libx264', H264Settings> {
     }
   }
 
-   settings2filters = ()=> {
+  settings2filters = () => {
     const settings = ProcessStore.videoSettings;
     const filters = [];
 
@@ -86,8 +85,8 @@ export class ProcessH264 extends ProcessBaseGeneric<'libx264', H264Settings> {
     return filters;
   }
 
-   audio2filters=()=> {
-    const audio: AudioSettings = {volume: ProcessStore.volume};
+  audio2filters = () => {
+    const audio: AudioSettings = { volume: ProcessStore.volume };
     const filters = [];
     if (audio.volume !== 1) {
       filters.push(`volume=${audio.volume ?? 1}`);
@@ -99,23 +98,20 @@ export class ProcessH264 extends ProcessBaseGeneric<'libx264', H264Settings> {
     return filters;
   }
 
-   filterComplex=(mediaDetails: FFprobeData)=> {
+  filterComplex = (mediaDetails: FFprobeData) => {
     const steps: string[] = [];
     const mappings = new Set<string>();
 
     steps.push(`[0:v]${this.settings2filters().join(',')}[v]`);
     mappings.add('[v]')
 
-     // fixme add audioTrakcIndexes to FFprobeData
-    const audioStreamIndexes = ff_getAudioTrackIndexes(mediaDetails);
-
-    if (audioStreamIndexes.length > 0 && ProcessStore.volume > 0) {
+    if (mediaDetails.audioTrackIndexes.length > 0 && ProcessStore.volume > 0) {
       const audioFilters = this.audio2filters();
 
-      const header = audioStreamIndexes.map((i) => `[0:${i}]`).join('');
+      const header = mediaDetails.audioTrackIndexes.map((i) => `[0:${i}]`).join('');
 
-      if(audioStreamIndexes.length > 1){
-        audioFilters.unshift(`amix=${audioStreamIndexes.length}`);
+      if (mediaDetails.audioTrackIndexes.length > 1) {
+        audioFilters.unshift(`amix=${mediaDetails.audioTrackIndexes.length}`);
       }
 
       steps.push(`${header}${audioFilters.join(',')}[a]`)
@@ -129,7 +125,7 @@ export class ProcessH264 extends ProcessBaseGeneric<'libx264', H264Settings> {
   }
 
   generateFFmpegArgs(fileIn: string, range: { begin: number, end: number }, fileOut: string): string[] {
-    if(!ProcessStore.videoDetails){
+    if (!ProcessStore.videoDetails) {
       throw new Error('Cannot continue without video details');
     }
 
