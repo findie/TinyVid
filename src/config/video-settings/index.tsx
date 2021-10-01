@@ -3,7 +3,7 @@ import * as css from './style.css';
 import {VideoSettings} from "../../../electron/types";
 import {FormControl, InputLabel, MenuItem, Select, Box} from "@material-ui/core";
 import {observer} from "mobx-react";
-import {ProcessStore} from "../../Process.store";
+import {ProcessStore} from "../../global-stores/Process.store";
 import {toJS} from "mobx";
 
 export type ConfigVideoSettingsData = VideoSettings;

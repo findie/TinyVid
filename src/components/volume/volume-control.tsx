@@ -4,7 +4,7 @@
 import React, {ChangeEvent, useCallback, useState} from "react";
 import {Icon, Mark, Paper, Slider, Tooltip} from "@material-ui/core";
 import * as css from './style.css'
-import {ProcessStore} from "../../Process.store";
+import {ProcessStore} from "../../global-stores/Process.store";
 
 import VolumeDown from "@material-ui/icons/VolumeDown";
 import VolumeUp from "@material-ui/icons/VolumeUp";
@@ -12,7 +12,7 @@ import VolumeOff from "@material-ui/icons/VolumeOff";
 import Add from '@material-ui/icons/Add';
 
 import {observer} from "mobx-react";
-import {AppState} from "../../AppState.store";
+import {AppState} from "../../global-stores/AppState.store";
 import classNames from "classnames";
 import {Theme} from "../../helpers/theme";
 import {eventList} from "../../helpers/events";

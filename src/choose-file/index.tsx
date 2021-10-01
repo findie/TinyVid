@@ -9,7 +9,7 @@ import InsertDriveFile from '@material-ui/icons/InsertDriveFile'
 import VideoLibrary from '@material-ui/icons/VideoLibrary'
 
 import classNames from 'classnames';
-import {AppState} from "../AppState.store";
+import {AppState} from "../global-stores/AppState.store";
 import {createPortal} from "react-dom";
 import {eventList} from "../helpers/events";
 

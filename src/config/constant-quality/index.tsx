@@ -2,7 +2,7 @@ import React from "react";
 import * as css from './style.css';
 import {clip, range} from "../../helpers/math";
 import {FormControl, InputLabel, MenuItem, Select} from "@material-ui/core";
-import {ProcessStore} from "../../Process.store";
+import {ProcessStore} from "../../global-stores/Process.store";
 import {observer} from "mobx-react";
 
 export interface ConfigConstantQualityProps {

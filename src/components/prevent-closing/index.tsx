@@ -3,6 +3,7 @@ import {Modal} from "../modal";
 import {Box, Button, Grid, Paper, Typography} from "@material-ui/core";
 import {ipcRenderer} from 'electron';
 import {getCurrentWindow} from '@electron/remote'
+import {ProcessStore} from "../../global-stores/Process.store";
 
 export interface PreventClosingProps {
   prevent: boolean
@@ -14,6 +15,7 @@ export function PreventClosing(props: PreventClosingProps) {
 
   function close() {
     getCurrentWindow().destroy();
+    ProcessStore.processing?.cancel();
     // console.trace('close called')
     setOpen(false);
   }

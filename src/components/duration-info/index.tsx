@@ -2,7 +2,7 @@ import React from "react";
 import {Box, Paper, Typography} from "@material-ui/core";
 import {round, seconds2time} from "../../helpers/math";
 import {observer} from "mobx-react";
-import {AppState} from "../../AppState.store";
+import {AppState} from "../../global-stores/AppState.store";
 
 export interface DurationInfoProps {
   className?: string

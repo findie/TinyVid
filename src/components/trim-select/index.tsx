@@ -9,10 +9,10 @@ import './style.css'
 import {arrIsConsistent, seconds2time} from "../../helpers/math";
 import {Box, Icon} from "@material-ui/core"
 import {observer} from "mobx-react";
-import {AppState} from "../../AppState.store";
-import {ProcessStore} from "../../Process.store";
+import {AppState} from "../../global-stores/AppState.store";
+import {ProcessStore} from "../../global-stores/Process.store";
 import classNames from "classnames";
-import {PlaybackStore} from "../../Playback.store";
+import {PlaybackStore} from "../../global-stores/Playback.store";
 import PlayArrow from "@material-ui/icons/PlayArrow";
 import {eventList} from "../../helpers/events";
 

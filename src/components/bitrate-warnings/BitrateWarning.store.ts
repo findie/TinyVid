@@ -2,10 +2,9 @@
  Copyright Findie 2021
  */
 import {computed, makeObservable} from "mobx";
-import {FFHelpers} from "../../../electron/helpers/ff";
 import {between} from "../../helpers/math";
-import {ProcessStore} from "../../Process.store";
-import {AppState} from "../../AppState.store";
+import {ProcessStore} from "../../global-stores/Process.store";
+import {AppState} from "../../global-stores/AppState.store";
 
 export type AlertVariants = 'corrupt' | 'bad' | 'artifacts' | 'ok' | 'waste';
 
@@ -25,8 +24,8 @@ class BitrateWarningStoreClass {
     const duration = AppState.trimRange.end - AppState.trimRange.start;
     const fileSizeInBytes = ProcessStore.strategyTune;
 
-    const bitrateThresholds = FFHelpers.optimalBitrateCalculator(videoDetails, videoSettings);
-    const averageBitrateInKb = FFHelpers.computeAverageBPS(fileSizeInBytes, duration, ProcessStore.volume > 0);
+    const bitrateThresholds = ProcessStore.processor.optimalBitrateCalculator(videoDetails, videoSettings);
+    const averageBitrateInKb = ProcessStore.processor.computeAverageBPS(fileSizeInBytes, duration, ProcessStore.volume > 0);
 
     const averageVideoBitrateInBits = averageBitrateInKb.videoBitrateInKb * 1024;
 

@@ -1,8 +1,8 @@
 import React, {useEffect, VideoHTMLAttributes} from "react";
 import css from './style.css'
 import {observer} from "mobx-react";
-import {AppState} from "../AppState.store";
-import {PlaybackStore} from "../Playback.store";
+import {AppState} from "../global-stores/AppState.store";
+import {PlaybackStore} from "../global-stores/Playback.store";
 
 export interface DisplayProps extends VideoHTMLAttributes<HTMLVideoElement> {
 }

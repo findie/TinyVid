@@ -1,10 +1,10 @@
 import {AudioStream, MediaDetails, MediaFormat, StringFraction, VideoStream} from "./types";
 import {existsSync} from "fs";
 import {ProcessHelpers} from "../process";
-import {FFHelpers} from "../../electron/helpers/ff";
 import assert from "assert";
 import {round} from "../../src/helpers/math";
 import {DeepReadonly} from "utility-types";
+import {ResourceHelpers} from "../../electron/helpers/resources";
 
 /**
  Copyright Findie 2021
@@ -12,13 +12,15 @@ import {DeepReadonly} from "utility-types";
 
 export namespace FFprobe {
 
+  const ffprobe = ResourceHelpers.bin_dir('ffprobe');
+
   export async function getDetails(file: string): Promise<FFprobeData> {
 
     if (!existsSync(file)) {
       throw new Error(`File ${file} doesn't exist`);
     }
 
-    const data = await ProcessHelpers.simpleSpawn(FFHelpers.ffprobe, [
+    const data = await ProcessHelpers.simpleSpawn(ffprobe, [
       '-i', file,
       '-hide_banner',
       '-show_format',
