@@ -62,10 +62,10 @@ export const TrimSlider = observer(function TrimSlider(props: TrimSliderProps) {
   const classes = sliderTheme();
 
   const disabled = !AppState.file;
-  const duration = ProcessStore.simpleVideoDetails ?
-    ProcessStore.simpleVideoDetails.duration || 0.04 :
+  const duration = ProcessStore.videoDetails ?
+    ProcessStore.videoDetails.duration || 0.04 :
     100;
-  const step = ProcessStore.simpleVideoDetails ? 1 / ProcessStore.simpleVideoDetails.fps : 0;
+  const step = ProcessStore.videoDetails ? 1 / ProcessStore.videoDetails.fps : 0;
 
   let start = duration * .33;
   let end = duration * .66;
@@ -142,7 +142,7 @@ export const TrimSlider = observer(function TrimSlider(props: TrimSliderProps) {
         // behaviour={'drag-snap'}
       />
 
-      {!!ProcessStore.simpleVideoDetails?.duration && (
+      {!!ProcessStore.videoDetails?.duration && (
         <div
           className={classNames(css.wiper, classes.wiper, startDrag !== null && css.drag)}
           onMouseDown={(e) => {
@@ -163,9 +163,9 @@ export const TrimSlider = observer(function TrimSlider(props: TrimSliderProps) {
 
             const percentageOfTrackMoved = diff / trackLen;
 
-            PlaybackStore.setTime(startDragTime + percentageOfTrackMoved * ProcessStore.simpleVideoDetails!.duration)
+            PlaybackStore.setTime(startDragTime + percentageOfTrackMoved * ProcessStore.videoDetails!.duration)
           }}
-          style={{ left: `${PlaybackStore.currentVideoTimestamp / ProcessStore.simpleVideoDetails.duration * 100}%` }}
+          style={{ left: `${PlaybackStore.currentVideoTimestamp / ProcessStore.videoDetails.duration * 100}%` }}
         >
           <Icon><PlayArrow className={css.icon} color="inherit"/></Icon>
           <div className={classNames(css.time, classes.time)}>{seconds2time(PlaybackStore.currentVideoTimestamp)}</div>

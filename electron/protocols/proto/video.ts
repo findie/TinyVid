@@ -1,6 +1,4 @@
 import {FileProtocol, JSONProtocol} from "../base-protocols";
-import {strictEqual} from "assert";
-import {VideoDetails} from "../../helpers/ff/details";
 
 export namespace VideoProtocol {
 
