@@ -59,18 +59,24 @@
     }
 
     .banner {
-      color: white;
-      padding: 8px;
-      border-radius: 0 0 0 8px;
+      display: flex;
 
       position: absolute;
       top: 0;
       right: 0;
 
-      &.gpu {
+      > * {
+        color: white;
+        padding: 8px;
+      }
+      > *:first-child {
+        border-radius: 0 0 0 8px;
+      }
+
+      .gpu {
         background: forestgreen;
       }
-      &.experimental {
+      .experimental {
         background: darkorange;
       }
     }

@@ -10,7 +10,6 @@ import {checkIfEncoderWorks, ff_encoders_map} from "../../../common/ff/encoders"
 
 
 const encoders: {
-  // todo make enum of codecs
   codec: keyof typeof Processors,
   name: React.ReactNode,
   desc: React.ReactNode,
@@ -37,37 +36,45 @@ const encoders: {
     experimental: true,
   },
   {
-    // @ts-ignore
     codec: 'h264_nvenc',
     name: 'NvEnc H.264',
     desc: 'Fast encoder, works on all modern devices and produces fair file sizes. ' +
       'This encoder is faster than H.264 but produces larger file sizes',
     cuda: true,
     disabled: true,
-    noGPUCompat: true
+    noGPUCompat: true,
+    experimental: true,
   },
   {
-    // @ts-ignore
     codec: 'hevc_nvenc',
     name: 'NvEnc HEVC',
     desc: 'Fast encoder, works on a small selection of modern devices and produces fair file sizes. ' +
       'This encoder is faster than H.265 but produces larger file sizes',
     cuda: true,
     disabled: true,
-    noGPUCompat: true
+    noGPUCompat: true,
+    experimental: true,
   },
 ]
 
 ff_encoders_map.then(map => {
   encoders.forEach(e => {
     if (map.has(e.codec)) {
-      e.disabled = false;
 
       if (e.cuda) {
         checkIfEncoderWorks(e.codec).then(
-          () => e.noGPUCompat = false,
-          () => e.noGPUCompat = true
+          (works) => {
+            if (works) {
+              e.noGPUCompat = false;
+              e.disabled = false;
+            } else {
+              e.noGPUCompat = true;
+              e.disabled = true;
+            }
+          }
         );
+      } else {
+        e.disabled = false;
       }
     }
   })
@@ -113,13 +120,14 @@ export const Encoders = observer(function Encoders() {
                   {e.desc}
                 </Typography>
 
-                {e.cuda && (
-                  <Typography className={classNames(classes.banner, classes.gpu)} variant="h6">Nvidia GPU</Typography>
-                )}
-                {e.experimental && (
-                  <Typography className={classNames(classes.banner, classes.experimental)}
-                              variant="h6">Experimental</Typography>
-                )}
+                <div className={classNames(classes.banner)}>
+                  {e.cuda && (
+                    <Typography className={classes.gpu} variant="h6">Nvidia GPU</Typography>
+                  )}
+                  {e.experimental && (
+                    <Typography className={classes.experimental} variant="h6">Experimental</Typography>
+                  )}
+                </div>
               </CardContent>
             </CardActionArea>
           </Card>
