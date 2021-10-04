@@ -58,8 +58,7 @@
       display: flex;
     }
 
-    .gpu {
-      background: forestgreen;
+    .banner {
       color: white;
       padding: 8px;
       border-radius: 0 0 0 8px;
@@ -67,6 +66,14 @@
       position: absolute;
       top: 0;
       right: 0;
+
+      &.gpu {
+        background: forestgreen;
+      }
+      &.experimental {
+        background: darkorange;
+      }
     }
+
   }
 }

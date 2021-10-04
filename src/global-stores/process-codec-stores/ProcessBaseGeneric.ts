@@ -27,7 +27,7 @@ export abstract class ProcessBaseGeneric<PROCESSOR extends string, SETTINGS exte
   readonly processorName: PROCESSOR;
 
   @observable.ref
-  abstract readonly qualityOptions: { text: string, value: number }[];
+  abstract readonly qualityOptions: { text: string, value: number, default?: boolean }[];
 
   @computed get strategy() {
     return RendererSettings.settings.processingParams.strategyType;

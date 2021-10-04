@@ -26,30 +26,31 @@ export type H264EncodingSpeedPresetsType =
 
 export class ProcessH264 extends ProcessBaseGeneric<'libx264', H264Settings> {
 
-  readonly qualityOptions: { text: string; value: number; }[] = range(18, 44, 2).map(q => {
+  readonly qualityOptions = range(18, 44, 2).map(q => {
     let q_percentage = 100 - ((q - 18) / 2 * 5);
 
+    let text = `${q_percentage}%`
     if (q === 18) {
-      return { text: `${q_percentage}% (crisp picture)`, value: q };
+      text += ' (crisp picture)';
     }
 
     if (q === 22) {
-      return { text: `${q_percentage}% (can't really tell the difference)`, value: q };
+      text += ' (can\'t really tell the difference)';
     }
 
     if (q === 28) {
-      return { text: `${q_percentage}% (starting to lose some quality)`, value: q };
+      text += ' (starting to lose some quality)'
     }
 
     if (q === 32) {
-      return { text: `${q_percentage}% (your usual twitter video)`, value: q };
+      text += ' (your usual twitter video)';
     }
 
     if (q === 40) {
-      return { text: `${q_percentage}% (potato quality 🥔)`, value: q };
+      text += ' (potato quality 🥔)';
     }
 
-    return { text: `${q_percentage}%`, value: q };
+    return { text, value: q, default: q === 20 };
   });
 
   constructor() {

@@ -7,18 +7,16 @@ import {RendererSettings} from "../../helpers/settings";
 import {ProcessStore} from "../Process.store";
 import {FFprobeData} from "../../../common/ff/ffprobe";
 import {range} from "../../helpers/math";
-import {H264EncodingSpeedPresetsType, ProcessH264} from "./ProcessH264";
 import {makeObservable} from "mobx";
 
-type H265Settings = ProcessBaseGenericSettings<'libx265'> & {
-  preset: H265EncodingSpeedPresetsType
+type AV1Settings = ProcessBaseGenericSettings<'libaom-av1'> & {
+  cpuUsed: number // 0 to 8, default 1
+  tiles: `${1 | 2 | 3 | 4 | 5 | 6}x${1 | 2 | 3 | 4 | 5 | 6}`
 }
 
-export type H265EncodingSpeedPresetsType = H264EncodingSpeedPresetsType;
+export class ProcessAV1 extends ProcessBaseGeneric<'libaom-av1', AV1Settings> {
 
-export class ProcessH265 extends ProcessBaseGeneric<'libx265', H265Settings> {
-
-  readonly qualityOptions: { text: string; value: number; }[] = range(22, 50, 2).map(q => {
+  readonly qualityOptions = range(22, 56, 2).map(q => {
     let q_percentage = 100 - ((q - 22) / 2 * 5);
 
     let text = `${q_percentage}%`;
@@ -38,7 +36,7 @@ export class ProcessH265 extends ProcessBaseGeneric<'libx265', H265Settings> {
       text += ' (your usual twitter video)';
     }
 
-    if (q === 46) {
+    if (q === 50) {
       text += ' (potato quality 🥔)';
     }
 
@@ -46,15 +44,16 @@ export class ProcessH265 extends ProcessBaseGeneric<'libx265', H265Settings> {
   });
 
   constructor() {
-    super('libx265', {
-      processorName: 'libx265',
+    super('libaom-av1', {
+      processorName: 'libaom-av1',
       version: 1,
-      preset: 'medium'
+      cpuUsed: 1,
+      tiles: '4x4',
     });
     makeObservable(this);
   }
 
-  protected paramsFromStrategy(details: FFprobeData, durationOrTrimmedDuration: number) {
+  protected paramsFromStrategy(details: FFprobeData, durationOrTrimmedDuration: number): string[] {
 
     const strategyType = RendererSettings.settings.processingParams.strategyType;
     const strategyTune = RendererSettings.settings.processingParams.strategyTune;
@@ -64,7 +63,11 @@ export class ProcessH265 extends ProcessBaseGeneric<'libx265', H265Settings> {
       case "constant-quality":
         return [
           '-crf', strategyTune.toString(),
-          '-preset', this.settings.preset
+          '-b:v', '0',
+          '-cpu-used', this.settings.cpuUsed.toString(),
+          '-row-mt', '1',
+          '-tiles', this.settings.tiles,
+          '-strict', '-2',
         ];
 
       case "max-file-size":
@@ -81,8 +84,11 @@ export class ProcessH265 extends ProcessBaseGeneric<'libx265', H265Settings> {
           '-minrate:v', Math.floor(videoBitrateInKb * 0.9) + 'k',
           '-b:a', Math.floor(audioBitrateInKb) + 'k',
           '-bufsize:v', Math.floor(videoBitrateInKb) + 'k',
-          '-preset:v', this.settings.preset,
-          '-x265-params', "nal-hrd=cbr"
+
+          '-cpu-used', this.settings.cpuUsed.toString(),
+          '-row-mt', '1',
+          '-tiles', this.settings.tiles,
+          '-strict', '-2',
         ];
 
       default:
@@ -98,7 +104,7 @@ export class ProcessH265 extends ProcessBaseGeneric<'libx265', H265Settings> {
 
     const pix_per_sec = out_h * out_w * out_fps;
 
-    // todo update this for h265
+    // todo update this for av1
     // return {
     //   mayCorrupt: [0, 0.01 * pix_per_sec],
     //   veryBad: [0.01 * pix_per_sec, 0.05 * pix_per_sec],
@@ -117,50 +123,6 @@ export class ProcessH265 extends ProcessBaseGeneric<'libx265', H265Settings> {
     } as const;
   }
 
-  // todo make tests for this
-  // https://write.corbpie.com/ffmpeg-preset-comparison-x264-2019-encode-speed-and-file-size/
-  static readonly benchmarksH265: ({ [s in H264EncodingSpeedPresetsType]: { fps: number, kbit: number } }) = {
-    veryslow: {
-      fps: 19,
-      kbit: 2970
-    },
-    slower: {
-      fps: 33,
-      kbit: 3185,
-    },
-    slow: {
-      fps: 61,
-      kbit: 3200
-    },
-    medium: {
-      fps: 87,
-      kbit: 3271
-    },
-    fast: {
-      fps: 95,
-      kbit: 3379
-    },
-    faster: {
-      fps: 101,
-      kbit: 3600//3226// ????
-    },
-    veryfast: {
-      fps: 114,
-      kbit: 4000,//2816// ????
-    },
-    superfast: {
-      fps: 115,
-      kbit: 5050
-    },
-    ultrafast: {
-      fps: 123,
-      kbit: 7666
-    }
-  }
-
-  static readonly encodingSpeedPresets: H264EncodingSpeedPresetsType[] = ProcessH264.encodingSpeedPresets;
-
-  static readonly encodingSpeedPresetsDisplay: string[] = ProcessH264.encodingSpeedPresetsDisplay;
 }
 
 

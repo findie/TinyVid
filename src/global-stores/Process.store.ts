@@ -101,9 +101,10 @@ class ProcessStoreClass {
       this.setProcessor(p);
 
       if (RendererSettings.settings.processingParams.strategyType === 'constant-quality') {
+        const defaultCRF = this.processor.qualityOptions.find(x => x.default)?.value;
         RendererSettings.settings.processingParams.strategyTune = clip(
           this.processor.qualityOptions[0].value,
-          RendererSettings.settings.processingParams.strategyTune,
+          defaultCRF ?? RendererSettings.settings.processingParams.strategyTune,
           this.processor.qualityOptions[this.processor.qualityOptions.length - 1].value,
         );
       }

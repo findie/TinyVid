@@ -6,6 +6,7 @@ import classNames from "classnames";
 import {Processors} from "../../global-stores/process-codec-stores";
 import {RendererSettings} from "../../helpers/settings";
 import {action} from "mobx";
+import {checkIfEncoderWorks, ff_encoders_map} from "../../../common/ff/encoders";
 
 
 const encoders: {
@@ -14,8 +15,10 @@ const encoders: {
   name: React.ReactNode,
   desc: React.ReactNode,
   className?: string
-  coda?: boolean
+  cuda?: boolean
   disabled?: boolean
+  noGPUCompat?: boolean
+  experimental?: boolean
 }[] = [
   {
     codec: 'libx264',
@@ -28,34 +31,47 @@ const encoders: {
     desc: 'Slow encoder, works on a small selection of modern devices and produces small file sizes.',
   },
   {
-    // @ts-ignore
     codec: 'libaom-av1',
     name: 'AV1',
     desc: 'Slow encoder, works on a small selection of modern devices and produces small file sizes.',
-    className: classNames(classes.disabled, classes.notImplemented),
-    disabled: true,
+    experimental: true,
   },
   {
     // @ts-ignore
-    codec: 'nvenc_h264',
+    codec: 'h264_nvenc',
     name: 'NvEnc H.264',
     desc: 'Fast encoder, works on all modern devices and produces fair file sizes. ' +
       'This encoder is faster than H.264 but produces larger file sizes',
-    coda: true,
-    className: classNames(classes.disabled, classes.noCompatibleGpu),
+    cuda: true,
     disabled: true,
+    noGPUCompat: true
   },
   {
     // @ts-ignore
-    codec: 'nvenc_hevc',
+    codec: 'hevc_nvenc',
     name: 'NvEnc HEVC',
     desc: 'Fast encoder, works on a small selection of modern devices and produces fair file sizes. ' +
       'This encoder is faster than H.265 but produces larger file sizes',
-    className: classNames(classes.disabled, classes.noCompatibleGpu),
-    coda: true,
+    cuda: true,
     disabled: true,
+    noGPUCompat: true
   },
 ]
+
+ff_encoders_map.then(map => {
+  encoders.forEach(e => {
+    if (map.has(e.codec)) {
+      e.disabled = false;
+
+      if (e.cuda) {
+        checkIfEncoderWorks(e.codec).then(
+          () => e.noGPUCompat = false,
+          () => e.noGPUCompat = true
+        );
+      }
+    }
+  })
+})
 
 export const Encoders = observer(function Encoders() {
 
@@ -76,7 +92,12 @@ export const Encoders = observer(function Encoders() {
         {encoders.map((e, i) => (
           <Card
             key={e.codec}
-            className={classNames(classes.encoder, e.className)}
+            className={classNames(
+              classes.encoder,
+              e.className,
+              e.disabled && classes.disabled,
+              e.noGPUCompat && classes.noCompatibleGpu
+            )}
           >
             <CardActionArea
               className={classes.actionArea}
@@ -92,8 +113,12 @@ export const Encoders = observer(function Encoders() {
                   {e.desc}
                 </Typography>
 
-                {e.coda && (
-                  <Typography className={classes.gpu} variant="h6">Nvidia GPU</Typography>
+                {e.cuda && (
+                  <Typography className={classNames(classes.banner, classes.gpu)} variant="h6">Nvidia GPU</Typography>
+                )}
+                {e.experimental && (
+                  <Typography className={classNames(classes.banner, classes.experimental)}
+                              variant="h6">Experimental</Typography>
                 )}
               </CardContent>
             </CardActionArea>

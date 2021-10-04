@@ -1,14 +1,14 @@
 import {FFMpegProgress, IFFMpegProgressData} from "ffmpeg-progress-wrapper";
 import {action, computed, makeObservable, observable} from "mobx";
 import type {FFMpegError} from "ffmpeg-progress-wrapper/dist/error";
-import {ResourceHelpers} from "../../electron/helpers/resources";
+import {FFFiles} from "./files";
 
 /**
  Copyright Findie 2021
  */
 export namespace FFmpeg {
 
-  const ffmpeg = ResourceHelpers.bin_dir('ffmpeg');
+  const ffmpeg = FFFiles.ffmpeg;
 
   export class FFmpegProcess {
 
@@ -24,6 +24,7 @@ export namespace FFmpeg {
 
     @observable done: boolean = false;
     @observable cancelled: boolean = false;
+
     @computed get started() {
       return !!this.p;
     }
