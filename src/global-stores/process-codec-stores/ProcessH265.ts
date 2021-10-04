@@ -34,7 +34,7 @@ export class ProcessH265 extends ProcessBaseGeneric<'libx265', H265Settings> {
       text += ' (starting to lose some quality)'
     }
 
-    if (q === 28) {
+    if (q === 40) {
       text += ' (your usual twitter video)';
     }
 

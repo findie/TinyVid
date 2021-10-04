@@ -68,10 +68,13 @@ export class ProcessH264NVENC extends ProcessBaseGeneric<'h264_nvenc', H264NVENC
     switch (strategyType) {
       case "constant-quality":
         return [
-          '-cq', strategyTune.toString(),
+          '-cq:v', strategyTune.toString(),
+          // '-qmin:v', strategyTune.toString(),
+          // '-qmax:v', strategyTune.toString(),
           '-preset', this.settings.preset,
-          '-rc', 'vbr_hq',
+          '-rc:v', 'vbr_hq',
           '-bf', '2',
+          '-b:v','0',
         ];
 
       case "max-file-size":

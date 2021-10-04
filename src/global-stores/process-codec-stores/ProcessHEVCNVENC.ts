@@ -20,11 +20,12 @@ type HEVCNVENCSettings = ProcessBaseGenericSettings<'hevc_nvenc'> & {
     'llhq' |
     'llhp'
 }
-
+// https://superuser.com/questions/1236275/how-can-i-use-crf-encoding-with-nvenc-in-ffmpeg
+// todo overload videoFilters and make use of scale_npp or scale_cuda (if they exists)
 export class ProcessHEVCNVENC extends ProcessBaseGeneric<'hevc_nvenc', HEVCNVENCSettings> {
 
-  readonly qualityOptions = range(18, 44, 2).map(q => {
-    let q_percentage = 100 - ((q - 18) / 2 * 5);
+  readonly qualityOptions = range(22, 50, 2).map(q => {
+    let q_percentage = 100 - ((q - 22) / 2 * 5);
 
     let text = `${q_percentage}%`;
     if (q === 22) {
@@ -39,7 +40,7 @@ export class ProcessHEVCNVENC extends ProcessBaseGeneric<'hevc_nvenc', HEVCNVENC
       text += ' (starting to lose some quality)'
     }
 
-    if (q === 28) {
+    if (q === 40) {
       text += ' (your usual twitter video)';
     }
 
@@ -68,9 +69,11 @@ export class ProcessHEVCNVENC extends ProcessBaseGeneric<'hevc_nvenc', HEVCNVENC
     switch (strategyType) {
       case "constant-quality":
         return [
-          '-cq', strategyTune.toString(),
-          '-preset', this.settings.preset,
-          '-rc', 'vbr_hq',
+          '-cq:v', strategyTune.toString(),
+          // '-qmin:v', strategyTune.toString(),
+          // '-qmax:v', strategyTune.toString(),
+          '-preset:v', this.settings.preset,
+          '-rc:V', 'vbr_hq',
           '-bf', '2',
         ];
 
