@@ -1,16 +1,18 @@
 import {action, computed, makeObservable, observable, reaction} from "mobx";
-import {ErrorLike} from "../electron/protocols/base-protocols";
-import {DetailsProtocol} from "../electron/protocols/proto/details";
-import {DetailsComms, TrimComms} from "./helpers/comms";
+import {ErrorLike} from "../../electron/protocols/base-protocols";
 import {AppState} from "./AppState.store";
-import {RenderStrategy} from "../electron/types";
+import {RenderStrategy} from "../../electron/types";
 import {dialog, getCurrentWindow} from '@electron/remote';
-import {RendererFileHelpers} from "./helpers/file";
-import {eventList} from "./helpers/events";
-import {FFHelpers} from "../electron/helpers/ff";
-import {clip} from "./helpers/math";
+import {RendererFileHelpers} from "../helpers/file";
+import {eventList} from "../helpers/events";
+import {clip} from "../helpers/math";
 import {PlaybackStore} from "./Playback.store";
-import {RendererSettings} from "./helpers/settings";
+import {RendererSettings} from "../helpers/settings";
+import {FFprobe, FFprobeData} from "../../common/ff/ffprobe";
+import {ProcessBaseGeneric, ProcessBaseGenericSettings} from "./process-codec-stores/ProcessBaseGeneric";
+import {Processors} from "./process-codec-stores";
+import {FFmpeg} from "../../common/ff/ffmpeg";
+
 
 /**
  Copyright Findie 2021
@@ -20,16 +22,15 @@ class ProcessStoreClass {
   @observable error: Error | ErrorLike | null = null;
   @action setError = (e: ProcessStoreClass['error']) => this.error = e;
 
-  @observable videoDetails: null | DetailsProtocol.DetailsProtocolResponse = null;
+  @observable.ref videoDetails: null | FFprobeData = null;
   @action setVideoDetails = (d: ProcessStoreClass['videoDetails']) => this.videoDetails = d;
 
-  @computed get simpleVideoDetails() {
-    if (!this.videoDetails) return null;
-    return DetailsComms.simplifyMediaDetails(this.videoDetails);
-  }
+  @observable.ref
+  processor: ProcessBaseGeneric<string, ProcessBaseGenericSettings<string>>
+  @action setProcessor = (processor: keyof typeof Processors) => this.processor = new Processors[processor]();
 
-  @observable processingID: string | null = null;
-  @action setProcessingID = (pid: string | null) => this.processingID = pid;
+  @observable processing: FFmpeg.FFmpegProcess | null = null;
+  @action setProcessing = (p: ProcessStoreClass['processing']) => this.processing = p;
 
   @computed get strategyType() {
     return RendererSettings.settings.processingParams.strategyType
@@ -39,23 +40,15 @@ class ProcessStoreClass {
     return RendererSettings.settings.processingParams.strategyTune
   }
 
-  @computed get strategySpeed() {
-    return RendererSettings.settings.processingParams.strategySpeed
-  }
-
   @action setStrategyType = (t: ProcessStoreClass['strategyType']) =>
     RendererSettings.settings.processingParams.strategyType = t;
   @action setStrategyTune = (t: ProcessStoreClass['strategyTune']) =>
     RendererSettings.settings.processingParams.strategyTune = t;
-  @action setStrategySpeed = (s: ProcessStoreClass['strategySpeed']) => {
-    RendererSettings.settings.processingParams.strategySpeed = s;
-  }
 
   @computed get strategy(): RenderStrategy {
     return {
       type: this.strategyType,
       tune: this.strategyTune,
-      speed: this.strategySpeed
     }
   }
 
@@ -70,6 +63,7 @@ class ProcessStoreClass {
   @observable fileOut: string = '';
   @action setFileOut = (f: string) => this.fileOut = f;
 
+  // todo move this into an AudioSettings
   @observable volume: number = 1;
   @action setVolume = (v: number) => {
     v = clip(0, v, 2);
@@ -86,15 +80,47 @@ class ProcessStoreClass {
         return;
       }
 
-      DetailsComms.getDetails(file)
+      FFprobe.getDetails(file)
         .then(this.setVideoDetails)
         .catch(this.setError);
     });
 
     reaction(() => this.error, (e) => {
       if (e) {
-        this.setProcessingID(null);
+        this.setProcessing(null);
         AppState.setFile('');
+      }
+    });
+
+    this.processor = new Processors[RendererSettings.settings.processor]();
+    reaction(() => RendererSettings.settings.processor, this.setProcessor);
+
+    reaction(() => this.processing?.error, (e) => {
+      if (e) {
+        getCurrentWindow().setProgressBar(1, { mode: "error" });
+      }
+    });
+
+    reaction(() => this.processing?.progress, (p) => {
+      if (p && (p.progress ?? 0) > 0) {
+        getCurrentWindow().setProgressBar(
+          p.progress || 0,
+          {
+            mode: "normal"
+          }
+        );
+      }
+    });
+
+    reaction(() => this.processing?.done, (done) => {
+      if (done) {
+        getCurrentWindow().setProgressBar(-1, { mode: "none" });
+      }
+    });
+
+    reaction(() => this.processing, (p) => {
+      if (!p) {
+        getCurrentWindow().setProgressBar(0, { mode: "none" });
       }
     })
   }
@@ -125,34 +151,36 @@ class ProcessStoreClass {
     }
 
     // box in the range by one frame to account for browser frame inaccuracy
-    const frameTime = (1 / (this.simpleVideoDetails?.fps || 60));
-    const start = AppState.trimRange.start + frameTime;
-    const end = Math.max(start + frameTime, AppState.trimRange.end - frameTime);
+    const fixedRange = ProcessBaseGeneric.fixTrimRange(this.videoDetails, AppState.trimRange.start, AppState.trimRange.end);
+
+    const args = this.processor.generateFFmpegArgs(
+      AppState.file,
+      fixedRange,
+      fout
+    );
 
     try {
-      const data = await TrimComms.startProcess(
-        AppState.file,
-        fout,
-        { start, end },
-        strategy,
-        this.videoSettings,
-        { volume: this.volume },
-        this.videoDetails
+
+      const proc = new FFmpeg.FFmpegProcess(
+        args,
+        fixedRange.end - fixedRange.begin
       );
+
+      this.setProcessing(proc);
+      proc.run().catch(console.error);
 
       eventList.global.process({
         type: strategy.type,
         tune: strategy.tune,
-        resolution: this.videoSettings.height === 'original' ? this.simpleVideoDetails!.height : this.videoSettings.height,
+        resolution: this.videoSettings.height === 'original' ? this.videoDetails!.height : this.videoSettings.height,
         isResolutionChanged: this.videoSettings.height !== 'original',
-        fps: this.videoSettings.fps === 'original' ? this.simpleVideoDetails!.fps : this.videoSettings.fps,
+        fps: this.videoSettings.fps === 'original' ? this.videoDetails!.fps : this.videoSettings.fps,
         isFPSChanged: this.videoSettings.fps !== 'original',
-        processSpeed: FFHelpers.encodingSpeedPresets[strategy.speed],
+        encoderSettings: this.processor.settings,
         volume: this.volume,
       });
 
       this.setFileOut(fout);
-      this.setProcessingID(data.id);
     } catch (e) {
       this.setError(e);
     }

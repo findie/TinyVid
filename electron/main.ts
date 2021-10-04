@@ -7,12 +7,12 @@ import * as path from 'path';
 import * as url from 'url';
 import * as os from 'os';
 import {Protocols} from "./protocols";
-import {TrimProtocol} from "./protocols/proto/trim";
 import {update} from "./update";
-import {initialize as initElectronMain, enable as enableRemote} from '@electron/remote/main';
+import {enable as enableRemote, initialize as initElectronMain} from '@electron/remote/main';
 
 import {RendererSettings} from "../src/helpers/settings";
 import {isMac} from "./helpers";
+import {readdirSync} from "fs";
 
 initElectronMain();
 let mainWindow: Electron.BrowserWindow | null;
@@ -151,24 +151,15 @@ function createWindow() {
   }
 
   mainWindow.on('close', (e) => {
-    if (Protocols.trimProtocol.getRunningTasks().length > 0) {
-      console.log('sending close event to show close dialog');
-      mainWindow?.webContents.send('x-closing-window');
-      e.preventDefault();
-      e.returnValue = true;
-    }
-    console.log('closing window as no task is running');
+    console.log('sending close event to show close dialog');
+    mainWindow?.webContents.send('x-closing-window');
+    e.preventDefault();
+    e.returnValue = true;
   });
 
   mainWindow.on('closed', () => {
     mainWindow = null;
     console.log('Killing process because window is closed');
-
-    // kill ffmpegs
-    Protocols
-      .list
-      .find((x): x is TrimProtocol.TrimProtocol => x instanceof TrimProtocol.TrimProtocol)!
-      .terminateAll();
 
     // give time for IO to finish
     setTimeout(() => {
@@ -210,9 +201,13 @@ app.on('ready', async () => {
   createWindow();
 
   if (!app.isPackaged) {
-    session.defaultSession.loadExtension(
-      path.join(os.homedir(), '.config/google-chrome/Default/Extensions/fmkadmapgofadopljbjfkapdkoienihi/4.13.5_0//')
-    )
+    const reactDevPath = path.join(
+      os.homedir(),
+      '.config/google-chrome/Default/Extensions/fmkadmapgofadopljbjfkapdkoienihi/'
+    );
+    const reactDevToolsVer = readdirSync(reactDevPath)[0];
+
+    session.defaultSession.loadExtension(path.join(reactDevPath, reactDevToolsVer))
       .then(ex => console.log('Registered extension ' + ex.name))
       .catch(e => console.error('Failed to register extension fmkadmapgofadopljbjfkapdkoienihi (React Dev Tools)', e));
   }

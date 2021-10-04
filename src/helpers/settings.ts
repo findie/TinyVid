@@ -7,13 +7,10 @@ import {v4 as uuid} from 'uuid';
 import {deepObserve} from "mobx-utils";
 import {RenderStrategy, VideoSettings} from "../../electron/types";
 import {objectMergeDeep} from "./js";
-import {FFHelpers} from "../../electron/helpers/ff";
+import type {Processors} from "../global-stores/process-codec-stores";
 
 export const ConfigMaxFileSizeDefaultSize = 8;
-export const ConfigMaxFileSizeDefaultSpeedOrQuality = FFHelpers.encodingSpeedPresets.indexOf('medium');
-
 export const ConfigConstantQualityDefaultQuality = 22;
-export const ConfigConstantQualityDefaultSpeedOrQuality = FFHelpers.encodingSpeedPresets.indexOf('medium');
 
 export interface RendererSettings {
   theme: ThemeNames
@@ -22,8 +19,9 @@ export interface RendererSettings {
   processingParams: {
     strategyType: RenderStrategy['type']
     strategyTune: RenderStrategy['tune']
-    strategySpeed: RenderStrategy['speed']
   }
+
+  processor: keyof typeof Processors;
 
   processingVideoSettings: VideoSettings
 
@@ -46,8 +44,9 @@ class RendererSettingsClass {
     processingParams: {
       strategyType: 'max-file-size',
       strategyTune: ConfigMaxFileSizeDefaultSize,
-      strategySpeed: ConfigMaxFileSizeDefaultSpeedOrQuality
     },
+
+    processor: 'h264',
 
     processingVideoSettings: {
       fps: "original",

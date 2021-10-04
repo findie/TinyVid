@@ -10,7 +10,6 @@ import {TrimSlider} from "./components/trim-select";
 import {ProcessingOverlay} from "./progress";
 import css from './style.css';
 import {ConfigMaxFileSize} from "./config/max-file-size";
-import {SpeedSlider} from "./config/speed-slider";
 import {ConfigConstantQuality} from "./config/constant-quality";
 import {ConfigVideoSettings} from "./config/video-settings";
 import {Loading} from "./components/loading";
@@ -46,11 +45,11 @@ import Videocam from '@material-ui/icons/Videocam'
 import '../common/sentry';
 import {VideoHelpers} from "./helpers/video";
 import {FeedbackModal} from "./components/feedback/Feedback";
-import {AppState} from "./AppState.store";
+import {AppState} from "./global-stores/AppState.store";
 import {observer} from "mobx-react";
-import {ProcessStore} from "./Process.store";
+import {ProcessStore} from "./global-stores/Process.store";
 import {toJS} from "mobx";
-import {PlaybackStore} from "./Playback.store";
+import {PlaybackStore} from "./global-stores/Playback.store";
 import {eventList} from "./helpers/events";
 import {Changelog} from "./components/changes-modal/changelog";
 import {VolumeControl} from "./components/volume/volume-control";
@@ -67,11 +66,11 @@ const App = observer(() => {
 
   const [showFeedback, setShowFeedback] = useState(false);
 
-  const mediaNoVideo = ProcessStore.simpleVideoDetails && !ProcessStore.simpleVideoDetails.videoCodec;
-  const mediaNotSupported = ProcessStore.simpleVideoDetails && (
-    !VideoHelpers.supportedVideoCodec(ProcessStore.simpleVideoDetails.videoCodec || '') ||
-    !VideoHelpers.supportedFormatContainer(ProcessStore.simpleVideoDetails.containerFormats) ||
-    !VideoHelpers.supportedPixelFormat(ProcessStore.simpleVideoDetails.pixelFormat || '')
+  const mediaNoVideo = ProcessStore.videoDetails && !ProcessStore.videoDetails.videoCodec;
+  const mediaNotSupported = ProcessStore.videoDetails && (
+    !VideoHelpers.supportedVideoCodec(ProcessStore.videoDetails.videoCodec || '') ||
+    !VideoHelpers.supportedFormatContainer(ProcessStore.videoDetails.containerFormats) ||
+    !VideoHelpers.supportedPixelFormat(ProcessStore.videoDetails.pixelFormat || '')
   );
 
   return (
@@ -170,42 +169,45 @@ const App = observer(() => {
                   </div>
                   <div className={css.right}>
                     <ConfigVideoSettings/>
+
+                    <Box marginLeft={2}>
+                      <Button
+                        startIcon={<Videocam/>}
+                        variant="contained"
+                        className={css.processBtn}
+                        color={"secondary"}
+                        disabled={!AppState.file || !!mediaNoVideo}
+                        onClick={ProcessStore.startProcessing}
+                      >Process
+                      </Button>
+                    </Box>
                   </div>
+
                 </div>
 
                 <Box marginTop={2} style={{ display: 'flex' }}>
-                  <SpeedSlider
-                    initialValue={ProcessStore.strategySpeed}
-                    className={css.speedSlider}
-                    highSpeedText={ProcessStore.strategyType === 'max-file-size' ? 'Faster Processing' : 'Faster Processing'}
-                    lowSpeedText={ProcessStore.strategyType === 'max-file-size' ? 'Better Quality' : 'Smaller File Size'}
+                  {/*<SpeedSlider*/}
+                  {/*  initialValue={ProcessStore.strategySpeed}*/}
+                  {/*  className={css.speedSlider}*/}
+                  {/*  highSpeedText={ProcessStore.strategyType === 'max-file-size' ? 'Faster Processing' : 'Faster Processing'}*/}
+                  {/*  lowSpeedText={ProcessStore.strategyType === 'max-file-size' ? 'Better Quality' : 'Smaller File Size'}*/}
 
-                    highSpeedTooltip={
-                      ProcessStore.strategyType === 'max-file-size' ?
-                        'Process will finish faster but video quality will suffer' :
-                        'Process will finish faster but file size will be larger'
-                    }
-                    lowSpeedTooltip={
-                      ProcessStore.strategyType === 'max-file-size' ?
-                        'Process will finish slower but video will be at the best quality it can' :
-                        'Process will finish slower but file will be at the lowest size quality'
-                    }
+                  {/*  highSpeedTooltip={*/}
+                  {/*    ProcessStore.strategyType === 'max-file-size' ?*/}
+                  {/*      'Process will finish faster but video quality will suffer' :*/}
+                  {/*      'Process will finish faster but file size will be larger'*/}
+                  {/*  }*/}
+                  {/*  lowSpeedTooltip={*/}
+                  {/*    ProcessStore.strategyType === 'max-file-size' ?*/}
+                  {/*      'Process will finish slower but video will be at the best quality it can' :*/}
+                  {/*      'Process will finish slower but file will be at the lowest size quality'*/}
+                  {/*  }*/}
 
-                    onChange={
-                      ProcessStore.setStrategySpeed
-                    }
-                  />
-                  <Box marginLeft={2}>
-                    <Button
-                      startIcon={<Videocam/>}
-                      variant="contained"
-                      className={css.processBtn}
-                      color={"secondary"}
-                      disabled={!AppState.file || !!mediaNoVideo}
-                      onClick={ProcessStore.startProcessing}
-                    >Process
-                    </Button>
-                  </Box>
+                  {/*  onChange={*/}
+                  {/*    ProcessStore.setStrategySpeed*/}
+                  {/*  }*/}
+                  {/*/>*/}
+
                 </Box>
 
                 <Box paddingY={1}>
@@ -231,13 +233,10 @@ const App = observer(() => {
           </Box>
         </Paper>
 
-        {ProcessStore.processingID ?
-          <ProcessingOverlay/> :
-          null
-        }
+        <ProcessingOverlay/>
 
         {
-          AppState.file && !ProcessStore.simpleVideoDetails ? <Loading/> : null
+          AppState.file && !ProcessStore.videoDetails ? <Loading/> : null
         }
 
         {
@@ -246,7 +245,7 @@ const App = observer(() => {
           }}/> : null
         }
 
-        <PreventClosing prevent={!!ProcessStore.processingID}/>
+        <PreventClosing prevent={!!ProcessStore.processing}/>
 
         <FeedbackModal open={showFeedback} onClose={() => setShowFeedback(false)}/>
 

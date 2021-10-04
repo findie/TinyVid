@@ -1,10 +1,9 @@
 import React, {useEffect, useState} from "react";
 import * as css from './style.css';
-import {DetailsComms} from "../../helpers/comms";
 import {VideoSettings} from "../../../electron/types";
 import {FormControl, InputLabel, MenuItem, Select, Box} from "@material-ui/core";
 import {observer} from "mobx-react";
-import {ProcessStore} from "../../Process.store";
+import {ProcessStore} from "../../global-stores/Process.store";
 import {toJS} from "mobx";
 
 export type ConfigVideoSettingsData = VideoSettings;
@@ -14,7 +13,7 @@ export interface ConfigVideoSettingsProps {
 
 export const ConfigVideoSettings = observer(function ConfigVideoSettings(props: ConfigVideoSettingsProps) {
 
-  const details = ProcessStore.simpleVideoDetails;
+  const details = ProcessStore.videoDetails;
 
   const originalVideoHeight: number | null = details?.height || null;
   const originalVideoFPS: number | null = details?.fps || null;

@@ -1,12 +1,8 @@
 import React, {useEffect, useState} from "react";
-import {DetailsComms} from "../../helpers/comms";
-import {VideoSettings} from "../../../electron/types";
 import {Collapse} from "@material-ui/core";
 import {Alert, AlertProps, AlertTitle} from "@material-ui/lab"
-import {FFHelpers} from "../../../electron/helpers/ff";
-import {between} from "../../helpers/math";
 import {observer} from "mobx-react";
-import {ProcessStore} from "../../Process.store";
+import {ProcessStore} from "../../global-stores/Process.store";
 import {AlertVariants, BitrateWarningStore} from "./BitrateWarning.store";
 
 
@@ -52,7 +48,7 @@ export const BitrateWarnings = observer(function BitrateWarnings(props: BitrateW
   const [suppress, setSuppress] = useState(false);
   const [lastAlert, setLastAlert] = useState<AlertVariants>("ok");
 
-  const videoDetails = ProcessStore.simpleVideoDetails;
+  const videoDetails = ProcessStore.videoDetails;
   const alertData = alertMessages[BitrateWarningStore.alertType]
 
   useEffect(() => {

@@ -12,7 +12,7 @@ import {
   Tooltip
 } from "@material-ui/core";
 import NumberFormat from 'react-number-format';
-import {ProcessStore} from "../../Process.store";
+import {ProcessStore} from "../../global-stores/Process.store";
 import {observer} from "mobx-react";
 import {RendererSettings} from "../../helpers/settings";
 import Delete from "@material-ui/icons/Delete";

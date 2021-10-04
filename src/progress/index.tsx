@@ -1,16 +1,15 @@
-import React, {useCallback, useEffect, useState} from 'react';
+import React, {useCallback, useState} from 'react';
 import css from './style.css'
 import {FFMpegError, IFFMpegProgressData} from "ffmpeg-progress-wrapper";
 import {shell} from 'electron';
-import {getCurrentWindow} from '@electron/remote'
-import {TrimComms} from "../helpers/comms";
 import {Modal} from "../components/modal";
 import {Box, Button, CircularProgress, Grid, LinearProgress, Paper, Typography} from '@material-ui/core';
 import * as path from 'path';
 import {CodeDisplay} from "../components/code";
 import {bps2text, seconds2time} from "../helpers/math";
-import {AppState} from "../AppState.store";
-import {ProcessStore} from "../Process.store";
+import {AppState} from "../global-stores/AppState.store";
+import {ProcessStore} from "../global-stores/Process.store";
+import {observer} from "mobx-react";
 
 interface ProgressProps {
   out: string
@@ -170,82 +169,40 @@ const Done = (props: DoneProps) => {
 export interface ProcessingOverlayProps {
 }
 
-export const ProcessingOverlay = (props: ProcessingOverlayProps) => {
+export const ProcessingOverlay = observer(function ProcessingOverlay(props: ProcessingOverlayProps) {
 
   const fileIn = AppState.file;
   const fileOut = ProcessStore.fileOut;
-  const id = ProcessStore.processingID!;
+  const processing = ProcessStore.processing;
 
   const onDone = useCallback(() => {
-    return ProcessStore.setProcessingID(null);
+    return ProcessStore.setProcessing(null);
   }, []);
   const onCancelRequest = useCallback(() => {
-    if (ProcessStore.processingID) {
-      return TrimComms.cancelProcess(ProcessStore.processingID!)
+    if (ProcessStore.processing) {
+      ProcessStore.processing.cancel();
     }
-    return Promise.resolve(null);
   }, []);
 
-  const [isDone, setIsDone] = useState(false);
-  const [progress, setProgress] = useState<IFFMpegProgressData | null>(null);
-  const [error, setError] = useState<FFMpegError | null>(null);
-  const [cancelled, setCancelled] = useState(false);
+  if (!processing) {
+    return null;
+  }
 
-  useEffect(() => {
-    const interval = setInterval(async () => {
-
-      console.log(interval, Date.now());
-
-      const task = await TrimComms.checkProcess(id);
-
-      if (task?.error) {
-        setError(task.error);
-        getCurrentWindow().setProgressBar(1, { mode: "error" });
-        clearInterval(interval);
-      }
-
-      if (task?.progress) {
-        setProgress(task.progress);
-        getCurrentWindow().setProgressBar(
-          task.progress.progress || 0,
-          {
-            mode: "normal"
-          }
-        );
-      }
-
-      if (!task || task.done) {
-        setIsDone(true);
-        clearInterval(interval);
-        getCurrentWindow().setProgressBar(-1, { mode: "none" });
-      }
-
-      if (task && task.cancelled) {
-        setCancelled(true);
-        getCurrentWindow().setProgressBar(-1, { mode: "none" });
-      }
-
-    }, 1000);
-
-    return function cleanup() {
-      clearInterval(interval);
-      getCurrentWindow().setProgressBar(0, { mode: "none" });
-    }
-  }, [id])
+  const isDone = processing.done;
+  const progress = processing.progress;
+  const error = processing.error;
+  const cancelled = processing.cancelled;
 
   let component: JSX.Element;
   if (error && !cancelled) {
     component = <ProgressError error={error} onOk={onDone}/>
-  } else if (isDone) {
+  } else if (isDone || cancelled) {
     component = <Done file={fileOut} onOk={onDone} wasCancelled={cancelled}/>
   } else {
     component = <Progress
       progress={progress}
       out={fileOut}
-      onCancel={() => {
-        setCancelled(true);
-        onCancelRequest().catch(console.error);
-      }}/>
+      onCancel={onCancelRequest}/>
   }
 
   return (
@@ -260,4 +217,4 @@ export const ProcessingOverlay = (props: ProcessingOverlayProps) => {
       </div>
     </Modal>
   )
-}
+});
