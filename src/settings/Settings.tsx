@@ -52,6 +52,16 @@ export const Settings = observer(function Settings() {
             <section>
               <Encoders/>
             </section>
+
+            <section>
+              <Typography variant="h6">
+                Encoder Settings
+              </Typography>
+
+              <pre>
+                insert encoding settings here
+              </pre>
+            </section>
           </TabPanel>
         </TabContext>
       </Paper>

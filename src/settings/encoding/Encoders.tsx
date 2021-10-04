@@ -1,6 +1,6 @@
 import React from 'react'
 import {observer} from "mobx-react";
-import {Card, CardActionArea, CardContent, Radio, RadioGroup, Typography} from "@material-ui/core";
+import {Card, CardActionArea, CardContent, MenuItem, Radio, RadioGroup, Select, Typography} from "@material-ui/core";
 import classes from './Encoders.modules.scss';
 import classNames from "classnames";
 import {Processors} from "../../global-stores/process-codec-stores";
@@ -28,6 +28,7 @@ const encoders: {
     codec: 'libx265',
     name: 'H.265',
     desc: 'Slow encoder, works on a small selection of modern devices and produces small file sizes.',
+    disabled: true
   },
   {
     codec: 'libaom-av1',
@@ -38,7 +39,7 @@ const encoders: {
   {
     codec: 'h264_nvenc',
     name: 'NvEnc H.264',
-    desc: 'Fast encoder, works on all modern devices and produces fair file sizes. ' +
+    desc: 'Fast encoder, works on all modern devices and produces fair file sizes. \n' +
       'This encoder is faster than H.264 but produces larger file sizes',
     cuda: true,
     disabled: true,
@@ -48,7 +49,7 @@ const encoders: {
   {
     codec: 'hevc_nvenc',
     name: 'NvEnc HEVC',
-    desc: 'Fast encoder, works on a small selection of modern devices and produces fair file sizes. ' +
+    desc: 'Fast encoder, works on a small selection of modern devices and produces fair file sizes. \n' +
       'This encoder is faster than H.265 but produces larger file sizes',
     cuda: true,
     disabled: true,
@@ -86,37 +87,38 @@ export const Encoders = observer(function Encoders() {
     <>
       <Typography variant="h6">Codec</Typography>
 
-      <RadioGroup
+      <Select
         className={classes.encoderList}
         value={RendererSettings.settings.processor}
-        onChange={action((e, v) => {
+        onChange={action((e) => {
+          const v = e.target.value as keyof typeof Processors
           if (v in Processors) {
-            RendererSettings.settings.processor = v as keyof typeof Processors;
+            RendererSettings.settings.processor = v;
           }
         })}
+        variant="outlined"
       >
-
         {encoders.map((e, i) => (
-          <Card
+          <MenuItem
+            value={e.codec}
             key={e.codec}
-            className={classNames(
-              classes.encoder,
-              e.className,
-              e.disabled && classes.disabled,
-              e.noGPUCompat && classes.noCompatibleGpu
-            )}
+            disabled={e.disabled}
+            className={classes.encoderMenuItem}
           >
-            <CardActionArea
-              className={classes.actionArea}
-              onClick={action(() => RendererSettings.settings.processor = e.codec)}
-              disabled={e.disabled}
+            <div
+              key={e.codec}
+              className={classNames(
+                classes.encoder,
+                e.className,
+                e.disabled && classes.disabled,
+                e.noGPUCompat && classes.noCompatibleGpu
+              )}
             >
-              <Radio color="primary" value={e.codec}/>
-              <CardContent>
+              <div className={classes.content}>
                 <Typography gutterBottom variant="h5" component="div">
                   {e.name}
                 </Typography>
-                <Typography variant="body2" color="textSecondary">
+                <Typography variant="body2" color="textSecondary" style={{ whiteSpace: 'break-spaces' }}>
                   {e.desc}
                 </Typography>
 
@@ -128,12 +130,12 @@ export const Encoders = observer(function Encoders() {
                     <Typography className={classes.experimental} variant="h6">Experimental</Typography>
                   )}
                 </div>
-              </CardContent>
-            </CardActionArea>
-          </Card>
+              </div>
+            </div>
+          </MenuItem>
         ))}
+      </Select>
 
-      </RadioGroup>
     </>
   )
 })
