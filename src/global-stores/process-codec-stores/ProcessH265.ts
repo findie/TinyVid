@@ -7,45 +7,37 @@ import {RendererSettings} from "../../helpers/settings";
 import {ProcessStore} from "../Process.store";
 import {FFprobeData} from "../../../common/ff/ffprobe";
 import {range} from "../../helpers/math";
+import {H264EncodingSpeedPresetsType} from "./ProcessH264";
 import {makeObservable} from "mobx";
 
-type H264Settings = ProcessBaseGenericSettings<'libx264'> & {
-  preset: H264EncodingSpeedPresetsType
+type H265Settings = ProcessBaseGenericSettings<'libx265'> & {
+  preset: H265EncodingSpeedPresetsType
 }
 
-export type H264EncodingSpeedPresetsType =
-  'ultrafast'
-  | 'superfast'
-  | 'veryfast'
-  | 'faster'
-  | 'fast'
-  | 'medium'
-  | 'slow'
-  | 'slower'
-  | 'veryslow'
+export type H265EncodingSpeedPresetsType =H264EncodingSpeedPresetsType;
 
-export class ProcessH264 extends ProcessBaseGeneric<'libx264', H264Settings> {
+export class ProcessH265 extends ProcessBaseGeneric<'libx265', H265Settings> {
 
-  readonly qualityOptions: { text: string; value: number; }[] = range(18, 44, 2).map(q => {
-    let q_percentage = 100 - ((q - 18) / 2 * 5);
+  readonly qualityOptions: { text: string; value: number; }[] = range(22, 50, 2).map(q => {
+    let q_percentage = 100 - ((q - 22) / 2 * 5);
 
-    if (q === 18) {
+    if (q === 22) {
       return { text: `${q_percentage}% (crisp picture)`, value: q };
     }
 
-    if (q === 22) {
+    if (q === 28) {
       return { text: `${q_percentage}% (can't really tell the difference)`, value: q };
     }
 
-    if (q === 28) {
+    if (q === 34) {
       return { text: `${q_percentage}% (starting to lose some quality)`, value: q };
     }
 
-    if (q === 32) {
+    if (q === 28) {
       return { text: `${q_percentage}% (your usual twitter video)`, value: q };
     }
 
-    if (q === 40) {
+    if (q === 46) {
       return { text: `${q_percentage}% (potato quality 🥔)`, value: q };
     }
 
@@ -53,8 +45,8 @@ export class ProcessH264 extends ProcessBaseGeneric<'libx264', H264Settings> {
   });
 
   constructor() {
-    super('libx264', {
-      processorName: 'libx264',
+    super('libx265', {
+      processorName: 'libx265',
       version: 1,
       preset: 'medium'
     });
@@ -89,7 +81,7 @@ export class ProcessH264 extends ProcessBaseGeneric<'libx264', H264Settings> {
           '-b:a', Math.floor(audioBitrateInKb) + 'k',
           '-bufsize:v', Math.floor(videoBitrateInKb) + 'k',
           '-preset:v', this.settings.preset,
-          '-x264-params', "nal-hrd=cbr"
+          '-x265-params', "nal-hrd=cbr"
         ];
 
       default:

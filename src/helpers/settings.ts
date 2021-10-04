@@ -46,7 +46,7 @@ class RendererSettingsClass {
       strategyTune: ConfigMaxFileSizeDefaultSize,
     },
 
-    processor: 'h264',
+    processor: 'libx264',
 
     processingVideoSettings: {
       fps: "original",

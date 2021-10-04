@@ -1,9 +1,11 @@
 import React from "react";
 import * as css from './style.css';
-import {clip, range} from "../../helpers/math";
+import {clip} from "../../helpers/math";
 import {FormControl, InputLabel, MenuItem, Select} from "@material-ui/core";
 import {ProcessStore} from "../../global-stores/Process.store";
 import {observer} from "mobx-react";
+import {RendererSettings} from "../../helpers/settings";
+import {trace} from "mobx";
 
 export interface ConfigConstantQualityProps {
 }
@@ -51,6 +53,11 @@ export function quality2name(q: number, flavored: boolean = true) {
 export const ConfigConstantQuality = observer(function ConfigConstantQuality(props: ConfigConstantQualityProps) {
 
   const qualityPreset = ProcessStore.strategyTune;
+  const qualityOptions = ProcessStore.processor.qualityOptions;
+
+  // this is here just because ProcessStore.processor isn't observable for some reason
+  // and RendererSettings.settings.processor will re-render the component
+  const processorName = RendererSettings.settings.processor;
 
   return (<div className={css.maxFileSizeConfig}>
     <FormControl>
@@ -63,8 +70,8 @@ export const ConfigConstantQuality = observer(function ConfigConstantQuality(pro
         value={qualityPreset}
       >
         {
-          range(18, 44, 2).map(q => (
-            <MenuItem value={q} key={q}>{quality2name(q)}</MenuItem>
+          qualityOptions.map(({ text, value }) => (
+            <MenuItem value={value} key={`${value}-${processorName}`}>{text}</MenuItem>
           ))
         }
       </Select>

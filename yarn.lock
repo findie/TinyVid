@@ -3958,7 +3958,7 @@ ffbinaries@^1.1.4:
     lodash "^4.17.15"
     request "^2.88.0"
 
-ffmpeg-progress-wrapper@^2.0.0:
+ffmpeg-progress-wrapper@^2.0.1:
   version "2.0.1"
   resolved "https://registry.yarnpkg.com/ffmpeg-progress-wrapper/-/ffmpeg-progress-wrapper-2.0.1.tgz#ba316a506a73c87e0b0a0b19cf43957fd2a24a77"
   integrity sha512-9IxiKiL4VOV8d1a4FjlafxfbhPP8/wWO4wKf1lFtG6pqKP4nrSIF6cwnSPhMxQK8ReNbnpST5sWmgG1iKfD5zA==

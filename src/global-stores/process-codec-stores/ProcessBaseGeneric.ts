@@ -8,9 +8,10 @@ import {objectMergeDeep} from "../../helpers/js";
 import {deepObserve} from "mobx-utils";
 import {debounce} from "throttle-debounce";
 import {RendererSettings} from "../../helpers/settings";
-import {VideoSettings} from "../../../electron/types";
+import {AudioSettings, VideoSettings} from "../../../electron/types";
 import {DeepReadonly} from "utility-types";
 import {FFprobeData} from "../../../common/ff/ffprobe";
+import {ProcessStore} from "../Process.store";
 
 const settings_file = (processors: string) =>
   ResourceHelpers.userData_dir(`processor_${processors.replace(/[^a-z0-9_]/gi, '_')}_settings.json`);
@@ -22,7 +23,11 @@ export type ProcessBaseGenericSettings<PROCESSOR> = {
 
 export abstract class ProcessBaseGeneric<PROCESSOR extends string, SETTINGS extends ProcessBaseGenericSettings<PROCESSOR>> {
 
+  @observable
   readonly processorName: PROCESSOR;
+
+  @observable.ref
+  abstract readonly qualityOptions: { text: string, value: number }[];
 
   @computed get strategy() {
     return RendererSettings.settings.processingParams.strategyType;
@@ -96,8 +101,6 @@ export abstract class ProcessBaseGeneric<PROCESSOR extends string, SETTINGS exte
     }
   }
 
-  abstract generateFFmpegArgs(fileIn: string, range: { begin: number, end: number }, fileOut: string): string[];
-
   computeAverageBPS(fileSizeInBytes: number, durationInSeconds: number, hasAudio: boolean) {
     const fileSizeInKB = fileSizeInBytes * 1000;
 
@@ -127,6 +130,88 @@ export abstract class ProcessBaseGeneric<PROCESSOR extends string, SETTINGS exte
     wastedSpace: [number, number]
   }>
 
+  protected audioFilters() {
+    const audio: AudioSettings = { volume: ProcessStore.volume };
+    const filters = [];
+    if (audio.volume !== 1) {
+      filters.push(`volume=${audio.volume ?? 1}`);
+    }
+
+    if (filters.length === 0) {
+      filters.push('anull');
+    }
+    return filters;
+  }
+
+  protected videoFilters() {
+    const settings = ProcessStore.videoSettings;
+    const filters = [];
+
+    if (settings.fps !== "original") {
+      filters.push(`fps=${settings.fps}`);
+    }
+    if (settings.height !== "original") {
+      filters.push(`scale=-2:${settings.height}`);
+    }
+
+    if (filters.length === 0) {
+      filters.push('null');
+    }
+    return filters;
+  }
+
+  protected filterComplex (mediaDetails: FFprobeData)  {
+    const steps: string[] = [];
+    const mappings = new Set<string>();
+
+    steps.push(`[0:v]${this.videoFilters().join(',')}[v]`);
+    mappings.add('[v]')
+
+    if (mediaDetails.audioTrackIndexes.length > 0 && ProcessStore.volume > 0) {
+      const audioFilters = this.audioFilters();
+
+      const header = mediaDetails.audioTrackIndexes.map((i) => `[0:${i}]`).join('');
+
+      if (mediaDetails.audioTrackIndexes.length > 1) {
+        audioFilters.unshift(`amix=${mediaDetails.audioTrackIndexes.length}`);
+      }
+
+      steps.push(`${header}${audioFilters.join(',')}[a]`)
+      mappings.add('[a]');
+    }
+
+    return {
+      filter_complex: steps,
+      mappings: [...mappings]
+    };
+  }
+
+  protected abstract paramsFromStrategy(details: FFprobeData, durationOrTrimmedDuration: number): string[];
+
+  public generateFFmpegArgs(fileIn: string, range: { begin: number, end: number }, fileOut: string): string[] {
+    if (!ProcessStore.videoDetails) {
+      throw new Error('Cannot continue without video details');
+    }
+
+    const fc = this.filterComplex(ProcessStore.videoDetails);
+    console.log('filter_complex', fc.filter_complex);
+    console.log('filter_complex mappings', fc.mappings);
+
+    return [
+      '-ss', range.begin.toFixed(6),
+      '-to', range.end.toFixed(6),
+      '-i', fileIn,
+
+      ...(fc.filter_complex.length > 0 ? ['-filter_complex', fc.filter_complex.join(';')] : []),
+      ...(fc.mappings.length > 0 ? fc.mappings.map(x => ['-map', x]).flat() : []),
+
+      ...this.paramsFromStrategy(ProcessStore.videoDetails, range.end - range.begin),
+      ...(ProcessStore.volume > 0 ? [] : ['-an']),
+      '-c:v', this.processorName,
+      fileOut, '-y'
+    ];
+  }
+
   static fixTrimRange(videoDetails: FFprobeData, start: number, end: number) {
     const frameTime = (1 / (videoDetails?.fps || 60));
     const _start = start + frameTime;
@@ -137,4 +222,5 @@ export abstract class ProcessBaseGeneric<PROCESSOR extends string, SETTINGS exte
       end: _end
     }
   }
+
 }

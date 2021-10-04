@@ -25,8 +25,9 @@ class ProcessStoreClass {
   @observable.ref videoDetails: null | FFprobeData = null;
   @action setVideoDetails = (d: ProcessStoreClass['videoDetails']) => this.videoDetails = d;
 
+  // fixme this looks like it's not observable :(
   @observable.ref
-  processor: ProcessBaseGeneric<string, ProcessBaseGenericSettings<string>>
+  processor: ProcessBaseGeneric<string, ProcessBaseGenericSettings<string>>;
   @action setProcessor = (processor: keyof typeof Processors) => this.processor = new Processors[processor]();
 
   @observable processing: FFmpeg.FFmpegProcess | null = null;
@@ -92,8 +93,21 @@ class ProcessStoreClass {
       }
     });
 
-    this.processor = new Processors[RendererSettings.settings.processor]();
-    reaction(() => RendererSettings.settings.processor, this.setProcessor);
+    this.processor = new (
+      Processors[RendererSettings.settings.processor] ||
+      Processors['libx264']
+    )();
+    reaction(() => RendererSettings.settings.processor, (p) => {
+      this.setProcessor(p);
+
+      if (RendererSettings.settings.processingParams.strategyType === 'constant-quality') {
+        RendererSettings.settings.processingParams.strategyTune = clip(
+          this.processor.qualityOptions[0].value,
+          RendererSettings.settings.processingParams.strategyTune,
+          this.processor.qualityOptions[this.processor.qualityOptions.length - 1].value,
+        );
+      }
+    });
 
     reaction(() => this.processing?.error, (e) => {
       if (e) {
