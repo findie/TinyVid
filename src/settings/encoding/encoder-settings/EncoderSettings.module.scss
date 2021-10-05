@@ -1,0 +1,36 @@
+.root {
+  display: flex;
+  flex-flow: column;
+
+  .setting-row {
+    margin-left: 8px;
+    margin-bottom: 8px;
+    display: flex;
+    flex-flow: column;
+
+    .setting-name {
+      font-size: 1.4em;
+      display: flex;
+      flex-flow: row;
+      align-items: baseline;
+    }
+    .setting-desc {
+      opacity: 0.5;
+      margin-left: 8px;
+    }
+
+  }
+}
+
+.select-items {
+  display: flex;
+  flex-flow: column;
+
+  .name {
+    width: 100%;
+  }
+  .desc {
+    width: 100%;
+    white-space: pre;
+  }
+}

@@ -5,6 +5,7 @@ import classes from './Settings.module.scss';
 import {TabContext, TabPanel} from "@material-ui/lab";
 import {ThemeSection} from "./display/ThemeSection";
 import {Encoders} from "./encoding/Encoders";
+import {EncoderSettings} from "./encoding/encoder-settings/EncoderSettings";
 
 enum TabValues {
   customization = 'customization',
@@ -58,9 +59,8 @@ export const Settings = observer(function Settings() {
                 Encoder Settings
               </Typography>
 
-              <pre>
-                insert encoding settings here
-              </pre>
+              <EncoderSettings/>
+
             </section>
           </TabPanel>
         </TabContext>

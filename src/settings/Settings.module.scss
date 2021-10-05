@@ -1,5 +1,6 @@
 .root {
-  height: 90vh;
+  height: 600px;
+  max-height: 90vh;
   border-radius: 8px;
 
   display: flex;
@@ -17,7 +18,7 @@
     max-width: 600px;
     height: 100%;
     overflow-y: auto;
-    background: rgba(0, 0, 0, 0.2);
+    background: rgba(0, 0, 0, 0.1);
 
     header {
       margin-top: -16px;
@@ -31,7 +32,7 @@
         opacity: 0.5;
         font-weight: bold;
         text-transform: uppercase;
-        font-size: 1em;
+        font-size: 1.25em;
       }
     }
   }

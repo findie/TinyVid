@@ -12,12 +12,14 @@ import {makeObservable} from "mobx";
 
 type H265Settings = ProcessBaseGenericSettings<'libx265'> & {
   preset: H265EncodingSpeedPresetsType
+  tune: 'grain'|'animation'|'none'
 }
 
 export type H265EncodingSpeedPresetsType = H264EncodingSpeedPresetsType;
 
 export class ProcessH265 extends ProcessBaseGeneric<'libx265', H265Settings> {
 
+  readonly qualityUnit = 'crf';
   readonly qualityOptions: { text: string; value: number; }[] = range(22, 50, 2).map(q => {
     let q_percentage = 100 - ((q - 22) / 2 * 5);
 
@@ -49,7 +51,8 @@ export class ProcessH265 extends ProcessBaseGeneric<'libx265', H265Settings> {
     super('libx265', {
       processorName: 'libx265',
       version: 1,
-      preset: 'medium'
+      preset: 'medium',
+      tune: 'none',
     });
     makeObservable(this);
   }
@@ -60,11 +63,17 @@ export class ProcessH265 extends ProcessBaseGeneric<'libx265', H265Settings> {
     const strategyTune = RendererSettings.settings.processingParams.strategyTune;
     const hasAudio = !!details.audioStream && ProcessStore.volume > 0;
 
+    const commonParams: string[] = [];
+    if (this.settings.tune !== 'none') {
+      commonParams.push(...['-tune', this.settings.tune]);
+    }
+
     switch (strategyType) {
       case "constant-quality":
         return [
           '-crf', strategyTune.toString(),
-          '-preset', this.settings.preset
+          '-preset', this.settings.preset,
+          ...commonParams
         ];
 
       case "max-file-size":
@@ -82,7 +91,8 @@ export class ProcessH265 extends ProcessBaseGeneric<'libx265', H265Settings> {
           '-b:a', Math.floor(audioBitrateInKb) + 'k',
           '-bufsize:v', Math.floor(videoBitrateInKb) + 'k',
           '-preset:v', this.settings.preset,
-          '-x265-params', "nal-hrd=cbr"
+          '-x265-params', "nal-hrd=cbr",
+          ...commonParams
         ];
 
       default:

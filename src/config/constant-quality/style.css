@@ -5,3 +5,15 @@
 .max-file-size-config {
     display: flex;
 }
+
+.quality-span {
+    color: white;
+    opacity: 0.1;
+    margin-left: auto;
+    padding-left: 8px;
+    font-weight: bold;
+}
+
+:global(.MuiSelect-select) .quality-span {
+    display: none;
+}

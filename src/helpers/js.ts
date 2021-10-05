@@ -23,3 +23,15 @@ export function objectMergeDeep<T1, T2>(original: T1, cover: T2, { replaceArrays
 
   return original as T1 & T2;
 }
+
+export function objKeys<T extends object>(o: T): (keyof T)[] {
+  return Object.keys(o) as (keyof T)[];
+}
+
+export function objValues<T extends object>(o: T): (T[keyof T])[] {
+  return objKeys(o).map(k => o[k]);
+}
+
+export function objKV<T extends object>(o: T): [keyof T, T[keyof T]][] {
+  return objKeys(o).map(k => [k,o[k]]);
+}

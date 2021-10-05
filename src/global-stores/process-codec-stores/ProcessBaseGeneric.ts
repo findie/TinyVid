@@ -1,7 +1,7 @@
 /**
  Copyright Findie 2021
  */
-import {action, computed, makeObservable, observable, toJS} from "mobx";
+import {action, computed, makeObservable, observable, reaction, toJS} from "mobx";
 import {ResourceHelpers} from "../../../electron/helpers/resources";
 import {existsSync, readFileSync, writeFileSync} from "fs";
 import {objectMergeDeep} from "../../helpers/js";
@@ -21,6 +21,8 @@ export type ProcessBaseGenericSettings<PROCESSOR> = {
   version: number
 }
 
+// https://github.com/mobxjs/mobx/blob/main/docs/subclassing.md
+
 export abstract class ProcessBaseGeneric<PROCESSOR extends string, SETTINGS extends ProcessBaseGenericSettings<PROCESSOR>> {
 
   @observable
@@ -28,6 +30,7 @@ export abstract class ProcessBaseGeneric<PROCESSOR extends string, SETTINGS exte
 
   @observable.ref
   abstract readonly qualityOptions: { text: string, value: number, default?: boolean }[];
+  abstract readonly qualityUnit: string;
 
   @computed get strategy() {
     return RendererSettings.settings.processingParams.strategyType;
@@ -41,7 +44,6 @@ export abstract class ProcessBaseGeneric<PROCESSOR extends string, SETTINGS exte
   settings: SETTINGS;
 
   protected constructor(processorName: PROCESSOR, defaultSettings: SETTINGS) {
-    makeObservable(this);
 
     this.processorName = processorName;
     this.settings = defaultSettings;
@@ -52,6 +54,17 @@ export abstract class ProcessBaseGeneric<PROCESSOR extends string, SETTINGS exte
       // save in case the load has failed and we're using default data
       this.saveSettings();
     }
+
+    makeObservable(this, {
+      processorName: observable,
+      qualityOptions: observable.ref,
+      settings: observable,
+
+      strategy: computed,
+      tune: computed
+    });
+
+
     deepObserve(
       this.settings,
       debounce(500, false, this.saveSettings)
@@ -96,6 +109,7 @@ export abstract class ProcessBaseGeneric<PROCESSOR extends string, SETTINGS exte
 
     try {
       writeFileSync(file, JSON.stringify(toJS(this.settings)));
+      console.log('processor', this.processorName, 'settings successfully saved at', file);
     } catch (e) {
       console.error('failed to save settings file', e);
     }
@@ -160,7 +174,7 @@ export abstract class ProcessBaseGeneric<PROCESSOR extends string, SETTINGS exte
     return filters;
   }
 
-  protected filterComplex (mediaDetails: FFprobeData)  {
+  protected filterComplex(mediaDetails: FFprobeData) {
     const steps: string[] = [];
     const mappings = new Set<string>();
 

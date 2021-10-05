@@ -24,6 +24,7 @@ type HEVCNVENCSettings = ProcessBaseGenericSettings<'hevc_nvenc'> & {
 // todo overload videoFilters and make use of scale_npp or scale_cuda (if they exists)
 export class ProcessHEVCNVENC extends ProcessBaseGeneric<'hevc_nvenc', HEVCNVENCSettings> {
 
+  readonly qualityUnit = 'cq';
   readonly qualityOptions = range(22, 50, 2).map(q => {
     let q_percentage = 100 - ((q - 22) / 2 * 5);
 

@@ -23,6 +23,7 @@ type H264NVENCSettings = ProcessBaseGenericSettings<'h264_nvenc'> & {
 
 export class ProcessH264NVENC extends ProcessBaseGeneric<'h264_nvenc', H264NVENCSettings> {
 
+  readonly qualityUnit = 'cq';
   readonly qualityOptions = range(18, 44, 2).map(q => {
     let q_percentage = 100 - ((q - 18) / 2 * 5);
 

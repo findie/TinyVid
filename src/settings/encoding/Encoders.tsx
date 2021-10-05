@@ -7,6 +7,7 @@ import {Processors} from "../../global-stores/process-codec-stores";
 import {RendererSettings} from "../../helpers/settings";
 import {action} from "mobx";
 import {checkIfEncoderWorks, ff_encoders_map} from "../../../common/ff/encoders";
+import {EncoderSettings} from "./encoder-settings/EncoderSettings";
 
 
 const encoders: {
@@ -33,7 +34,7 @@ const encoders: {
   {
     codec: 'libaom-av1',
     name: 'AV1',
-    desc: 'Slow encoder, works on a small selection of modern devices and produces small file sizes.',
+    desc: 'Very slow encoder, works on a small selection of modern devices and produces small file sizes.',
     experimental: true,
   },
   {

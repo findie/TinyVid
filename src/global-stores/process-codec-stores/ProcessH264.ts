@@ -7,10 +7,11 @@ import {RendererSettings} from "../../helpers/settings";
 import {ProcessStore} from "../Process.store";
 import {FFprobeData} from "../../../common/ff/ffprobe";
 import {range} from "../../helpers/math";
-import {makeObservable} from "mobx";
+import {makeObservable, observable, override} from "mobx";
 
-type H264Settings = ProcessBaseGenericSettings<'libx264'> & {
+export type H264Settings = ProcessBaseGenericSettings<'libx264'> & {
   preset: H264EncodingSpeedPresetsType
+  tune: 'film' | 'animation' | 'grain' | 'stillimage' | 'none'
 }
 
 export type H264EncodingSpeedPresetsType =
@@ -26,6 +27,7 @@ export type H264EncodingSpeedPresetsType =
 
 export class ProcessH264 extends ProcessBaseGeneric<'libx264', H264Settings> {
 
+  readonly qualityUnit = 'crf';
   readonly qualityOptions = range(18, 44, 2).map(q => {
     let q_percentage = 100 - ((q - 18) / 2 * 5);
 
@@ -57,7 +59,8 @@ export class ProcessH264 extends ProcessBaseGeneric<'libx264', H264Settings> {
     super('libx264', {
       processorName: 'libx264',
       version: 1,
-      preset: 'medium'
+      preset: 'medium',
+      tune: 'none',
     });
     makeObservable(this);
   }
@@ -68,11 +71,17 @@ export class ProcessH264 extends ProcessBaseGeneric<'libx264', H264Settings> {
     const strategyTune = RendererSettings.settings.processingParams.strategyTune;
     const hasAudio = !!details.audioStream && ProcessStore.volume > 0;
 
+    const commonParams: string[] = [];
+    if (this.settings.tune !== 'none') {
+      commonParams.push(...['-tune', this.settings.tune]);
+    }
+
     switch (strategyType) {
       case "constant-quality":
         return [
           '-crf', strategyTune.toString(),
-          '-preset', this.settings.preset
+          '-preset', this.settings.preset,
+          ...commonParams
         ];
 
       case "max-file-size":
@@ -90,7 +99,8 @@ export class ProcessH264 extends ProcessBaseGeneric<'libx264', H264Settings> {
           '-b:a', Math.floor(audioBitrateInKb) + 'k',
           '-bufsize:v', Math.floor(videoBitrateInKb) + 'k',
           '-preset:v', this.settings.preset,
-          '-x264-params', "nal-hrd=cbr"
+          '-x264-params', "nal-hrd=cbr",
+          ...commonParams
         ];
 
       default:

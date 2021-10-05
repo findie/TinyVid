@@ -16,6 +16,7 @@ type AV1Settings = ProcessBaseGenericSettings<'libaom-av1'> & {
 
 export class ProcessAV1 extends ProcessBaseGeneric<'libaom-av1', AV1Settings> {
 
+  readonly qualityUnit = 'crf';
   readonly qualityOptions = range(22, 56, 2).map(q => {
     let q_percentage = 100 - ((q - 22) / 2 * 5);
 
@@ -32,7 +33,7 @@ export class ProcessAV1 extends ProcessBaseGeneric<'libaom-av1', AV1Settings> {
       text += ' (starting to lose some quality)'
     }
 
-    if (q === 28) {
+    if (q === 46) {
       text += ' (your usual twitter video)';
     }
 
@@ -46,8 +47,8 @@ export class ProcessAV1 extends ProcessBaseGeneric<'libaom-av1', AV1Settings> {
   constructor() {
     super('libaom-av1', {
       processorName: 'libaom-av1',
-      version: 1,
-      cpuUsed: 1,
+      version: 2,
+      cpuUsed: 8,
       tiles: '4x4',
     });
     makeObservable(this);
