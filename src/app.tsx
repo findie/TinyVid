@@ -32,7 +32,6 @@ import {
 import {Theme} from "./helpers/theme";
 import {DurationInfo} from "./components/duration-info";
 import {ErrorDisplayModal} from "./components/error";
-import {ThemeSwitch} from "./components/theme-switch";
 import {BitrateWarnings} from "./components/bitrate-warnings";
 import {PreventClosing} from "./components/prevent-closing";
 import {FooterBranding} from "./components/footer-branding";

@@ -52,13 +52,18 @@ export namespace FFmpeg {
         }
       );
 
-      console.log('Spawning','ffmpeg', this.args.join(' '));
+      console.log('Spawning', 'ffmpeg', this.args.join(' '));
       this.p.on('raw', console.log);
       this.p.on('progress', action(progress => this.progress = progress));
 
       this.donePromise = this.p.onDone();
-      this.donePromise.then(action(() => this.done = true));
-      this.donePromise.catch(action(e => this.error = e));
+      this.donePromise.then(action(() => {
+        this.done = true;
+      }));
+      this.donePromise.catch(action(e => {
+        this.done = true;
+        this.error = e
+      }));
 
       return this.donePromise;
     }

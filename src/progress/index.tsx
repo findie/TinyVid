@@ -196,7 +196,7 @@ export const ProcessingOverlay = observer(function ProcessingOverlay(props: Proc
   let component: JSX.Element;
   if (error && !cancelled) {
     component = <ProgressError error={error} onOk={onDone}/>
-  } else if (isDone || cancelled) {
+  } else if (isDone) {
     component = <Done file={fileOut} onOk={onDone} wasCancelled={cancelled}/>
   } else {
     component = <Progress
