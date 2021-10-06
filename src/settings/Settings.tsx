@@ -1,13 +1,12 @@
 import React, {useState} from 'react'
-import {Checkbox, FormControlLabel, Paper, Tab, Tabs, Typography} from "@material-ui/core";
+import {Paper, Tab, Tabs, Typography} from "@material-ui/core";
 import {observer} from "mobx-react";
 import classes from './Settings.module.scss';
 import {TabContext, TabPanel} from "@material-ui/lab";
 import {ThemeSection} from "./display/ThemeSection";
 import {Encoders} from "./encoding/Encoders";
 import {EncoderSettings} from "./encoding/encoder-settings/EncoderSettings";
-import {RendererSettings} from "../helpers/settings";
-import {action} from "mobx";
+import {AdvancedSettingsFlags} from "./advanced/AdvancedFlags";
 
 enum TabValues {
   customization = 'customization',
@@ -74,30 +73,7 @@ export const Settings = observer(function Settings() {
             </header>
 
             <section>
-              <FormControlLabel
-                label="Enable Dev Tools - requires app restart to take effect"
-                control={
-                  <Checkbox
-                    color="primary"
-                    checked={RendererSettings.settings.flags.enableDevTools}
-                    onChange={action((event, checked) => {
-                      RendererSettings.settings.flags.enableDevTools = checked;
-                    })}
-                  />
-                }
-              />
-              <FormControlLabel
-                label="Disable NvEnc HEVC B-frames - Older GPUs don't support B-frames. you can disable them for compatibility"
-                control={
-                  <Checkbox
-                    color="primary"
-                    checked={RendererSettings.settings.flags.noHevcNvencBFrames}
-                    onChange={action((event, checked) => {
-                      RendererSettings.settings.flags.noHevcNvencBFrames = checked;
-                    })}
-                  />
-                }
-              />
+              <AdvancedSettingsFlags/>
             </section>
           </TabPanel>
         </TabContext>
