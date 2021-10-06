@@ -20,6 +20,8 @@ export namespace ProcessHelpers {
 
     const p = spawn(exec, args, options);
 
+    console.info('Spawning', exec, args.join(' '));
+
     let stdout = '';
     let stderr = '';
 

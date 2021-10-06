@@ -68,10 +68,12 @@ function createWindow() {
     {
       label: 'View',
       submenu: [
+        ...(RendererSettings.settings.flags.enableDevTools ? [
+          { role: 'toggleDevTools' },
+        ]: []),
         ...(!app.isPackaged ? [
           { role: 'reload' },
           { role: 'forceReload' },
-          { role: 'toggleDevTools' },
           { type: 'separator' },
         ] : []),
         { role: 'resetZoom' },

@@ -1,11 +1,11 @@
 import {existsSync, readFileSync, writeFileSync} from "fs";
 import {ResourceHelpers} from "../../electron/helpers/resources";
-import {ThemeNames} from "./theme";
+import type {ThemeNames} from "./theme";
 import {action, makeObservable, observable, reaction, toJS} from "mobx";
 import {debounce} from "throttle-debounce";
 import {v4 as uuid} from 'uuid';
 import {deepObserve} from "mobx-utils";
-import {RenderStrategy, VideoSettings} from "../../electron/types";
+import type {RenderStrategy, VideoSettings} from "../../electron/types";
 import {objectMergeDeep} from "./js";
 import type {Processors} from "../global-stores/process-codec-stores";
 
@@ -30,6 +30,11 @@ export interface RendererSettings {
       text: string,
       size: number
     }[]
+  }
+
+  flags: {
+    enableDevTools: boolean,
+    noHevcNvencBFrames: boolean
   }
 }
 
@@ -61,6 +66,11 @@ class RendererSettingsClass {
         { size: 64, text: '64 MB (WhatsApp)' },
         { size: 100, text: '100 MB (Discord Nitro)' },
       ]
+    },
+
+    flags: {
+      enableDevTools: false,
+      noHevcNvencBFrames: false
     }
   }
 

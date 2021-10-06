@@ -74,8 +74,9 @@ export class ProcessHEVCNVENC extends ProcessBaseGeneric<'hevc_nvenc', HEVCNVENC
           // '-qmin:v', strategyTune.toString(),
           // '-qmax:v', strategyTune.toString(),
           '-preset:v', this.settings.preset,
-          '-rc:V', 'vbr_hq',
-          '-bf', '2',
+          '-rc:v', 'vbr_hq',
+          '-b:v', '0',
+          '-bf', RendererSettings.settings.flags.noHevcNvencBFrames ? '0' : '2',
         ];
 
       case "max-file-size":
@@ -93,7 +94,7 @@ export class ProcessHEVCNVENC extends ProcessBaseGeneric<'hevc_nvenc', HEVCNVENC
           '-b:a', Math.floor(audioBitrateInKb) + 'k',
           '-bufsize:v', Math.floor(videoBitrateInKb) + 'k',
           '-rc', 'cbr_hq',
-          '-bf', '2',
+          '-bf', RendererSettings.settings.flags.noHevcNvencBFrames ? '0' : '2',
         ];
 
       default:

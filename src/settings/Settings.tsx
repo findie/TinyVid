@@ -1,15 +1,18 @@
 import React, {useState} from 'react'
-import {Paper, Tab, Tabs, Typography} from "@material-ui/core";
+import {Checkbox, FormControlLabel, Paper, Tab, Tabs, Typography} from "@material-ui/core";
 import {observer} from "mobx-react";
 import classes from './Settings.module.scss';
 import {TabContext, TabPanel} from "@material-ui/lab";
 import {ThemeSection} from "./display/ThemeSection";
 import {Encoders} from "./encoding/Encoders";
 import {EncoderSettings} from "./encoding/encoder-settings/EncoderSettings";
+import {RendererSettings} from "../helpers/settings";
+import {action} from "mobx";
 
 enum TabValues {
   customization = 'customization',
   encoding = 'encoding',
+  advanced = 'advanced'
 }
 
 export const Settings = observer(function Settings() {
@@ -29,6 +32,7 @@ export const Settings = observer(function Settings() {
       >
         <Tab label="Display" value={TabValues.customization}/>
         <Tab label="Encoding" value={TabValues.encoding}/>
+        <Tab label="Advanced" value={TabValues.advanced}/>
 
       </Tabs>
 
@@ -61,6 +65,39 @@ export const Settings = observer(function Settings() {
 
               <EncoderSettings/>
 
+            </section>
+          </TabPanel>
+          <TabPanel value={TabValues.advanced}>
+
+            <header>
+              <Typography variant="h4">Advanced</Typography>
+            </header>
+
+            <section>
+              <FormControlLabel
+                label="Enable Dev Tools - requires app restart to take effect"
+                control={
+                  <Checkbox
+                    color="primary"
+                    checked={RendererSettings.settings.flags.enableDevTools}
+                    onChange={action((event, checked) => {
+                      RendererSettings.settings.flags.enableDevTools = checked;
+                    })}
+                  />
+                }
+              />
+              <FormControlLabel
+                label="Disable NvEnc HEVC B-frames - Older GPUs don't support B-frames. you can disable them for compatibility"
+                control={
+                  <Checkbox
+                    color="primary"
+                    checked={RendererSettings.settings.flags.noHevcNvencBFrames}
+                    onChange={action((event, checked) => {
+                      RendererSettings.settings.flags.noHevcNvencBFrames = checked;
+                    })}
+                  />
+                }
+              />
             </section>
           </TabPanel>
         </TabContext>

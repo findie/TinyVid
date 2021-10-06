@@ -52,7 +52,7 @@ export namespace FFmpeg {
         }
       );
 
-      console.log('ffmpeg', this.args);
+      console.log('Spawning','ffmpeg', this.args.join(' '));
       this.p.on('raw', console.log);
       this.p.on('progress', action(progress => this.progress = progress));
 
