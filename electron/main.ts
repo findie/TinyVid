@@ -13,6 +13,7 @@ import {enable as enableRemote, initialize as initElectronMain} from '@electron/
 import {RendererSettings} from "../src/helpers/settings";
 import {isMac} from "./helpers";
 import {readdirSync} from "fs";
+import {sendToRenderer} from "../common/shared-event-comms";
 
 initElectronMain();
 let mainWindow: Electron.BrowserWindow | null;
@@ -58,6 +59,16 @@ function createWindow() {
     {
       label: 'File',
       submenu: [
+        {
+          label: 'Open File',
+          click: () => {
+            if(mainWindow) {
+              sendToRenderer(mainWindow.webContents, 'open-file');
+            }
+          },
+          accelerator:'CommandOrControl+O',
+          acceleratorWorksWhenHidden: true,
+        },
         ...(isMac ? [] : [
           { role: 'about', click: app.showAboutPanel }
         ]),

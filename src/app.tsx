@@ -52,7 +52,6 @@ import {PlaybackStore} from "./global-stores/Playback.store";
 import {eventList} from "./helpers/events";
 import {Changelog} from "./components/changes-modal/changelog";
 import {VolumeControl} from "./components/volume/volume-control";
-import {RendererEventComms} from "./helpers/event-comms-renderer";
 import {ModalTrigger} from "./components/modals";
 import {Settings} from "./settings/Settings";
 import SettingsIcon from "@material-ui/icons/Settings";
@@ -267,6 +266,3 @@ const App = observer(() => {
 })
 
 ReactDom.render(<App/>, mainElement);
-
-// @ts-ignore
-window.RendererEventComms = RendererEventComms;

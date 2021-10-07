@@ -2,6 +2,10 @@
  Copyright Findie 2021
  */
 import {action, makeObservable, observable} from "mobx";
+import {registerRendererHandler} from "../../common/shared-event-comms";
+import {dialog, getCurrentWindow} from "@electron/remote";
+import {eventList} from "../helpers/events";
+import {ipcRenderer} from 'electron';
 
 class AppStateClass {
 
@@ -22,6 +26,19 @@ class AppStateClass {
 
   constructor() {
     makeObservable(this);
+
+    registerRendererHandler(ipcRenderer, 'open-file', async event => {
+      const files = await dialog.showOpenDialog(
+        getCurrentWindow(),
+        {
+          properties: ['openFile'],
+        });
+
+      if (!files.canceled && files.filePaths[0]) {
+        eventList.file.choose({ type: 'app-menu' });
+        AppState.setFile(files.filePaths[0]);
+      }
+    });
   }
 }
 

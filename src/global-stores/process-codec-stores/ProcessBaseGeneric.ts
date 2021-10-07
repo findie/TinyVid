@@ -1,17 +1,15 @@
 /**
  Copyright Findie 2021
  */
-import {action, computed, makeObservable, observable, reaction, toJS} from "mobx";
+import {action, computed, makeObservable, observable, toJS} from "mobx";
 import {ResourceHelpers} from "../../../electron/helpers/resources";
 import {existsSync, readFileSync, writeFileSync} from "fs";
 import {objectMergeDeep} from "../../helpers/js";
 import {deepObserve} from "mobx-utils";
 import {debounce} from "throttle-debounce";
-import {RendererSettings} from "../../helpers/settings";
-import {AudioSettings, VideoSettings} from "../../../electron/types";
+import {AudioSettings, RenderStrategy, VideoSettings} from "../../../electron/types";
 import {DeepReadonly} from "utility-types";
 import {FFprobeData} from "../../../common/ff/ffprobe";
-import {ProcessStore} from "../Process.store";
 
 const settings_file = (processors: string) =>
   ResourceHelpers.userData_dir(`processor_${processors.replace(/[^a-z0-9_]/gi, '_')}_settings.json`);
@@ -19,6 +17,15 @@ const settings_file = (processors: string) =>
 export type ProcessBaseGenericSettings<PROCESSOR> = {
   processorName: PROCESSOR
   version: number
+}
+
+export type RenderingSettings = {
+  video: VideoSettings,
+  audio: AudioSettings,
+  processingParams: {
+    strategyType: RenderStrategy['type']
+    strategyTune: RenderStrategy['tune']
+  }
 }
 
 // https://github.com/mobxjs/mobx/blob/main/docs/subclassing.md
@@ -31,14 +38,6 @@ export abstract class ProcessBaseGeneric<PROCESSOR extends string, SETTINGS exte
   @observable.ref
   abstract readonly qualityOptions: { text: string, value: number, default?: boolean }[];
   abstract readonly qualityUnit: string;
-
-  @computed get strategy() {
-    return RendererSettings.settings.processingParams.strategyType;
-  }
-
-  @computed get tune() {
-    return RendererSettings.settings.processingParams.strategyTune;
-  }
 
   @observable
   settings: SETTINGS;
@@ -59,9 +58,6 @@ export abstract class ProcessBaseGeneric<PROCESSOR extends string, SETTINGS exte
       processorName: observable,
       qualityOptions: observable.ref,
       settings: observable,
-
-      strategy: computed,
-      tune: computed
     });
 
 
@@ -144,8 +140,8 @@ export abstract class ProcessBaseGeneric<PROCESSOR extends string, SETTINGS exte
     wastedSpace: [number, number]
   }>
 
-  protected audioFilters() {
-    const audio: AudioSettings = { volume: ProcessStore.volume };
+  protected audioFilters(settings: RenderingSettings) {
+    const audio: AudioSettings = { volume: settings.audio.volume };
     const filters = [];
     if (audio.volume !== 1) {
       filters.push(`volume=${audio.volume ?? 1}`);
@@ -157,8 +153,7 @@ export abstract class ProcessBaseGeneric<PROCESSOR extends string, SETTINGS exte
     return filters;
   }
 
-  protected videoFilters() {
-    const settings = ProcessStore.videoSettings;
+  protected videoFilters({ video: settings }: RenderingSettings) {
     const filters = [];
 
     if (settings.fps !== "original") {
@@ -174,15 +169,15 @@ export abstract class ProcessBaseGeneric<PROCESSOR extends string, SETTINGS exte
     return filters;
   }
 
-  protected filterComplex(mediaDetails: FFprobeData) {
+  protected filterComplex(mediaDetails: FFprobeData, settings: RenderingSettings) {
     const steps: string[] = [];
     const mappings = new Set<string>();
 
-    steps.push(`[0:v]${this.videoFilters().join(',')}[v]`);
+    steps.push(`[0:v]${this.videoFilters(settings).join(',')}[v]`);
     mappings.add('[v]')
 
-    if (mediaDetails.audioTrackIndexes.length > 0 && ProcessStore.volume > 0) {
-      const audioFilters = this.audioFilters();
+    if (mediaDetails.audioTrackIndexes.length > 0 && settings.audio.volume > 0) {
+      const audioFilters = this.audioFilters(settings);
 
       const header = mediaDetails.audioTrackIndexes.map((i) => `[0:${i}]`).join('');
 
@@ -202,12 +197,15 @@ export abstract class ProcessBaseGeneric<PROCESSOR extends string, SETTINGS exte
 
   protected abstract paramsFromStrategy(details: FFprobeData, durationOrTrimmedDuration: number): string[];
 
-  public generateFFmpegArgs(fileIn: string, range: { begin: number, end: number }, fileOut: string): string[] {
-    if (!ProcessStore.videoDetails) {
-      throw new Error('Cannot continue without video details');
-    }
+  public generateFFmpegArgs(
+    fileIn: string,
+    range: { begin: number, end: number },
+    fileOut: string,
+    videoDetails: FFprobeData,
+    renderSettings: RenderingSettings
+  ): string[] {
 
-    const fc = this.filterComplex(ProcessStore.videoDetails);
+    const fc = this.filterComplex(videoDetails, renderSettings);
     console.log('filter_complex', fc.filter_complex);
     console.log('filter_complex mappings', fc.mappings);
 
@@ -219,8 +217,8 @@ export abstract class ProcessBaseGeneric<PROCESSOR extends string, SETTINGS exte
       ...(fc.filter_complex.length > 0 ? ['-filter_complex', fc.filter_complex.join(';')] : []),
       ...(fc.mappings.length > 0 ? fc.mappings.map(x => ['-map', x]).flat() : []),
 
-      ...this.paramsFromStrategy(ProcessStore.videoDetails, range.end - range.begin),
-      ...(ProcessStore.volume > 0 ? [] : ['-an']),
+      ...this.paramsFromStrategy(videoDetails, range.end - range.begin),
+      ...(renderSettings.audio.volume > 0 ? [] : ['-an']),
       '-c:v', this.processorName,
       fileOut, '-y'
     ];

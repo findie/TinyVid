@@ -137,7 +137,7 @@ class ProcessStoreClass {
       if (!p) {
         getCurrentWindow().setProgressBar(0, { mode: "none" });
       }
-    })
+    });
   }
 
   startProcessing = async () => {
@@ -171,7 +171,15 @@ class ProcessStoreClass {
     const args = this.processor.generateFFmpegArgs(
       AppState.file,
       fixedRange,
-      fout
+      fout,
+      this.videoDetails,
+      {
+        video: this.videoSettings,
+        audio: {
+          volume: this.volume
+        },
+        processingParams: RendererSettings.settings.processingParams
+      }
     );
 
     try {

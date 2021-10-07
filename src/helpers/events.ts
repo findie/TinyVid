@@ -137,7 +137,7 @@ export const eventList = {
   },
   file: {
     choose: enclose<{
-      type: 'click' | 'dnd'
+      type: 'click' | 'dnd' | 'app-menu'
     }>('file', {
       action: 'Choose File'
     }),
