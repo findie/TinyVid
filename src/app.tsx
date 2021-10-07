@@ -17,6 +17,7 @@ import {Loading} from "./components/loading";
 import {
   Box,
   Button,
+  Collapse,
   Divider,
   FormControl,
   Icon,
@@ -26,7 +27,8 @@ import {
   MenuItem,
   Paper,
   Select,
-  ThemeProvider, Tooltip,
+  ThemeProvider,
+  Tooltip,
   Typography
 } from "@material-ui/core";
 import {Theme} from "./helpers/theme";
@@ -55,6 +57,8 @@ import {VolumeControl} from "./components/volume/volume-control";
 import {ModalTrigger} from "./components/modals";
 import {Settings} from "./settings/Settings";
 import SettingsIcon from "@material-ui/icons/Settings";
+import {CollapsableQueue, QueueComponent} from "./components/queue/Queue";
+import classNames from "classnames";
 
 const mainElement = document.createElement('div');
 document.body.appendChild(mainElement);
@@ -196,31 +200,6 @@ const App = observer(() => {
 
                 </div>
 
-                <Box marginTop={2} style={{ display: 'flex' }}>
-                  {/*<SpeedSlider*/}
-                  {/*  initialValue={ProcessStore.strategySpeed}*/}
-                  {/*  className={css.speedSlider}*/}
-                  {/*  highSpeedText={ProcessStore.strategyType === 'max-file-size' ? 'Faster Processing' : 'Faster Processing'}*/}
-                  {/*  lowSpeedText={ProcessStore.strategyType === 'max-file-size' ? 'Better Quality' : 'Smaller File Size'}*/}
-
-                  {/*  highSpeedTooltip={*/}
-                  {/*    ProcessStore.strategyType === 'max-file-size' ?*/}
-                  {/*      'Process will finish faster but video quality will suffer' :*/}
-                  {/*      'Process will finish faster but file size will be larger'*/}
-                  {/*  }*/}
-                  {/*  lowSpeedTooltip={*/}
-                  {/*    ProcessStore.strategyType === 'max-file-size' ?*/}
-                  {/*      'Process will finish slower but video will be at the best quality it can' :*/}
-                  {/*      'Process will finish slower but file will be at the lowest size quality'*/}
-                  {/*  }*/}
-
-                  {/*  onChange={*/}
-                  {/*    ProcessStore.setStrategySpeed*/}
-                  {/*  }*/}
-                  {/*/>*/}
-
-                </Box>
-
                 <Box paddingY={1}>
                   <Divider/>
                 </Box>
@@ -259,6 +238,8 @@ const App = observer(() => {
         <PreventClosing prevent={!!ProcessStore.processing}/>
 
         <FeedbackModal open={showFeedback} onClose={() => setShowFeedback(false)}/>
+
+        <CollapsableQueue/>
 
       </div>
     </ThemeProvider>

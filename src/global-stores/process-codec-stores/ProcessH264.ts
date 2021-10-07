@@ -1,7 +1,7 @@
 /**
  Copyright Findie 2021
  */
-import {ProcessBaseGeneric, ProcessBaseGenericSettings} from "./ProcessBaseGeneric";
+import {ProcessBaseGeneric, ProcessBaseGenericSettings, RenderingSettings} from "./ProcessBaseGeneric";
 import {VideoSettings} from "../../../electron/types";
 import {RendererSettings} from "../../helpers/settings";
 import {ProcessStore} from "../Process.store";
@@ -65,10 +65,10 @@ export class ProcessH264 extends ProcessBaseGeneric<'libx264', H264Settings> {
     makeObservable(this);
   }
 
-  protected paramsFromStrategy(details: FFprobeData, durationOrTrimmedDuration: number) {
+  protected paramsFromStrategy(details: FFprobeData, durationOrTrimmedDuration: number, settings: RenderingSettings): string[] {
 
-    const strategyType = RendererSettings.settings.processingParams.strategyType;
-    const strategyTune = RendererSettings.settings.processingParams.strategyTune;
+    const strategyType = settings.strategy.type;
+    const strategyTune = settings.strategy.tune;
     const hasAudio = !!details.audioStream && ProcessStore.volume > 0;
 
     const commonParams: string[] = [];

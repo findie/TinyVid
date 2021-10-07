@@ -21,8 +21,8 @@ class AppStateClass {
   @observable lastTrimValue: number = 0;
   @action setLastTrimValue = (v: number) => this.lastTrimValue = v;
 
-  // @observable showSettings = false;
-  // @action setShowSettings = (show: boolean) => this.showSettings = show;
+  @observable showQueue = false;
+  @action setShowQueue = (show: boolean) => this.showQueue = show;
 
   constructor() {
     makeObservable(this);

@@ -1,7 +1,7 @@
 /**
  Copyright Findie 2021
  */
-import {ProcessBaseGeneric, ProcessBaseGenericSettings} from "./ProcessBaseGeneric";
+import {ProcessBaseGeneric, ProcessBaseGenericSettings, RenderingSettings} from "./ProcessBaseGeneric";
 import {VideoSettings} from "../../../electron/types";
 import {RendererSettings} from "../../helpers/settings";
 import {ProcessStore} from "../Process.store";
@@ -61,10 +61,10 @@ export class ProcessHEVCNVENC extends ProcessBaseGeneric<'hevc_nvenc', HEVCNVENC
     makeObservable(this);
   }
 
-  protected paramsFromStrategy(details: FFprobeData, durationOrTrimmedDuration: number): string[] {
+  protected paramsFromStrategy(details: FFprobeData, durationOrTrimmedDuration: number, settings: RenderingSettings): string[] {
 
-    const strategyType = RendererSettings.settings.processingParams.strategyType;
-    const strategyTune = RendererSettings.settings.processingParams.strategyTune;
+    const strategyType = settings.strategy.type;
+    const strategyTune = settings.strategy.tune;
     const hasAudio = !!details.audioStream && ProcessStore.volume > 0;
 
     switch (strategyType) {

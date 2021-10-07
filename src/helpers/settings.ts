@@ -16,10 +16,7 @@ export interface RendererSettings {
   theme: ThemeNames
   readonly ID: string
 
-  processingParams: {
-    strategyType: RenderStrategy['type']
-    strategyTune: RenderStrategy['tune']
-  }
+  processingStrategy: RenderStrategy
 
   processor: keyof typeof Processors;
 
@@ -46,9 +43,9 @@ class RendererSettingsClass {
 
     ID: uuid(),
 
-    processingParams: {
-      strategyType: 'max-file-size',
-      strategyTune: ConfigMaxFileSizeDefaultSize,
+    processingStrategy: {
+      type: 'max-file-size',
+      tune: ConfigMaxFileSizeDefaultSize,
     },
 
     processor: 'libx264',
@@ -120,7 +117,7 @@ class RendererSettingsClass {
     );
 
     reaction(
-      () => this.settings.processingParams.strategyType,
+      () => this.settings.processingStrategy.type,
       (type, prevType) => {
         if (!prevType) return;
 
@@ -128,14 +125,14 @@ class RendererSettingsClass {
           return;
         }
 
-        this.settings.processingParams.strategyTune = type === 'max-file-size' ?
+        this.settings.processingStrategy.tune = type === 'max-file-size' ?
           this.settings.UI.fileSizePresets[0].size :
           ConfigConstantQualityDefaultQuality
       },
       { fireImmediately: true }
     );
 
-    console.log('tune is', this.settings.processingParams.strategyTune);
+    console.log('tune is', this.settings.processingStrategy.tune);
   }
 }
 

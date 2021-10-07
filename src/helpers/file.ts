@@ -14,10 +14,14 @@ export namespace RendererFileHelpers {
       pth.dir,
       [
         pth.name,
-        range.start.toFixed(2) + '-' + range.end.toFixed(2),
+        range.end > range.start ?
+          range.start.toFixed(2) + '-' + range.end.toFixed(2) :
+          '',
         'compressed' + (index ? `-${index}` : ''),
         'mp4'
-      ].join('.')
+      ]
+        .filter(x => !!x)
+        .join('.')
     );
   }
 

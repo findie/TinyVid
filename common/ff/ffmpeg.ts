@@ -74,7 +74,7 @@ export namespace FFmpeg {
     cancel = () => {
       if (this.p && !this.cancelled) {
         this.cancelled = true;
-        this.p?.kill('SIGINT');
+        this.p?.stop();
       }
     }
   }

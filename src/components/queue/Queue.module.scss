@@ -1,0 +1,106 @@
+:global(.MuiPaper-root).root {
+  padding: 8px;
+
+  display: flex;
+  flex-flow: column;
+
+  position: relative;
+  height: 100%;
+
+  .controls {
+    display: flex;
+    flex-flow: row;
+  }
+
+  .list {
+    flex-grow: 1;
+    overflow-y: auto;
+
+    .list-item {
+      display: flex;
+      flex-direction: column;
+      justify-content: start;
+
+      .item-section {
+        position: relative;
+        display: flex;
+        flex-direction: row;
+        justify-content: start;
+        width: 100%;
+
+        &.progress {
+          .progress-bar {
+            width: 100%;
+            height: 32px;
+            border-radius: 8px;
+          }
+
+          .progress-info {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+          }
+        }
+
+
+      }
+    }
+  }
+}
+
+
+.collapse {
+  transition: height, top;
+  transition-duration: 0.3s;
+
+  z-index: 10;
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+
+
+  .collapse-handle {
+    position: absolute;
+    top: 0;
+    z-index: 1;
+    left: 0;
+    right: 0;
+    display: flex;
+    justify-content: center;
+    pointer-events: none;
+
+    .collapse-handle-item {
+      pointer-events: all;
+      padding: 4px 8px;
+      border-radius: 0 0 8px 8px;
+
+      background: rgba(0, 0, 0, 0.44);
+    }
+  }
+
+  &.show {
+    top: 0;
+    height: 100%;
+  }
+
+  &.hide {
+    top: 100%;
+    height: 0;
+
+    .collapse-handle {
+      transform: translateY(-100%);
+
+      .collapse-handle-item {
+        border-radius: 8px 8px 0 0;
+      }
+    }
+  }
+}
+

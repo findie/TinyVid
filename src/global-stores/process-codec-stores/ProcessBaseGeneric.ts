@@ -1,7 +1,7 @@
 /**
  Copyright Findie 2021
  */
-import {action, computed, makeObservable, observable, toJS} from "mobx";
+import {action, makeObservable, observable, toJS} from "mobx";
 import {ResourceHelpers} from "../../../electron/helpers/resources";
 import {existsSync, readFileSync, writeFileSync} from "fs";
 import {objectMergeDeep} from "../../helpers/js";
@@ -22,10 +22,7 @@ export type ProcessBaseGenericSettings<PROCESSOR> = {
 export type RenderingSettings = {
   video: VideoSettings,
   audio: AudioSettings,
-  processingParams: {
-    strategyType: RenderStrategy['type']
-    strategyTune: RenderStrategy['tune']
-  }
+  strategy: RenderStrategy
 }
 
 // https://github.com/mobxjs/mobx/blob/main/docs/subclassing.md
@@ -195,7 +192,7 @@ export abstract class ProcessBaseGeneric<PROCESSOR extends string, SETTINGS exte
     };
   }
 
-  protected abstract paramsFromStrategy(details: FFprobeData, durationOrTrimmedDuration: number): string[];
+  protected abstract paramsFromStrategy(details: FFprobeData, durationOrTrimmedDuration: number, settings: RenderingSettings): string[];
 
   public generateFFmpegArgs(
     fileIn: string,
@@ -210,14 +207,17 @@ export abstract class ProcessBaseGeneric<PROCESSOR extends string, SETTINGS exte
     console.log('filter_complex mappings', fc.mappings);
 
     return [
-      '-ss', range.begin.toFixed(6),
+      ...(range.begin !== 0 ?
+          ['-ss', range.begin.toFixed(6)] :
+          []
+      ),
       '-to', range.end.toFixed(6),
       '-i', fileIn,
 
       ...(fc.filter_complex.length > 0 ? ['-filter_complex', fc.filter_complex.join(';')] : []),
       ...(fc.mappings.length > 0 ? fc.mappings.map(x => ['-map', x]).flat() : []),
 
-      ...this.paramsFromStrategy(videoDetails, range.end - range.begin),
+      ...this.paramsFromStrategy(videoDetails, range.end - range.begin, renderSettings),
       ...(renderSettings.audio.volume > 0 ? [] : ['-an']),
       '-c:v', this.processorName,
       fileOut, '-y'

@@ -34,17 +34,17 @@ class ProcessStoreClass {
   @action setProcessing = (p: ProcessStoreClass['processing']) => this.processing = p;
 
   @computed get strategyType() {
-    return RendererSettings.settings.processingParams.strategyType
+    return RendererSettings.settings.processingStrategy.type;
   }
 
   @computed get strategyTune() {
-    return RendererSettings.settings.processingParams.strategyTune
+    return RendererSettings.settings.processingStrategy.tune;
   }
 
   @action setStrategyType = (t: ProcessStoreClass['strategyType']) =>
-    RendererSettings.settings.processingParams.strategyType = t;
+    RendererSettings.settings.processingStrategy.type = t;
   @action setStrategyTune = (t: ProcessStoreClass['strategyTune']) =>
-    RendererSettings.settings.processingParams.strategyTune = t;
+    RendererSettings.settings.processingStrategy.tune = t;
 
   @computed get strategy(): RenderStrategy {
     return {
@@ -64,7 +64,7 @@ class ProcessStoreClass {
   @observable fileOut: string = '';
   @action setFileOut = (f: string) => this.fileOut = f;
 
-  // todo move this into an AudioSettings
+  // todo move this into an AudioSettings in RendererSettings
   @observable volume: number = 1;
   @action setVolume = (v: number) => {
     v = clip(0, v, 2);
@@ -100,11 +100,11 @@ class ProcessStoreClass {
     reaction(() => RendererSettings.settings.processor, (p) => {
       this.setProcessor(p);
 
-      if (RendererSettings.settings.processingParams.strategyType === 'constant-quality') {
+      if (RendererSettings.settings.processingStrategy.type === 'constant-quality') {
         const defaultCRF = this.processor.qualityOptions.find(x => x.default)?.value;
-        RendererSettings.settings.processingParams.strategyTune = clip(
+        RendererSettings.settings.processingStrategy.tune = clip(
           this.processor.qualityOptions[0].value,
-          defaultCRF ?? RendererSettings.settings.processingParams.strategyTune,
+          defaultCRF ?? RendererSettings.settings.processingStrategy.tune,
           this.processor.qualityOptions[this.processor.qualityOptions.length - 1].value,
         );
       }
@@ -178,7 +178,7 @@ class ProcessStoreClass {
         audio: {
           volume: this.volume
         },
-        processingParams: RendererSettings.settings.processingParams
+        strategy: RendererSettings.settings.processingStrategy
       }
     );
 
