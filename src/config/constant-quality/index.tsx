@@ -1,18 +1,20 @@
 import React from "react";
 import * as css from './style.css';
-import {clip} from "../../helpers/math";
-import {FormControl, InputLabel, MenuItem, Select, Typography} from "@material-ui/core";
+import {FormControl, InputLabel, MenuItem, Select} from "@material-ui/core";
 import {ProcessStore} from "../../global-stores/Process.store";
 import {observer} from "mobx-react";
 import {RendererSettings} from "../../helpers/settings";
-import {trace} from "mobx";
+import {useProcess} from "../../global-stores/contexts/Process.context";
 
 export interface ConfigConstantQualityProps {
+  disabled?: boolean
 }
 
 export const ConfigConstantQuality = observer(function ConfigConstantQuality(props: ConfigConstantQualityProps) {
 
-  const qualityPreset = ProcessStore.strategyTune;
+  const store = useProcess();
+
+  const qualityPreset = store.strategy.tune;
   const qualityOptions = ProcessStore.processor.qualityOptions;
 
   // this is here just because ProcessStore.processor isn't observable for some reason
@@ -20,12 +22,12 @@ export const ConfigConstantQuality = observer(function ConfigConstantQuality(pro
   const processorName = RendererSettings.settings.processor;
 
   return (<div className={css.maxFileSizeConfig}>
-    <FormControl>
+    <FormControl disabled={props.disabled}>
       <InputLabel id="quality-label">Quality</InputLabel>
       <Select
         labelId={'quality-label'}
         onChange={e => {
-          ProcessStore.setStrategyTune(parseInt(e.target.value as string));
+          store.setStrategyTune(parseInt(e.target.value as string));
         }}
         value={qualityPreset}
       >

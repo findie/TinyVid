@@ -4,7 +4,6 @@
 import React, {ChangeEvent, useCallback, useState} from "react";
 import {Icon, Mark, Paper, Slider, Tooltip} from "@material-ui/core";
 import * as css from './style.css'
-import {ProcessStore} from "../../global-stores/Process.store";
 
 import VolumeDown from "@material-ui/icons/VolumeDown";
 import VolumeUp from "@material-ui/icons/VolumeUp";
@@ -16,6 +15,7 @@ import {AppState} from "../../global-stores/AppState.store";
 import classNames from "classnames";
 import {Theme} from "../../helpers/theme";
 import {eventList} from "../../helpers/events";
+import {useProcess} from "../../global-stores/contexts/Process.context";
 
 const sliderMarks: Mark[] = [
   { value: 2, label: '200%' },
@@ -29,13 +29,13 @@ const sliderMarks: Mark[] = [
   { value: 0, label: '0%' },
 ];
 const sliderFormat = (n: number) => {
- return (
-   <div className={css.sliderTooltip}>
-     {(n * 100).toFixed(0)}%
-     {n >= 1.25 && (<><br/><br/>Volume is above 125%, audio may distort!</>)}
-     {n === 0 && (<><br/><br/>Audio is muted, this will slightly increase your video quality</>)}
-   </div>
- )
+  return (
+    <div className={css.sliderTooltip}>
+      {(n * 100).toFixed(0)}%
+      {n >= 1.25 && (<><br/><br/>Volume is above 125%, audio may distort!</>)}
+      {n === 0 && (<><br/><br/>Audio is muted, this will slightly increase your video quality</>)}
+    </div>
+  )
 
 }
 
@@ -52,7 +52,9 @@ function SliderValueLabelComponent(props: { children: React.ReactElement, open: 
 
 export const VolumeControl = observer(function VolumeControl() {
 
-  const volume = ProcessStore.volume;
+  const store = useProcess();
+
+  const volume = store.audioSettings.volume;
 
   const [lastNonMutedVolume, setLastNonMutedVolume] = useState(1);
 
@@ -68,18 +70,18 @@ export const VolumeControl = observer(function VolumeControl() {
 
   const toggleVolume = useCallback(() => {
     if (disabled) return;
-    if (ProcessStore.volume > 0) {
+    if (store.audioSettings.volume > 0) {
       eventList.audio.mute();
-      ProcessStore.setVolume(0);
+      store.setAudioSettings('volume', 0);
     } else {
       eventList.audio.unmute();
-      ProcessStore.setVolume(lastNonMutedVolume);
+      store.setAudioSettings('volume', lastNonMutedVolume);
     }
   }, [disabled, lastNonMutedVolume]);
 
   const setVolume = useCallback((e: ChangeEvent<{}>, v: number | number[]) => {
     eventList.audio.volume({ volume: v as number });
-    ProcessStore.setVolume(v as number);
+    store.setAudioSettings('volume', v as number);
     if (v as number > 0) {
       // never set lastNonMutedVolume to 0 as mute/unmute will then appear to do nothing
       setLastNonMutedVolume(v as number);

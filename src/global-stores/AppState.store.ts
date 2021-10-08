@@ -9,9 +9,8 @@ import {ipcRenderer} from 'electron';
 
 class AppStateClass {
 
-
-  @observable file: string = '';
-  @action setFile = (f: string) => {
+  @observable file: string | null = null;
+  @action setFile = (f: AppStateClass["file"]) => {
     console.log('setting input file to', f);
     this.file = f;
   }
@@ -21,8 +20,13 @@ class AppStateClass {
   @observable lastTrimValue: number = 0;
   @action setLastTrimValue = (v: number) => this.lastTrimValue = v;
 
-  @observable showQueue = false;
-  @action setShowQueue = (show: boolean) => this.showQueue = show;
+  @observable showQueue = true;
+  @action setShowQueue = (show: boolean) => {
+    if (show) {
+      this.setFile(null);
+    }
+    this.showQueue = show;
+  }
 
   constructor() {
     makeObservable(this);

@@ -61,7 +61,7 @@ export class ProcessH265 extends ProcessBaseGeneric<'libx265', H265Settings> {
 
     const strategyType = settings.strategy.type;
     const strategyTune = settings.strategy.tune;
-    const hasAudio = !!details.audioStream && ProcessStore.volume > 0;
+    const hasAudio = !!details.audioStream && settings.audio.volume > 0;
 
     const commonParams: string[] = [];
     if (this.settings.tune !== 'none') {

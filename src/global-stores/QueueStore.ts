@@ -1,38 +1,100 @@
 /**
  Copyright Findie 2021
  */
-import {action, computed, makeObservable, observable} from "mobx";
+import {action, computed, makeObservable, observable, reaction, toJS} from "mobx";
 import {FFprobe, FFprobeData} from "../../common/ff/ffprobe";
 import {AudioSettings, RenderStrategy, VideoSettings} from "../../electron/types";
 import {FFmpeg} from "../../common/ff/ffmpeg";
 import {ProcessHelpers} from "../../common/process";
-import {RendererSettings} from "../helpers/settings";
+import {ConfigConstantQualityDefaultQuality, RendererSettings} from "../helpers/settings";
 import {ProcessStore} from "./Process.store";
 import {PlaybackStore} from "./Playback.store";
 import {eventList} from "../helpers/events";
+import {IProcessContext} from "./contexts/Process.context";
+import {b2text, bps2text, seconds2time} from "../helpers/math";
+import {RendererFileHelpers} from "../helpers/file";
+import {existsSync} from "fs";
 import FFmpegProcess = FFmpeg.FFmpegProcess;
 import ProcessError = ProcessHelpers.ProcessError;
 
-export class QueueItemClass {
+export class QueueItemClass implements IProcessContext {
 
   readonly fileIn: string
 
   @observable
   fileOut: string
+  @observable
+  fileOutAlreadyExists: boolean = false;
 
   @observable.ref
   videoDetails: FFprobeData | null = null;
 
   @observable
-  video: VideoSettings = RendererSettings.settings.processingVideoSettings
+  videoSettings: VideoSettings = RendererSettings.settings.processingVideoSettings;
+  @action
+  setVideoSettings = <K extends keyof IProcessContext["videoSettings"]>(key: K, val: IProcessContext["videoSettings"][K]) => {
+    this.videoSettings[key] = val;
+  }
 
+  @computed get isVideoSettingsLocked() {
+    return this.videoSettings === RendererSettings.settings.processingVideoSettings;
+  }
+
+  @action toggleVideoSettingsLock = () => {
+    if (this.isVideoSettingsLocked) {
+      this.videoSettings = toJS(this.videoSettings);
+    } else {
+      this.videoSettings = RendererSettings.settings.processingVideoSettings;
+    }
+  }
+
+  // todo move to RendererSettings.settings.audioSettings
   @observable
-  audio: AudioSettings = {
-    volume: ProcessStore.volume
+  audioSettings: AudioSettings = ProcessStore.audioSettings
+  @action
+  setAudioSettings = <K extends keyof IProcessContext["audioSettings"]>(key: K, val: IProcessContext["audioSettings"][K]) => {
+    this.audioSettings[key] = val;
   }
 
   @observable
   strategy: RenderStrategy = RendererSettings.settings.processingStrategy
+  @action setStrategyType = (type: RenderStrategy["type"]) => {
+
+    if (this.strategy.type !== type) {
+
+      if (type === ProcessStore.strategy.type) {
+        this.strategy.tune = toJS(ProcessStore.strategy.tune);
+      } else {
+
+        // fixme DRY this and the reaction in RendererSettings on RendererSettings.settings.processingStrategy.type
+        if (type === 'constant-quality') {
+          this.strategy.tune = (
+            ProcessStore.processor.qualityOptions.find(x => x.default) ||
+            ProcessStore.processor.qualityOptions[0]
+          )?.value ?? ConfigConstantQualityDefaultQuality;
+        } else if (type === 'max-file-size') {
+          this.strategy.tune = RendererSettings.settings.UI.fileSizePresets[0].size ?? 8;
+        }
+      }
+
+    }
+
+    this.strategy.type = toJS(type);
+
+  }
+  @action setStrategyTune = (tune: RenderStrategy["tune"]) => this.strategy.tune = tune;
+
+  @computed get isStrategyLocked() {
+    return this.strategy === RendererSettings.settings.processingStrategy;
+  }
+
+  @action toggleStrategyLock = () => {
+    if (this.isStrategyLocked) {
+      this.strategy = toJS(this.strategy);
+    } else {
+      this.strategy = RendererSettings.settings.processingStrategy;
+    }
+  }
 
   @observable.ref
   process: FFmpegProcess | null = null;
@@ -51,6 +113,42 @@ export class QueueItemClass {
     return this._error || this.process?.error;
   }
 
+  @computed get statusText(): string {
+    if (this.error && !this.process?.cancelled) {
+      return 'Errored';
+    }
+    if (this.process?.cancelled) {
+      return 'Cancelled';
+    }
+    if (this.process?.done) {
+      return 'Done';
+    }
+    if (this.process?.started) {
+      const progress = this.process.progress;
+      if (!progress) {
+        return 'Starting process';
+      }
+
+      return `
+${((this.process?.progress?.progress ?? 0) * 100).toFixed(1)}%\
+ in \
+${(this.process?.progress?.eta ?? 0) > 10 ? seconds2time(this.process?.progress?.eta ?? 0, 0, true) : 'a few seconds'}\
+ | \
+Size: ${b2text(this.process?.progress?.size ?? 0)}\
+ \
+Speed: ${(this.process?.progress?.speed || 0).toFixed(2)}x\
+ \
+Bitrate: ${bps2text(this.process?.progress?.bitrate ?? 0)}\
+`;
+    }
+    return 'Waiting';
+  }
+
+  @computed get isRunning() {
+    if (!this.process) return false;
+    return !this.process.done;
+  }
+
   constructor(
     fileIn: string,
     fileOut: string,
@@ -58,6 +156,7 @@ export class QueueItemClass {
   ) {
     this.fileIn = fileIn;
     this.fileOut = fileOut;
+    this.fileOutAlreadyExists = existsSync(fileOut);
 
     if (videoDetails) {
       this.videoDetails = videoDetails;
@@ -68,6 +167,13 @@ export class QueueItemClass {
     }
 
     makeObservable(this);
+
+    reaction(
+      () => this.fileOut,
+      action((f) => {
+        this.fileOutAlreadyExists = existsSync(f);
+      })
+    );
   }
 
   @action
@@ -93,8 +199,8 @@ export class QueueItemClass {
       this.fileOut,
       this.videoDetails,
       {
-        video: this.video,
-        audio: this.audio,
+        video: this.videoSettings,
+        audio: this.audioSettings,
         strategy: this.strategy
       }
     );
@@ -111,12 +217,12 @@ export class QueueItemClass {
       eventList.global.process({
         type: this.strategy.type,
         tune: this.strategy.tune,
-        resolution: this.video.height === 'original' ? this.videoDetails!.height : this.video.height,
-        isResolutionChanged: this.video.height !== 'original',
-        fps: this.video.fps === 'original' ? this.videoDetails!.fps : this.video.fps,
-        isFPSChanged: this.video.fps !== 'original',
+        resolution: this.videoSettings.height === 'original' ? this.videoDetails!.height : this.videoSettings.height,
+        isResolutionChanged: this.videoSettings.height !== 'original',
+        fps: this.videoSettings.fps === 'original' ? this.videoDetails!.fps : this.videoSettings.fps,
+        isFPSChanged: this.videoSettings.fps !== 'original',
         encoderSettings: ProcessStore.processor.settings,
-        volume: this.audio.volume,
+        volume: this.audioSettings.volume,
       });
 
       this.process = proc;
@@ -144,6 +250,16 @@ export class QueueItemClass {
   cancel = () => {
     this.process?.cancel();
   }
+
+  requestOutputChange = async () => {
+    const { canceled, filePath } = await RendererFileHelpers.requestFileSaveDialog(this.fileOut);
+
+    if (!canceled && filePath) {
+      action(() => {
+        this.fileOut = filePath;
+      })();
+    }
+  }
 }
 
 class QueueStoreClass {
@@ -156,13 +272,25 @@ class QueueStoreClass {
     this.queue.push(item);
   }
 
+  @action
+  remove(item: QueueItemClass) {
+    const index = this.queue.indexOf(item);
+    if (index !== -1) {
+      this.queue.splice(index, 1);
+    }
+  }
+
+  @computed get isRunning() {
+    return this.queue.some(x => x.isRunning)
+  }
+
   constructor() {
     makeObservable(this);
 
-    // this.addToQueue(new QueueItemClass(
-    //   '/home/stefan/Downloads/redbull_grid.mp4',
-    //   '/home/stefan/Downloads/redbull_grid.test.queue.mp4',
-    // ));
+    this.addToQueue(new QueueItemClass(
+      '/home/stefan/Downloads/redbull_grid.mp4',
+      '/home/stefan/Downloads/redbull_grid.test.queue.mp4',
+    ));
 
   }
 

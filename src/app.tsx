@@ -9,24 +9,17 @@ import {Display} from "./display";
 import {TrimSlider} from "./components/trim-select";
 import {ProcessingOverlay} from "./progress";
 import css from './style.css';
-import {ConfigMaxFileSize} from "./config/max-file-size";
-import {ConfigConstantQuality} from "./config/constant-quality";
 import {ConfigVideoSettings} from "./config/video-settings";
 import {Loading} from "./components/loading";
 
 import {
   Box,
   Button,
-  Collapse,
   Divider,
-  FormControl,
   Icon,
   IconButton,
-  InputLabel,
   Link,
-  MenuItem,
   Paper,
-  Select,
   ThemeProvider,
   Tooltip,
   Typography
@@ -57,8 +50,9 @@ import {VolumeControl} from "./components/volume/volume-control";
 import {ModalTrigger} from "./components/modals";
 import {Settings} from "./settings/Settings";
 import SettingsIcon from "@material-ui/icons/Settings";
-import {CollapsableQueue, QueueComponent} from "./components/queue/Queue";
-import classNames from "classnames";
+import {CollapsableQueue} from "./queue/Queue";
+import {ProcessContextProvider} from "./global-stores/contexts/Process.context";
+import {VideoStrategy} from "./config/Strategy";
 
 const mainElement = document.createElement('div');
 document.body.appendChild(mainElement);
@@ -146,81 +140,59 @@ const App = observer(() => {
             null
           }
 
-          <Box>
-            <div className={css.trimAndVolume}>
-              <TrimSlider/>
-              <VolumeControl/>
-            </div>
-            <Box marginX={2} marginY={1} className={css.controls}>
-              <div className={css.rows + ' ' + css.flexGrow}>
+          <ProcessContextProvider store={ProcessStore}>
+            <Box>
+              <div className={css.trimAndVolume}>
+                <TrimSlider/>
+                <VolumeControl/>
+              </div>
+              <Box marginX={2} marginY={1} className={css.controls}>
+                <div className={css.rows + ' ' + css.flexGrow}>
 
-                <div className={css.settings}>
-                  <div className={css.left}>
-                    <FormControl>
-                      <InputLabel id="strategy-label">Output must</InputLabel>
-                      <Select
-                        labelId={"strategy-label"}
-                        value={ProcessStore.strategyType}
-                        variant={"standard"}
-                        onChange={
-                          e => {
-                            if (e.target.value === 'max-file-size') {
-                              ProcessStore.setStrategyType('max-file-size');
-                            } else {
-                              ProcessStore.setStrategyType('constant-quality');
-                            }
-                          }
-                        }
-                      >
-                        <MenuItem value={'max-file-size'}>have max file size of</MenuItem>
-                        <MenuItem value={'constant-quality'}>be constant quality of</MenuItem>
-                      </Select>
-                    </FormControl>
+                  <div className={css.settings}>
+                    <div className={css.left}>
+                      <VideoStrategy/>
+                    </div>
+                    <div className={css.right}>
+                      <ConfigVideoSettings/>
 
-                    {ProcessStore.strategyType === 'max-file-size' ?
-                      <ConfigMaxFileSize/> :
-                      <ConfigConstantQuality/>
-                    }
-                  </div>
-                  <div className={css.right}>
-                    <ConfigVideoSettings/>
+                      <Box marginLeft={2}>
+                        <Button
+                          startIcon={<Videocam/>}
+                          variant="contained"
+                          className={css.processBtn}
+                          color={"secondary"}
+                          disabled={!AppState.file || !!mediaNoVideo}
+                          onClick={ProcessStore.startProcessing}
+                        >Process
+                        </Button>
+                      </Box>
+                    </div>
 
-                    <Box marginLeft={2}>
-                      <Button
-                        startIcon={<Videocam/>}
-                        variant="contained"
-                        className={css.processBtn}
-                        color={"secondary"}
-                        disabled={!AppState.file || !!mediaNoVideo}
-                        onClick={ProcessStore.startProcessing}
-                      >Process
-                      </Button>
-                    </Box>
                   </div>
 
+                  <Box paddingY={1}>
+                    <Divider/>
+                  </Box>
+
+                  <Box marginBottom={-1}>
+                    <FooterBranding>
+                      <Link onClick={() => {
+                        setShowFeedback(true);
+                        eventList.global.sendFeedback();
+                      }}>
+                        Send Feedback 👋
+                      </Link>
+                      &nbsp;|&nbsp;
+                      <Changelog/>
+
+                    </FooterBranding>
+                  </Box>
                 </div>
 
-                <Box paddingY={1}>
-                  <Divider/>
-                </Box>
-
-                <Box marginBottom={-1}>
-                  <FooterBranding>
-                    <Link onClick={() => {
-                      setShowFeedback(true);
-                      eventList.global.sendFeedback();
-                    }}>
-                      Send Feedback 👋
-                    </Link>
-                    &nbsp;|&nbsp;
-                    <Changelog/>
-
-                  </FooterBranding>
-                </Box>
-              </div>
-
+              </Box>
             </Box>
-          </Box>
+          </ProcessContextProvider>
         </Paper>
 
         <ProcessingOverlay/>

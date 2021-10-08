@@ -65,7 +65,7 @@ export class ProcessHEVCNVENC extends ProcessBaseGeneric<'hevc_nvenc', HEVCNVENC
 
     const strategyType = settings.strategy.type;
     const strategyTune = settings.strategy.tune;
-    const hasAudio = !!details.audioStream && ProcessStore.volume > 0;
+    const hasAudio = !!details.audioStream && settings.audio.volume > 0;
 
     switch (strategyType) {
       case "constant-quality":

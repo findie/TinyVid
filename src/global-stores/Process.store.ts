@@ -2,7 +2,7 @@ import {action, computed, makeObservable, observable, reaction} from "mobx";
 import {ErrorLike} from "../../electron/protocols/base-protocols";
 import {AppState} from "./AppState.store";
 import {RenderStrategy} from "../../electron/types";
-import {dialog, getCurrentWindow} from '@electron/remote';
+import {getCurrentWindow} from '@electron/remote';
 import {RendererFileHelpers} from "../helpers/file";
 import {eventList} from "../helpers/events";
 import {clip} from "../helpers/math";
@@ -12,13 +12,14 @@ import {FFprobe, FFprobeData} from "../../common/ff/ffprobe";
 import {ProcessBaseGeneric, ProcessBaseGenericSettings} from "./process-codec-stores/ProcessBaseGeneric";
 import {Processors} from "./process-codec-stores";
 import {FFmpeg} from "../../common/ff/ffmpeg";
+import {IProcessContext} from "./contexts/Process.context";
 
 
 /**
  Copyright Findie 2021
  */
 
-class ProcessStoreClass {
+export class ProcessStoreClass implements IProcessContext {
   @observable error: Error | ErrorLike | null = null;
   @action setError = (e: ProcessStoreClass['error']) => this.error = e;
 
@@ -61,16 +62,16 @@ class ProcessStoreClass {
     RendererSettings.settings.processingVideoSettings[key] = val;
   }
 
-  @observable fileOut: string = '';
-  @action setFileOut = (f: string) => this.fileOut = f;
-
   // todo move this into an AudioSettings in RendererSettings
-  @observable volume: number = 1;
-  @action setVolume = (v: number) => {
-    v = clip(0, v, 2);
-    PlaybackStore.setVolume(v);
-    return this.volume = v;
+  @observable audioSettings = {
+    volume: 1
   }
+  @action setAudioSettings = <K extends keyof ProcessStoreClass['audioSettings']>(key: K, val: ProcessStoreClass['audioSettings'][K]) => {
+    this.audioSettings[key] = val;
+  }
+
+  @observable fileOut: string | null = null;
+  @action setFileOut = (f: ProcessStoreClass['fileOut']) => this.fileOut = f;
 
   constructor() {
     makeObservable(this);
@@ -151,15 +152,9 @@ class ProcessStoreClass {
     const strategy = ProcessStore.strategy;
     PlaybackStore.pause();
 
-    const { canceled, filePath: fout } = await dialog.showSaveDialog(
-      getCurrentWindow(),
-      {
-        title: 'Output location',
-        defaultPath: RendererFileHelpers.generateFileOutName(AppState.file, AppState.trimRange, strategy, ProcessStore.videoSettings),
-        buttonLabel: 'Save & Start',
-        filters: [{ name: 'Video', extensions: ['mp4'] }],
-        properties: ['createDirectory', 'showOverwriteConfirmation']
-      });
+    const { canceled, filePath: fout } = await RendererFileHelpers.requestFileSaveDialog(
+      RendererFileHelpers.generateFileOutName(AppState.file, AppState.trimRange, strategy, ProcessStore.videoSettings)
+    );
 
     if (!fout || canceled) {
       return console.warn('refusing to start process with empty output location');
@@ -175,9 +170,7 @@ class ProcessStoreClass {
       this.videoDetails,
       {
         video: this.videoSettings,
-        audio: {
-          volume: this.volume
-        },
+        audio: this.audioSettings,
         strategy: RendererSettings.settings.processingStrategy
       }
     );
@@ -200,7 +193,7 @@ class ProcessStoreClass {
         fps: this.videoSettings.fps === 'original' ? this.videoDetails!.fps : this.videoSettings.fps,
         isFPSChanged: this.videoSettings.fps !== 'original',
         encoderSettings: this.processor.settings,
-        volume: this.volume,
+        volume: this.audioSettings.volume,
       });
 
       this.setFileOut(fout);

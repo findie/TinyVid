@@ -171,8 +171,8 @@ export interface ProcessingOverlayProps {
 
 export const ProcessingOverlay = observer(function ProcessingOverlay(props: ProcessingOverlayProps) {
 
-  const fileIn = AppState.file;
-  const fileOut = ProcessStore.fileOut;
+  const fileIn = AppState.file!;
+  const fileOut = ProcessStore.fileOut!;
   const processing = ProcessStore.processing;
 
   const onDone = useCallback(() => {

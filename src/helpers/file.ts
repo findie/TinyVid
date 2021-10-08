@@ -2,6 +2,7 @@ import * as path from "path";
 import {RenderStrategy, VideoSettings} from "../../electron/types";
 import {existsSync} from "fs";
 import {v4 as uuid} from "uuid";
+import {dialog, getCurrentWindow} from "@electron/remote";
 
 export namespace RendererFileHelpers {
 
@@ -38,6 +39,18 @@ export namespace RendererFileHelpers {
 
     return _generateFileOutNameHelper(uuid().split('-')[0], fileIn, range, strategy, settings);
 
+  }
+
+  export async function requestFileSaveDialog(defaultPath: string) {
+    return await dialog.showSaveDialog(
+      getCurrentWindow(),
+      {
+        title: 'Output location',
+        defaultPath: defaultPath,
+        buttonLabel: 'Save & Start',
+        filters: [{ name: 'Video', extensions: ['mp4'] }],
+        properties: ['createDirectory', 'showOverwriteConfirmation']
+      });
   }
 
 }

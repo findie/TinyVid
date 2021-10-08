@@ -69,7 +69,7 @@ export class ProcessH264 extends ProcessBaseGeneric<'libx264', H264Settings> {
 
     const strategyType = settings.strategy.type;
     const strategyTune = settings.strategy.tune;
-    const hasAudio = !!details.audioStream && ProcessStore.volume > 0;
+    const hasAudio = !!details.audioStream && settings.audio.volume > 0;
 
     const commonParams: string[] = [];
     if (this.settings.tune !== 'none') {

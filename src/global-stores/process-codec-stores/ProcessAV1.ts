@@ -58,7 +58,7 @@ export class ProcessAV1 extends ProcessBaseGeneric<'libaom-av1', AV1Settings> {
 
     const strategyType = settings.strategy.type;
     const strategyTune = settings.strategy.tune;
-    const hasAudio = !!details.audioStream && ProcessStore.volume > 0;
+    const hasAudio = !!details.audioStream && settings.audio.volume > 0;
 
     switch (strategyType) {
       case "constant-quality":

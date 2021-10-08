@@ -1,0 +1,19 @@
+.root {
+  display: flex;
+  flex-flow: row nowrap;
+  width: 100%;
+  overflow: hidden;
+
+  .folder {
+    //flex-grow: 1;
+    flex-shrink: 1;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: pre;
+  }
+  .file {
+    flex-grow: 0;
+    flex-shrink: 0;
+    white-space: pre;
+  }
+}

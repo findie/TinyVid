@@ -38,10 +38,12 @@ module.exports = {
           {
             loader: "css-loader",
             options: {
+              sourceMap: true,
               importLoaders: 1,
-              modules: true,
-              localsConvention:'camelCase'
-              // localIdentName: "[name]__[local]___[hash:base64:5]"
+              modules: {
+                localIdentName: "[name]__[local]___[hash:base64:5]"
+              },
+              localsConvention:'camelCase',
             }
           }
         ]
@@ -55,10 +57,12 @@ module.exports = {
           {
             loader: "css-loader",
             options: {
+              sourceMap: true,
               importLoaders: 1,
-              modules: true,
-              localsConvention:'camelCase'
-              // localIdentName: "[name]__[local]___[hash:base64:5]"
+              modules: {
+                localIdentName: "[name]__[local]___[hash:base64:5]"
+              },
+              localsConvention:'camelCase',
             }
           },
           // Compiles Sass to CSS
