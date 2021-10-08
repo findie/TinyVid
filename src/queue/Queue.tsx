@@ -94,7 +94,7 @@ export const QueueItemComponent = observer(function QueueItemComponent({ item }:
             <WarningRounded
               fontSize="small"
               color="inherit"
-              style={{color: 'orange'}}
+              style={{ color: 'orange' }}
             />
           </Tooltip>
         )}
@@ -110,7 +110,13 @@ export const QueueItemComponent = observer(function QueueItemComponent({ item }:
         <LinearProgress
           className={classes.progressBar}
           variant="determinate"
-          value={(item.process?.progress?.progress ?? 0) * 100}
+          value={
+            (
+              item.isDone ?
+                1 :
+                item.process?.progress?.progress ?? 0
+            ) * 100
+          }
         />
         <Typography className={classes.progressInfo}>
           {item.statusText}
@@ -176,6 +182,7 @@ export const QueueComponent = observer(function QueueComponent() {
             color="primary"
             variant="contained"
             startIcon={<VideoLibrary/>}
+            disabled={QueueStore.isRunning}
           >
             Add
           </Button>
@@ -184,6 +191,8 @@ export const QueueComponent = observer(function QueueComponent() {
             variant="contained"
             color="secondary"
             startIcon={<Videocam/>}
+            disabled={QueueStore.isRunning}
+            onClick={QueueStore.start}
           >
             Start
           </Button>
@@ -191,8 +200,10 @@ export const QueueComponent = observer(function QueueComponent() {
             // disabled
             variant="contained"
             startIcon={<Stop/>}
-            color="inherit"
-            style={{ background: 'orangered', color: 'white' }}
+            color={!QueueStore.isRunning ? 'default' : 'inherit'}
+            style={!QueueStore.isRunning ? undefined : { background: 'orangered', color: 'white' }}
+            disabled={!QueueStore.isRunning}
+            onClick={QueueStore.stop}
           >
             Stop
           </Button>
@@ -247,7 +258,13 @@ export const CollapsableQueue = observer(function CollapsableQueue() {
       <div className={classes.collapseHandle}>
         <Paper
           className={classes.collapseHandleItem}
-          onClick={() => AppState.setShowQueue(!AppState.showQueue)}
+          onClick={() => {
+            if (QueueStore.isRunning) {
+              AppState.setShowQueue(true);
+            } else {
+              AppState.setShowQueue(!AppState.showQueue);
+            }
+          }}
         >
           <Typography>
             {AppState.showQueue ? 'Hide Queue' : 'Show Queue'}

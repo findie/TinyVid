@@ -33,5 +33,7 @@ export function objValues<T extends object>(o: T): (T[keyof T])[] {
 }
 
 export function objKV<T extends object>(o: T): [keyof T, T[keyof T]][] {
-  return objKeys(o).map(k => [k,o[k]]);
+  return objKeys(o).map(k => [k, o[k]]);
 }
+
+export const noop = () => void 0;

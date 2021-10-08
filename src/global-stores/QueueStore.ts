@@ -14,6 +14,7 @@ import {IProcessContext} from "./contexts/Process.context";
 import {b2text, bps2text, seconds2time} from "../helpers/math";
 import {RendererFileHelpers} from "../helpers/file";
 import {existsSync} from "fs";
+import {noop} from "../helpers/js";
 import FFmpegProcess = FFmpeg.FFmpegProcess;
 import ProcessError = ProcessHelpers.ProcessError;
 
@@ -177,6 +178,11 @@ Bitrate: ${bps2text(this.process?.progress?.bitrate ?? 0)}\
   }
 
   @action
+  rearm = () => {
+    this.process = null;
+  }
+
+  @action
   startProcess = () => {
     if (!this.videoDetails) {
       return false;
@@ -228,16 +234,10 @@ Bitrate: ${bps2text(this.process?.progress?.bitrate ?? 0)}\
       this.process = proc;
       proc
         .wait()
-        .then(action(() => {
+        .finally(action(() => {
           if (!proc.cancelled) {
             // mark as done if not cancelled
             this._isDone = true;
-          } else {
-            // once cancelled and done
-            // remove proc so we can start it again
-            if (this.process === proc) {
-              this.process = null;
-            }
           }
         }))
       return true;
@@ -281,7 +281,11 @@ class QueueStoreClass {
   }
 
   @computed get isRunning() {
-    return this.queue.some(x => x.isRunning)
+    return !!this.runningItem;
+  }
+
+  @computed get runningItem() {
+    return this.queue.find(x => x.isRunning);
   }
 
   constructor() {
@@ -293,6 +297,35 @@ class QueueStoreClass {
     ));
 
   }
+
+  start = () => {
+    if (this.runningItem) return;
+
+    const item = this.queue.find(x => !x.isDone);
+
+    if (!item) return;
+
+    const started = item.startProcess();
+
+    if (started) {
+      item.process!
+        .wait()
+        .catch(noop)
+        .finally(() => {
+          if (item.process!.cancelled) {
+            // don't continue
+            item.rearm();
+            return;
+          }
+          return this.start();
+        });
+    }
+  }
+
+  stop = () => {
+    this.runningItem?.cancel();
+  }
+
 
 }
 
