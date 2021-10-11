@@ -36,6 +36,9 @@ function createWindow() {
       webSecurity: true,
       // preload: path.join(__dirname, "..", "common", "sentry"),
     },
+    backgroundColor: RendererSettings.settings.theme === "dark" || nativeTheme.shouldUseDarkColors ?
+      '#303030' :
+      '#FFFFFF',
   });
 
   enableRemote(mainWindow.webContents);
@@ -139,13 +142,6 @@ function createWindow() {
     authors: ['stefan@kamua.com']
   });
 
-
-  mainWindow.setBackgroundColor(
-    RendererSettings.settings.theme === "dark" || nativeTheme.shouldUseDarkColors ?
-      '#303030' :
-      '#FFFFFF'
-  );
-
   mainWindow.on('page-title-updated', (evt) => {
     evt.preventDefault();
   });
@@ -186,12 +182,9 @@ app.on('web-contents-created', (event, contents) => {
     return event.preventDefault();
   });
 
-  contents.on('new-window', async (event, navigationUrl) => {
-    // In this example, we'll ask the operating system
-    // to open this event's url in the default browser.
-    event.preventDefault();
-
-    await shell.openExternal(navigationUrl);
+  contents.setWindowOpenHandler(details => {
+    shell.openExternal(details.url).catch(console.error);
+    return {action: 'deny'};
   })
 });
 

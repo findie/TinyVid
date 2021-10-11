@@ -219,3 +219,11 @@ const App = observer(() => {
 })
 
 ReactDom.render(<App/>, mainElement);
+
+const loaders = document.getElementById('loaders');
+if (loaders) {
+  loaders.style.opacity = '0';
+  setTimeout(() => {
+    document.body.removeChild(loaders);
+  }, 250);
+}
