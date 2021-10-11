@@ -295,12 +295,6 @@ class QueueStoreClass {
 
   constructor() {
     makeObservable(this);
-
-    this.addToQueue(new QueueItemClass(
-      '/home/stefan/Downloads/redbull_grid.mp4',
-      '/home/stefan/Downloads/redbull_grid.test.queue.mp4',
-    ));
-
   }
 
   start = () => {
