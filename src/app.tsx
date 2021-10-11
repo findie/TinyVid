@@ -207,7 +207,7 @@ const App = observer(() => {
           }}/> : null
         }
 
-        <PreventClosing prevent={!!ProcessStore.processing}/>
+        <PreventClosing/>
 
         <FeedbackModal open={showFeedback} onClose={() => setShowFeedback(false)}/>
 

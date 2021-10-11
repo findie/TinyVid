@@ -37,7 +37,8 @@ export function sendToMain<C extends keyof RendererToMainAsyncEvents>(
   channel: C,
   ...args: Parameters<RendererToMainAsyncEvents[C]>
 ) {
-  pipe.sendToHost(channel, ...args);
+  // pipe.sendToHost(channel, ...args);
+  pipe.send(channel, ...args);
 }
 
 export function sendToRenderer<C extends keyof MainToRenderAsyncEvents>(

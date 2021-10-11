@@ -14,6 +14,7 @@ import {RendererSettings} from "../src/helpers/settings";
 import {isMac} from "./helpers";
 import {readdirSync} from "fs";
 import {sendToRenderer} from "../common/shared-event-comms";
+import {PreventClosing} from "./helpers/prevent-closing";
 
 initElectronMain();
 let mainWindow: Electron.BrowserWindow | null;
@@ -62,11 +63,11 @@ function createWindow() {
         {
           label: 'Open File',
           click: () => {
-            if(mainWindow) {
+            if (mainWindow) {
               sendToRenderer(mainWindow.webContents, 'open-file');
             }
           },
-          accelerator:'CommandOrControl+O',
+          accelerator: 'CommandOrControl+O',
           acceleratorWorksWhenHidden: true,
         },
         ...(isMac ? [] : [
@@ -81,7 +82,7 @@ function createWindow() {
       submenu: [
         ...(RendererSettings.settings.flags.enableDevTools ? [
           { role: 'toggleDevTools' },
-        ]: []),
+        ] : []),
         ...(!app.isPackaged ? [
           { role: 'reload' },
           { role: 'forceReload' },
@@ -163,22 +164,7 @@ function createWindow() {
     );
   }
 
-  mainWindow.on('close', (e) => {
-    console.log('sending close event to show close dialog');
-    mainWindow?.webContents.send('x-closing-window');
-    e.preventDefault();
-    e.returnValue = true;
-  });
-
-  mainWindow.on('closed', () => {
-    mainWindow = null;
-    console.log('Killing process because window is closed');
-
-    // give time for IO to finish
-    setTimeout(() => {
-      process.exit(0);
-    }, 100);
-  });
+  PreventClosing.register(mainWindow);
 }
 
 Protocols.grantPrivileges();

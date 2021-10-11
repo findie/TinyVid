@@ -2,6 +2,8 @@ import {FFMpegProgress, IFFMpegProgressData} from "ffmpeg-progress-wrapper";
 import {action, computed, makeObservable, observable} from "mobx";
 import type {FFMpegError} from "ffmpeg-progress-wrapper/dist/error";
 import {FFFiles} from "./files";
+import {sendToMain} from "../shared-event-comms";
+import {ipcRenderer} from "electron";
 
 /**
  Copyright Findie 2021
@@ -51,6 +53,8 @@ export namespace FFmpeg {
           hideFFConfig: true
         }
       );
+
+      sendToMain(ipcRenderer, 'register-ffmpeg', this.p.process.pid);
 
       console.log('Spawning', 'ffmpeg', this.args.join(' '));
       this.p.on('raw', console.log);

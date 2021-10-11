@@ -1,46 +1,35 @@
-import React, {useEffect, useState} from "react";
+import React, {useCallback, useEffect, useState} from "react";
 import {Modal} from "../modal";
 import {Box, Button, Grid, Paper, Typography} from "@material-ui/core";
 import {ipcRenderer} from 'electron';
 import {getCurrentWindow} from '@electron/remote'
-import {ProcessStore} from "../../global-stores/Process.store";
 
 export interface PreventClosingProps {
-  prevent: boolean
 }
 
 export function PreventClosing(props: PreventClosingProps) {
 
   const [open, setOpen] = useState(false);
 
-  function close() {
+  const close = useCallback(function close() {
     getCurrentWindow().destroy();
-    ProcessStore.processing?.cancel();
-    // console.trace('close called')
     setOpen(false);
-  }
+  }, [setOpen])
 
-  function cancel() {
+  const cancel = useCallback(function cancel() {
     setOpen(false);
-  }
+  }, [setOpen]);
+
+  const show = useCallback(function show() {
+    setOpen(true);
+  }, [setOpen]);
 
   useEffect(() => {
-
-    const myCloseFn = (e: BeforeUnloadEvent) => {
-      console.log(props);
-      if (props.prevent) {
-        e.returnValue = 'false';
-        setOpen(true);
-      } else {
-        close();
-      }
-    };
-
-    ipcRenderer.addListener('x-closing-window', myCloseFn)
+    ipcRenderer.addListener('x-closing-window', show)
     return function cleanup() {
-      ipcRenderer.removeListener('x-closing-window', myCloseFn);
+      ipcRenderer.removeListener('x-closing-window', show);
     }
-  }, [props.prevent]);
+  }, [show]);
 
   return (
     <Modal open={open}>
