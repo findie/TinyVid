@@ -17,6 +17,7 @@ import {existsSync} from "fs";
 import {noop} from "../helpers/js";
 import FFmpegProcess = FFmpeg.FFmpegProcess;
 import ProcessError = ProcessHelpers.ProcessError;
+import {shell} from "@electron/remote";
 
 export class QueueItemClass implements IProcessContext {
 
@@ -259,6 +260,10 @@ Bitrate: ${bps2text(this.process?.progress?.bitrate ?? 0)}\
         this.fileOut = filePath;
       })();
     }
+  }
+
+  requestOutputPlayback = async () => {
+    return shell.openPath(this.fileOut);
   }
 }
 

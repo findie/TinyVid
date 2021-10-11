@@ -33,6 +33,7 @@ import LinkOff from "@material-ui/icons/LinkOff";
 import SettingsApplications from "@material-ui/icons/SettingsApplications";
 import Clear from "@material-ui/icons/Clear";
 import {WarningRounded} from "@material-ui/icons";
+import PlayArrow from "@material-ui/icons/PlayArrow";
 
 async function add2q() {
   const files = await dialog.showOpenDialog(
@@ -98,12 +99,23 @@ export const QueueItemComponent = observer(function QueueItemComponent({ item }:
             />
           </Tooltip>
         )}
-        <IconButton
-          size="small"
-          onClick={item.requestOutputChange}
-        >
-          <Edit/>
-        </IconButton>
+
+        {!item.isDone && (
+          <IconButton
+            size="small"
+            onClick={item.requestOutputChange}
+          >
+            <Edit/>
+          </IconButton>
+        )}
+        {item.isDone && (
+          <IconButton
+            size="small"
+            onClick={item.requestOutputPlayback}
+          >
+            <PlayArrow/>
+          </IconButton>
+        )}
       </div>
 
       <div className={classNames(classes.itemSection, classes.progress)}>
@@ -138,6 +150,7 @@ export const QueueItemComponent = observer(function QueueItemComponent({ item }:
             <IconButton
               className={classes.linkIcon}
               onClick={item.toggleStrategyLock}
+              disabled={item.isDone}
             >
               {
                 item.isStrategyLocked ?
@@ -146,13 +159,14 @@ export const QueueItemComponent = observer(function QueueItemComponent({ item }:
               }
             </IconButton>
 
-            <VideoStrategy disabled={item.isStrategyLocked}/>
+            <VideoStrategy disabled={item.isStrategyLocked || item.isDone}/>
           </div>
 
-          <ConfigVideoSettings disabled={item.isVideoSettingsLocked} canUpscale/>
+          <ConfigVideoSettings disabled={item.isVideoSettingsLocked || item.isDone} canUpscale/>
           <IconButton
             className={classes.linkIcon}
             onClick={item.toggleVideoSettingsLock}
+            disabled={item.isDone}
           >
             {
               item.isVideoSettingsLocked ?
