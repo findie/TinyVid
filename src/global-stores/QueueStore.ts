@@ -15,9 +15,9 @@ import {b2text, bps2text, seconds2time} from "../helpers/math";
 import {RendererFileHelpers} from "../helpers/file";
 import {existsSync} from "fs";
 import {noop} from "../helpers/js";
+import {shell} from "@electron/remote";
 import FFmpegProcess = FFmpeg.FFmpegProcess;
 import ProcessError = ProcessHelpers.ProcessError;
-import {shell} from "@electron/remote";
 
 export class QueueItemClass implements IProcessContext {
 
@@ -118,6 +118,9 @@ export class QueueItemClass implements IProcessContext {
   @computed get statusText(): string {
     if (this.error && !this.process?.cancelled) {
       return 'Errored';
+    }
+    if (!this.videoDetails) {
+      return 'Reading file...';
     }
     if (this.process?.cancelled) {
       return 'Cancelled';
@@ -300,7 +303,7 @@ class QueueStoreClass {
   start = () => {
     if (this.runningItem) return;
 
-    const item = this.queue.find(x => !x.isDone);
+    const item = this.queue.find(x => !x.isDone && x.videoDetails);
 
     if (!item) return;
 
