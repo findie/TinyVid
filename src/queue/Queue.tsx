@@ -50,12 +50,14 @@ export const QueueItemComponent = observer(function QueueItemComponent({ item }:
         <Typography>Input: </Typography>
         <TruncatedFilePath filePath={item.fileIn}/>
 
-        <IconButton
-          size="small"
-          onClick={() => QueueStore.remove(item)}
-        >
-          <Clear/>
-        </IconButton>
+        <Tooltip title="Remove from queue">
+          <IconButton
+            size="small"
+            onClick={() => QueueStore.remove(item)}
+          >
+            <Clear/>
+          </IconButton>
+        </Tooltip>
       </div>
       <div className={classNames(classes.itemSection, classes.file, themedClasses.textField)}>
         <Typography>Output: </Typography>
@@ -72,20 +74,24 @@ export const QueueItemComponent = observer(function QueueItemComponent({ item }:
         )}
 
         {!item.isDone && (
-          <IconButton
-            size="small"
-            onClick={item.requestOutputChange}
-          >
-            <Edit/>
-          </IconButton>
+          <Tooltip title="Change output location">
+            <IconButton
+              size="small"
+              onClick={item.requestOutputChange}
+            >
+              <Edit/>
+            </IconButton>
+          </Tooltip>
         )}
         {item.isDone && (
-          <IconButton
-            size="small"
-            onClick={item.requestOutputPlayback}
-          >
-            <PlayArrow/>
-          </IconButton>
+          <Tooltip title="Play output">
+            <IconButton
+              size="small"
+              onClick={item.requestOutputPlayback}
+            >
+              <PlayArrow/>
+            </IconButton>
+          </Tooltip>
         )}
       </div>
 
@@ -104,9 +110,12 @@ export const QueueItemComponent = observer(function QueueItemComponent({ item }:
         <Typography className={classes.progressInfo}>
           {item.statusText}
         </Typography>
-        <IconButton onClick={() => setShowSettings(b => !b)}>
-          <SettingsApplications/>
-        </IconButton>
+
+        <Tooltip title="Change item's settings">
+          <IconButton onClick={() => setShowSettings(b => !b)}>
+            <SettingsApplications/>
+          </IconButton>
+        </Tooltip>
       </div>
 
       <Collapse
@@ -118,33 +127,45 @@ export const QueueItemComponent = observer(function QueueItemComponent({ item }:
       >
         <ProcessContextProvider store={item}>
           <div style={{ display: 'flex', marginRight: 'auto' }}>
-            <IconButton
-              className={classes.linkIcon}
-              onClick={item.toggleStrategyLock}
-              disabled={item.isDone}
-            >
-              {
-                item.isStrategyLocked ?
-                  <Link/> :
-                  <LinkOff/>
-              }
-            </IconButton>
+            <Tooltip title={
+              item.isStrategyLocked ?
+                'Unlink and edit' :
+                'Link to global settings'
+            }>
+              <IconButton
+                className={classes.linkIcon}
+                onClick={item.toggleStrategyLock}
+                disabled={item.isDone}
+              >
+                {
+                  item.isStrategyLocked ?
+                    <Link/> :
+                    <LinkOff/>
+                }
+              </IconButton>
+            </Tooltip>
 
             <VideoStrategy disabled={item.isStrategyLocked || item.isDone}/>
           </div>
 
           <ConfigVideoSettings disabled={item.isVideoSettingsLocked || item.isDone} canUpscale/>
-          <IconButton
-            className={classes.linkIcon}
-            onClick={item.toggleVideoSettingsLock}
-            disabled={item.isDone}
-          >
-            {
-              item.isVideoSettingsLocked ?
-                <Link/> :
-                <LinkOff/>
-            }
-          </IconButton>
+          <Tooltip title={
+            item.isVideoSettingsLocked ?
+              'Unlink and edit' :
+              'Link to global settings'
+          }>
+            <IconButton
+              className={classes.linkIcon}
+              onClick={item.toggleVideoSettingsLock}
+              disabled={item.isDone}
+            >
+              {
+                item.isVideoSettingsLocked ?
+                  <Link/> :
+                  <LinkOff/>
+              }
+            </IconButton>
+          </Tooltip>
         </ProcessContextProvider>
       </Collapse>
 
@@ -241,23 +262,32 @@ export const CollapsableQueue = observer(function CollapsableQueue() {
       )}
     >
       <div className={classes.collapseHandle}>
-        <Paper
-          className={classNames(
-            classes.collapseHandleItem,
-            QueueStore.isRunning && classes.disabled
-          )}
-          onClick={() => {
-            if (QueueStore.isRunning) {
-              AppState.setShowQueue(true);
-            } else {
-              AppState.setShowQueue(!AppState.showQueue);
-            }
-          }}
+        <Tooltip arrow
+          title={AppState.showQueue && QueueStore.isRunning ?
+            'You cannot hide the queue while it is running' :
+            AppState.showQueue ?
+              'Hide the queue panel' :
+              'Show the queue panel'
+          }
         >
-          <Typography>
-            {AppState.showQueue ? 'Hide Queue' : 'Show Queue'}
-          </Typography>
-        </Paper>
+          <Paper
+            className={classNames(
+              classes.collapseHandleItem,
+              QueueStore.isRunning && classes.disabled
+            )}
+            onClick={() => {
+              if (QueueStore.isRunning) {
+                AppState.setShowQueue(true);
+              } else {
+                AppState.setShowQueue(!AppState.showQueue);
+              }
+            }}
+          >
+            <Typography>
+              {AppState.showQueue ? 'Hide Queue' : 'Show Queue'}
+            </Typography>
+          </Paper>
+        </Tooltip>
       </div>
       <QueueComponent/>
     </div>

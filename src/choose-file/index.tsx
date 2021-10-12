@@ -1,6 +1,5 @@
 import React, {useCallback, useEffect, useState} from "react";
 import css from './style.css'
-import {dialog, getCurrentWindow} from '@electron/remote'
 
 import {Box, Button, Icon, Tooltip, Typography} from "@material-ui/core";
 import {makeStyles} from "@material-ui/core/styles";
@@ -107,13 +106,15 @@ export const ChooseFile = (props: ChooseFileProps) => {
         className={classNames(css.main, props.className)}
         onClick={AppState.requestFileInputDialogFlow}
       >
-        <Button
-          variant="contained"
-          className={css.button}
-          startIcon={<VideoLibrary/>}
-        >
-          Open File(s)
-        </Button>
+        <Tooltip title="Open file or choose multiple to add to queue" arrow>
+          <Button
+            variant="contained"
+            className={css.button}
+            startIcon={<VideoLibrary/>}
+          >
+            Open File(s)
+          </Button>
+        </Tooltip>
         <Box paddingLeft={2} className={css.text + ' ' + classes.textField}>
           <Tooltip title={file ? file : 'No file chosen...'} arrow>
             <Typography noWrap>

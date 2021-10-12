@@ -33,6 +33,8 @@
   .list {
     flex-grow: 1;
     overflow-y: auto;
+    margin-top: 8px;
+    border-top: 2px solid grey;
 
     .empty {
       height: 100%;

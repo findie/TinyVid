@@ -20,7 +20,12 @@ const commonTheme: ThemeOptions = {
   overrides: {
     MuiTooltip: {
       tooltip: {
-        fontSize: '0.8rem'
+        fontSize: '1rem',
+        maxWidth: 400,
+        backgroundColor: 'rgba(0,130,255,0.8)'
+      },
+      arrow: {
+        color: 'rgba(0,130,255,0.6)'
       }
     },
     MuiLink: {
