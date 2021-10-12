@@ -157,12 +157,14 @@
       background: rgba(0, 0, 0, 0.2);
 
       border-top: 2px solid #0082FF;
+      cursor: pointer;
 
       > p {
         font-size: 1.5em;
       }
       &.disabled {
         opacity: 0.5;
+        cursor: not-allowed;
       }
     }
   }
