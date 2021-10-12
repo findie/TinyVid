@@ -4,6 +4,7 @@ import {existsSync} from "fs";
 import {v4 as uuid} from "uuid";
 import {dialog, getCurrentWindow} from "@electron/remote";
 import type {FileFilter} from "electron";
+import {isWindows} from "../../electron/helpers";
 
 export namespace RendererFileHelpers {
 
@@ -80,9 +81,11 @@ export namespace RendererFileHelpers {
     {extensions: ['nsv'], name: 'Nullsoft Streaming Video'},
   ];
 
-  videoFilters.forEach(f => {
-    f.name += ` (${f.extensions.join(', ')})`
-  });
+  if(!isWindows) {
+    videoFilters.forEach(f => {
+      f.name += ` (${f.extensions.join(', ')})`;
+    });
+  }
 
   videoFilters.unshift({
     extensions: videoFilters.reduce<string[]>((a, c) => a.concat(c.extensions), []),
