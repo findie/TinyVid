@@ -7,6 +7,7 @@ import {dialog, getCurrentWindow} from "@electron/remote";
 import {eventList} from "../helpers/events";
 import {ipcRenderer} from 'electron';
 import {QueueStore} from "./QueueStore";
+import {RendererFileHelpers} from "../helpers/file";
 
 class AppStateClass {
 
@@ -36,12 +37,14 @@ class AppStateClass {
   }
 
   requestFileInputDialogFlow = async () => {
+
     const files = await dialog.showOpenDialog(
       getCurrentWindow(),
       {
         properties: ['openFile', 'multiSelections'],
         buttonLabel: 'Open',
-        title: 'Open file or files to add'
+        title: 'Open file or files to add',
+        filters: RendererFileHelpers.videoFilters
       });
 
     if (!files.canceled && files.filePaths.length) {
