@@ -276,12 +276,24 @@ class QueueStoreClass {
   queue: QueueItemClass[] = [];
 
   @action
-  addToQueue(item: QueueItemClass) {
+  addToQueue = (item: QueueItemClass) => {
     this.queue.push(item);
   }
 
+  addFilePath = (fp: string) => {
+    return this.addToQueue(new QueueItemClass(
+      fp,
+      RendererFileHelpers.generateFileOutName(
+        fp,
+        { start: 0, end: 0 },
+        ProcessStore.strategy,
+        ProcessStore.videoSettings
+      )
+    ));
+  }
+
   @action
-  remove(item: QueueItemClass) {
+  remove = (item: QueueItemClass) => {
     const index = this.queue.indexOf(item);
     if (index !== -1) {
       this.queue.splice(index, 1);

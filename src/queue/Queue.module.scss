@@ -153,6 +153,15 @@
       border-radius: 0 0 8px 8px;
 
       background: rgba(0, 0, 0, 0.2);
+
+      border-top: 2px solid #0082FF;
+
+      > p {
+        font-size: 1.5em;
+      }
+      &.disabled {
+        opacity: 0.5;
+      }
     }
   }
 
@@ -170,6 +179,10 @@
 
       .collapse-handle-item {
         border-radius: 8px 8px 0 0;
+
+        > p {
+          font-size: 1rem;
+        }
       }
     }
   }

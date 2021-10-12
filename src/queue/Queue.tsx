@@ -12,10 +12,7 @@ import {
   Typography
 } from "@material-ui/core";
 import classes from './Queue.module.scss';
-import {dialog, getCurrentWindow} from "@electron/remote";
-import {eventList} from "../helpers/events";
 import {QueueItemClass, QueueStore} from "../global-stores/QueueStore";
-import {RendererFileHelpers} from "../helpers/file";
 import {ProcessStore} from "../global-stores/Process.store";
 import classNames from "classnames";
 import {AppState} from "../global-stores/AppState.store";
@@ -34,32 +31,6 @@ import SettingsApplications from "@material-ui/icons/SettingsApplications";
 import Clear from "@material-ui/icons/Clear";
 import {WarningRounded} from "@material-ui/icons";
 import PlayArrow from "@material-ui/icons/PlayArrow";
-
-async function add2q() {
-  const files = await dialog.showOpenDialog(
-    getCurrentWindow(),
-    {
-      properties: ['openFile', 'multiSelections'],
-    });
-
-  if (files.canceled) return;
-
-  files.filePaths.forEach(fp => {
-
-    QueueStore.addToQueue(new QueueItemClass(
-      fp,
-      RendererFileHelpers.generateFileOutName(
-        fp,
-        { start: 0, end: 0 },
-        ProcessStore.strategy,
-        ProcessStore.videoSettings
-      )
-    ));
-    eventList.file.choose({ type: 'click' });
-  })
-
-}
-
 
 const qItemsThemedClassesStyles = makeStyles(theme => ({
   'textField': {
@@ -192,7 +163,7 @@ export const QueueComponent = observer(function QueueComponent() {
       <div className={classes.controls}>
         <div className={classes.buttons}>
           <Button
-            onClick={add2q}
+            onClick={AppState.requestFileInputDialogFlow}
             color="primary"
             variant="contained"
             startIcon={<VideoLibrary/>}
@@ -271,7 +242,10 @@ export const CollapsableQueue = observer(function CollapsableQueue() {
     >
       <div className={classes.collapseHandle}>
         <Paper
-          className={classes.collapseHandleItem}
+          className={classNames(
+            classes.collapseHandleItem,
+            QueueStore.isRunning && classes.disabled
+          )}
           onClick={() => {
             if (QueueStore.isRunning) {
               AppState.setShowQueue(true);

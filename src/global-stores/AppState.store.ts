@@ -6,6 +6,7 @@ import {registerRendererHandler} from "../../common/shared-event-comms";
 import {dialog, getCurrentWindow} from "@electron/remote";
 import {eventList} from "../helpers/events";
 import {ipcRenderer} from 'electron';
+import {QueueStore} from "./QueueStore";
 
 class AppStateClass {
 
@@ -31,18 +32,37 @@ class AppStateClass {
   constructor() {
     makeObservable(this);
 
-    registerRendererHandler(ipcRenderer, 'open-file', async event => {
-      const files = await dialog.showOpenDialog(
-        getCurrentWindow(),
-        {
-          properties: ['openFile'],
-        });
+    registerRendererHandler(ipcRenderer, 'open-file', this.requestFileInputDialogFlow);
+  }
 
-      if (!files.canceled && files.filePaths[0]) {
-        eventList.file.choose({ type: 'app-menu' });
-        AppState.setFile(files.filePaths[0]);
-      }
-    });
+  requestFileInputDialogFlow = async () => {
+    const files = await dialog.showOpenDialog(
+      getCurrentWindow(),
+      {
+        properties: ['openFile', 'multiSelections'],
+        buttonLabel: 'Open',
+        title: 'Open file or files to add'
+      });
+
+    if (!files.canceled && files.filePaths.length) {
+      eventList.file.choose({ type: 'click' });
+      this.handleFileInput(files.filePaths);
+    }
+  }
+
+  @action
+  handleFileInput = (fl: string[]) => {
+    if (fl.length === 0) {
+      return;
+    }
+
+    if (fl.length === 1 && !AppState.showQueue) {
+      this.setFile(fl[0]);
+      return;
+    }
+
+    this.setShowQueue(true);
+    fl.forEach(QueueStore.addFilePath);
   }
 }
 
