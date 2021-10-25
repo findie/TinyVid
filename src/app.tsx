@@ -53,6 +53,7 @@ import SettingsIcon from "@material-ui/icons/Settings";
 import {CollapsableQueue} from "./queue/Queue";
 import {ProcessContextProvider} from "./global-stores/contexts/Process.context";
 import {VideoStrategy} from "./config/Strategy";
+import {DownloadResources} from "./download-resources/DownloadResources";
 
 const mainElement = document.createElement('div');
 document.body.appendChild(mainElement);
@@ -212,6 +213,8 @@ const App = observer(() => {
         <FeedbackModal open={showFeedback} onClose={() => setShowFeedback(false)}/>
 
         <CollapsableQueue/>
+
+        <DownloadResources/>
 
       </div>
     </ThemeProvider>

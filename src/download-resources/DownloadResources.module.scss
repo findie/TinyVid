@@ -1,0 +1,19 @@
+.root {
+  padding: 8px;
+  width: 500px;
+
+  .container {
+    display: flex;
+    flex-direction: column;
+    margin-top: 8px;
+
+    button {
+      margin: 12px auto 0;
+    }
+
+    .progress {
+      height: 24px;
+      border-radius: 4px;
+    }
+  }
+}

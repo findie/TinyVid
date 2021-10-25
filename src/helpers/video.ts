@@ -10,6 +10,7 @@ export namespace VideoHelpers {
     codec = codec.toLowerCase()
     return (
       codec === 'vp9' ||
+      codec === 'av1' ||
       codec === 'vp8' ||
       codec === 'h264'
     )

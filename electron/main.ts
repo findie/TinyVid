@@ -184,7 +184,7 @@ app.on('web-contents-created', (event, contents) => {
 
   contents.setWindowOpenHandler(details => {
     shell.openExternal(details.url).catch(console.error);
-    return {action: 'deny'};
+    return { action: 'deny' };
   })
 });
 
@@ -212,3 +212,6 @@ app.on('ready', async () => {
   }
 });
 // app.allowRendererProcessReuse = true;
+
+
+// const ff = new FFInput('file:/home/stefan/Downloads/amgqLjo_460svav1.mp4')
