@@ -4,7 +4,7 @@ import {ProcessHelpers} from "../process";
 import assert from "assert";
 import {round} from "../../src/helpers/math";
 import {DeepReadonly} from "utility-types";
-import {ResourceHelpers} from "../../electron/helpers/resources";
+import {FFFiles} from "./files";
 
 /**
  Copyright Findie 2021
@@ -12,7 +12,7 @@ import {ResourceHelpers} from "../../electron/helpers/resources";
 
 export namespace FFprobe {
 
-  const ffprobe = ResourceHelpers.bin_dir('ffprobe');
+  const ffprobe = FFFiles.ffprobe;
 
   export async function getDetails(file: string): Promise<FFprobeData> {
 

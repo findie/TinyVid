@@ -40,6 +40,25 @@ export function bps2text(bps: number): string {
   return `${bps.toFixed(1)}${unit}`;
 }
 
+export function b2text(b: number): string {
+
+  let unit = 'B';
+  if (b > 1024) {
+    b /= 1024;
+    unit = 'KB';
+  }
+  if (b > 1024) {
+    b /= 1024;
+    unit = 'MB';
+  }
+  if (b > 1024) {
+    b /= 1024;
+    unit = 'GB';
+  }
+
+  return `${b.toFixed(1)}${unit}`;
+}
+
 export function between(min: number, val: number, max: number): boolean {
   if (min > val) return false;
   if (max < val) return false;

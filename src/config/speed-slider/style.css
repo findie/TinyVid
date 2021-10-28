@@ -1,9 +1,0 @@
-.container {
-    display: flex;
-    min-width: 150px;
-    align-items: center;
-}
-
-.slider {
-    flex-grow: 1;
-}

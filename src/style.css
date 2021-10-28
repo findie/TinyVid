@@ -49,7 +49,7 @@
 }
 
 :local .footer {
-    position: relative;
+    /*position: relative;*/
     flex-grow: 0;
     flex-shrink: 0;
 }

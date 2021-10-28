@@ -8,7 +8,7 @@ import {eventList} from "../helpers/events";
 
 class PlaybackStoreClass {
 
-  @observable videoRef = createRef<HTMLVideoElement>();
+  @observable.shallow videoRef = createRef<HTMLVideoElement>();
   audio: {
     context: AudioContext,
     gain: GainNode,

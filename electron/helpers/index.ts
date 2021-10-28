@@ -2,8 +2,5 @@
  Copyright Findie 2021
  */
 
-import {initMainEventComms} from './event-comms';
-
 export const isMac = process.platform === 'darwin'
-
-initMainEventComms();
+export const isWindows = process.platform === 'win32' || process.platform === 'cygwin'

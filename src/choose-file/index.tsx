@@ -1,6 +1,5 @@
 import React, {useCallback, useEffect, useState} from "react";
 import css from './style.css'
-import {dialog, getCurrentWindow} from '@electron/remote'
 
 import {Box, Button, Icon, Tooltip, Typography} from "@material-ui/core";
 import {makeStyles} from "@material-ui/core/styles";
@@ -34,7 +33,10 @@ function DocumentDropZone() {
     if (!firstFile) return;
 
     eventList.file.choose({ type: 'dnd' });
-    AppState.setFile(firstFile.path);
+
+    AppState.handleFileInput(
+      Array.prototype.slice.apply(files).map(x => x.path)
+    );
 
     for (let i = 0; i < files.length; i++) {
       const f = files[i];
@@ -96,34 +98,23 @@ export const ChooseFile = (props: ChooseFileProps) => {
 
   const file = AppState.file;
 
-  const chooseFileCallback = async () => {
-    const files = await dialog.showOpenDialog(
-      getCurrentWindow(),
-      {
-        properties: ['openFile'],
-      });
-
-    if (!files.canceled && files.filePaths[0]) {
-      eventList.file.choose({ type: 'click' });
-      AppState.setFile(files.filePaths[0]);
-    }
-  }
-
   return (
     <>
       <DocumentDropZone/>
       <Box
         padding={1}
         className={classNames(css.main, props.className)}
-        onClick={chooseFileCallback}
+        onClick={AppState.requestFileInputDialogFlow}
       >
-        <Button
-          variant="contained"
-          className={css.button}
-          startIcon={<VideoLibrary/>}
-        >
-          Open File
-        </Button>
+        <Tooltip title="Open file or choose multiple to add to queue" arrow>
+          <Button
+            variant="contained"
+            className={css.button}
+            startIcon={<VideoLibrary/>}
+          >
+            Open File(s)
+          </Button>
+        </Tooltip>
         <Box paddingLeft={2} className={css.text + ' ' + classes.textField}>
           <Tooltip title={file ? file : 'No file chosen...'} arrow>
             <Typography noWrap>

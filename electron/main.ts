@@ -13,6 +13,8 @@ import {enable as enableRemote, initialize as initElectronMain} from '@electron/
 import {RendererSettings} from "../src/helpers/settings";
 import {isMac} from "./helpers";
 import {readdirSync} from "fs";
+import {sendToRenderer} from "../common/shared-event-comms";
+import {PreventClosing} from "./helpers/prevent-closing";
 
 initElectronMain();
 let mainWindow: Electron.BrowserWindow | null;
@@ -34,6 +36,9 @@ function createWindow() {
       webSecurity: true,
       // preload: path.join(__dirname, "..", "common", "sentry"),
     },
+    backgroundColor: RendererSettings.settings.theme === "dark" || nativeTheme.shouldUseDarkColors ?
+      '#303030' :
+      '#FFFFFF',
   });
 
   enableRemote(mainWindow.webContents);
@@ -58,6 +63,16 @@ function createWindow() {
     {
       label: 'File',
       submenu: [
+        {
+          label: 'Open File',
+          click: () => {
+            if (mainWindow) {
+              sendToRenderer(mainWindow.webContents, 'open-file');
+            }
+          },
+          accelerator: 'CommandOrControl+O',
+          acceleratorWorksWhenHidden: true,
+        },
         ...(isMac ? [] : [
           { role: 'about', click: app.showAboutPanel }
         ]),
@@ -68,10 +83,12 @@ function createWindow() {
     {
       label: 'View',
       submenu: [
+        ...(RendererSettings.settings.flags.enableDevTools ? [
+          { role: 'toggleDevTools' },
+        ] : []),
         ...(!app.isPackaged ? [
           { role: 'reload' },
           { role: 'forceReload' },
-          { role: 'toggleDevTools' },
           { type: 'separator' },
         ] : []),
         { role: 'resetZoom' },
@@ -125,13 +142,6 @@ function createWindow() {
     authors: ['stefan@kamua.com']
   });
 
-
-  mainWindow.setBackgroundColor(
-    RendererSettings.settings.theme === "dark" || nativeTheme.shouldUseDarkColors ?
-      '#303030' :
-      '#FFFFFF'
-  );
-
   mainWindow.on('page-title-updated', (evt) => {
     evt.preventDefault();
   });
@@ -150,22 +160,7 @@ function createWindow() {
     );
   }
 
-  mainWindow.on('close', (e) => {
-    console.log('sending close event to show close dialog');
-    mainWindow?.webContents.send('x-closing-window');
-    e.preventDefault();
-    e.returnValue = true;
-  });
-
-  mainWindow.on('closed', () => {
-    mainWindow = null;
-    console.log('Killing process because window is closed');
-
-    // give time for IO to finish
-    setTimeout(() => {
-      process.exit(0);
-    }, 100);
-  });
+  PreventClosing.register(mainWindow);
 }
 
 Protocols.grantPrivileges();
@@ -187,12 +182,9 @@ app.on('web-contents-created', (event, contents) => {
     return event.preventDefault();
   });
 
-  contents.on('new-window', async (event, navigationUrl) => {
-    // In this example, we'll ask the operating system
-    // to open this event's url in the default browser.
-    event.preventDefault();
-
-    await shell.openExternal(navigationUrl);
+  contents.setWindowOpenHandler(details => {
+    shell.openExternal(details.url).catch(console.error);
+    return { action: 'deny' };
   })
 });
 
@@ -220,3 +212,6 @@ app.on('ready', async () => {
   }
 });
 // app.allowRendererProcessReuse = true;
+
+
+// const ff = new FFInput('file:/home/stefan/Downloads/amgqLjo_460svav1.mp4')

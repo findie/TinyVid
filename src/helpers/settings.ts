@@ -1,11 +1,11 @@
 import {existsSync, readFileSync, writeFileSync} from "fs";
 import {ResourceHelpers} from "../../electron/helpers/resources";
-import {ThemeNames} from "./theme";
+import type {ThemeNames} from "./theme";
 import {action, makeObservable, observable, reaction, toJS} from "mobx";
 import {debounce} from "throttle-debounce";
 import {v4 as uuid} from 'uuid';
 import {deepObserve} from "mobx-utils";
-import {RenderStrategy, VideoSettings} from "../../electron/types";
+import type {RenderStrategy, VideoSettings} from "../../electron/types";
 import {objectMergeDeep} from "./js";
 import type {Processors} from "../global-stores/process-codec-stores";
 
@@ -16,10 +16,7 @@ export interface RendererSettings {
   theme: ThemeNames
   readonly ID: string
 
-  processingParams: {
-    strategyType: RenderStrategy['type']
-    strategyTune: RenderStrategy['tune']
-  }
+  processingStrategy: RenderStrategy
 
   processor: keyof typeof Processors;
 
@@ -31,6 +28,11 @@ export interface RendererSettings {
       size: number
     }[]
   }
+
+  flags: {
+    enableDevTools: boolean,
+    noHevcNvencBFrames: boolean
+  }
 }
 
 class RendererSettingsClass {
@@ -41,12 +43,12 @@ class RendererSettingsClass {
 
     ID: uuid(),
 
-    processingParams: {
-      strategyType: 'max-file-size',
-      strategyTune: ConfigMaxFileSizeDefaultSize,
+    processingStrategy: {
+      type: 'max-file-size',
+      tune: ConfigMaxFileSizeDefaultSize,
     },
 
-    processor: 'h264',
+    processor: 'libx264',
 
     processingVideoSettings: {
       fps: "original",
@@ -61,6 +63,11 @@ class RendererSettingsClass {
         { size: 64, text: '64 MB (WhatsApp)' },
         { size: 100, text: '100 MB (Discord Nitro)' },
       ]
+    },
+
+    flags: {
+      enableDevTools: false,
+      noHevcNvencBFrames: false
     }
   }
 
@@ -110,7 +117,7 @@ class RendererSettingsClass {
     );
 
     reaction(
-      () => this.settings.processingParams.strategyType,
+      () => this.settings.processingStrategy.type,
       (type, prevType) => {
         if (!prevType) return;
 
@@ -118,14 +125,14 @@ class RendererSettingsClass {
           return;
         }
 
-        this.settings.processingParams.strategyTune = type === 'max-file-size' ?
+        this.settings.processingStrategy.tune = type === 'max-file-size' ?
           this.settings.UI.fileSizePresets[0].size :
           ConfigConstantQualityDefaultQuality
       },
       { fireImmediately: true }
     );
 
-    console.log('tune is', this.settings.processingParams.strategyTune);
+    console.log('tune is', this.settings.processingStrategy.tune);
   }
 }
 

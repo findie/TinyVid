@@ -203,7 +203,11 @@ exports.default = async function (configuration) {
   for (let i = 0; i < 10; i++) {
     try {
       // const out = /TinyVid-win-0\.14\.4\.exe/ig.test(path) ? path + '.signed.exe' : path;
-      await allStepsSign(path/*, out*/);
+      if (!process.env.NO_SIGN) {
+        await allStepsSign(path/*, out*/);
+      } else {
+        console.log('Skipping signature for', path);
+      }
       return;
     } catch (e) {
       console.log(e);

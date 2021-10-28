@@ -1,0 +1,15 @@
+.form-control {
+
+}
+.subtext {
+  font-size: 1em!important;
+  padding: 0;
+  margin-top: -10px!important;
+  margin-left: 30px!important;
+  opacity: 0.5;
+
+  &.warn {
+    color: orange;
+    opacity: 1;
+  }
+}

@@ -9,8 +9,6 @@ import {Display} from "./display";
 import {TrimSlider} from "./components/trim-select";
 import {ProcessingOverlay} from "./progress";
 import css from './style.css';
-import {ConfigMaxFileSize} from "./config/max-file-size";
-import {ConfigConstantQuality} from "./config/constant-quality";
 import {ConfigVideoSettings} from "./config/video-settings";
 import {Loading} from "./components/loading";
 
@@ -18,21 +16,17 @@ import {
   Box,
   Button,
   Divider,
-  FormControl,
   Icon,
   IconButton,
-  InputLabel,
   Link,
-  MenuItem,
   Paper,
-  Select,
   ThemeProvider,
+  Tooltip,
   Typography
 } from "@material-ui/core";
 import {Theme} from "./helpers/theme";
 import {DurationInfo} from "./components/duration-info";
 import {ErrorDisplayModal} from "./components/error";
-import {ThemeSwitch} from "./components/theme-switch";
 import {BitrateWarnings} from "./components/bitrate-warnings";
 import {PreventClosing} from "./components/prevent-closing";
 import {FooterBranding} from "./components/footer-branding";
@@ -53,7 +47,13 @@ import {PlaybackStore} from "./global-stores/Playback.store";
 import {eventList} from "./helpers/events";
 import {Changelog} from "./components/changes-modal/changelog";
 import {VolumeControl} from "./components/volume/volume-control";
-import {RendererEventComms} from "./helpers/event-comms-renderer";
+import {ModalTrigger} from "./components/modals";
+import {Settings} from "./settings/Settings";
+import SettingsIcon from "@material-ui/icons/Settings";
+import {CollapsableQueue} from "./queue/Queue";
+import {ProcessContextProvider} from "./global-stores/contexts/Process.context";
+import {VideoStrategy} from "./config/Strategy";
+import {DownloadResources} from "./download-resources/DownloadResources";
 
 const mainElement = document.createElement('div');
 document.body.appendChild(mainElement);
@@ -78,7 +78,17 @@ const App = observer(() => {
       <div className={css.app}>
         <Paper elevation={3} className={css.header} square={true}>
           <ChooseFile className={css.flexGrow + ' ' + css.fileSelect}/>
-          <ThemeSwitch theme={Theme.currentName} onClick={Theme.setNext}/>
+
+          <ModalTrigger
+            content={<Settings/>}
+          >
+            <Tooltip title="Preferences" arrow>
+              <IconButton>
+                <SettingsIcon/>
+              </IconButton>
+            </Tooltip>
+          </ModalTrigger>
+
           <BitrateWarnings className={css.alert}/>
         </Paper>
         <Display className={css.display}>
@@ -131,106 +141,59 @@ const App = observer(() => {
             null
           }
 
-          <Box>
-            <div className={css.trimAndVolume}>
-              <TrimSlider/>
-              <VolumeControl/>
-            </div>
-            <Box marginX={2} marginY={1} className={css.controls}>
-              <div className={css.rows + ' ' + css.flexGrow}>
+          <ProcessContextProvider store={ProcessStore}>
+            <Box>
+              <div className={css.trimAndVolume}>
+                <TrimSlider/>
+                <VolumeControl/>
+              </div>
+              <Box marginX={2} marginY={1} className={css.controls}>
+                <div className={css.rows + ' ' + css.flexGrow}>
 
-                <div className={css.settings}>
-                  <div className={css.left}>
-                    <FormControl>
-                      <InputLabel id="strategy-label">Output must</InputLabel>
-                      <Select
-                        labelId={"strategy-label"}
-                        value={ProcessStore.strategyType}
-                        variant={"standard"}
-                        onChange={
-                          e => {
-                            if (e.target.value === 'max-file-size') {
-                              ProcessStore.setStrategyType('max-file-size');
-                            } else {
-                              ProcessStore.setStrategyType('constant-quality');
-                            }
-                          }
-                        }
-                      >
-                        <MenuItem value={'max-file-size'}>have max file size of</MenuItem>
-                        <MenuItem value={'constant-quality'}>be constant quality of</MenuItem>
-                      </Select>
-                    </FormControl>
+                  <div className={css.settings}>
+                    <div className={css.left}>
+                      <VideoStrategy/>
+                    </div>
+                    <div className={css.right}>
+                      <ConfigVideoSettings/>
 
-                    {ProcessStore.strategyType === 'max-file-size' ?
-                      <ConfigMaxFileSize/> :
-                      <ConfigConstantQuality/>
-                    }
-                  </div>
-                  <div className={css.right}>
-                    <ConfigVideoSettings/>
+                      <Box marginLeft={2}>
+                        <Button
+                          startIcon={<Videocam/>}
+                          variant="contained"
+                          className={css.processBtn}
+                          color={"secondary"}
+                          disabled={!AppState.file || !!mediaNoVideo}
+                          onClick={ProcessStore.startProcessing}
+                        >Process
+                        </Button>
+                      </Box>
+                    </div>
 
-                    <Box marginLeft={2}>
-                      <Button
-                        startIcon={<Videocam/>}
-                        variant="contained"
-                        className={css.processBtn}
-                        color={"secondary"}
-                        disabled={!AppState.file || !!mediaNoVideo}
-                        onClick={ProcessStore.startProcessing}
-                      >Process
-                      </Button>
-                    </Box>
                   </div>
 
+                  <Box paddingY={1}>
+                    <Divider/>
+                  </Box>
+
+                  <Box marginBottom={-1}>
+                    <FooterBranding>
+                      <Link onClick={() => {
+                        setShowFeedback(true);
+                        eventList.global.sendFeedback();
+                      }}>
+                        Send Feedback 👋
+                      </Link>
+                      &nbsp;|&nbsp;
+                      <Changelog/>
+
+                    </FooterBranding>
+                  </Box>
                 </div>
 
-                <Box marginTop={2} style={{ display: 'flex' }}>
-                  {/*<SpeedSlider*/}
-                  {/*  initialValue={ProcessStore.strategySpeed}*/}
-                  {/*  className={css.speedSlider}*/}
-                  {/*  highSpeedText={ProcessStore.strategyType === 'max-file-size' ? 'Faster Processing' : 'Faster Processing'}*/}
-                  {/*  lowSpeedText={ProcessStore.strategyType === 'max-file-size' ? 'Better Quality' : 'Smaller File Size'}*/}
-
-                  {/*  highSpeedTooltip={*/}
-                  {/*    ProcessStore.strategyType === 'max-file-size' ?*/}
-                  {/*      'Process will finish faster but video quality will suffer' :*/}
-                  {/*      'Process will finish faster but file size will be larger'*/}
-                  {/*  }*/}
-                  {/*  lowSpeedTooltip={*/}
-                  {/*    ProcessStore.strategyType === 'max-file-size' ?*/}
-                  {/*      'Process will finish slower but video will be at the best quality it can' :*/}
-                  {/*      'Process will finish slower but file will be at the lowest size quality'*/}
-                  {/*  }*/}
-
-                  {/*  onChange={*/}
-                  {/*    ProcessStore.setStrategySpeed*/}
-                  {/*  }*/}
-                  {/*/>*/}
-
-                </Box>
-
-                <Box paddingY={1}>
-                  <Divider/>
-                </Box>
-
-                <Box marginBottom={-1}>
-                  <FooterBranding>
-                    <Link onClick={() => {
-                      setShowFeedback(true);
-                      eventList.global.sendFeedback();
-                    }}>
-                      Send Feedback 👋
-                    </Link>
-                    &nbsp;|&nbsp;
-                    <Changelog/>
-
-                  </FooterBranding>
-                </Box>
-              </div>
-
+              </Box>
             </Box>
-          </Box>
+          </ProcessContextProvider>
         </Paper>
 
         <ProcessingOverlay/>
@@ -245,9 +208,13 @@ const App = observer(() => {
           }}/> : null
         }
 
-        <PreventClosing prevent={!!ProcessStore.processing}/>
+        <PreventClosing/>
 
         <FeedbackModal open={showFeedback} onClose={() => setShowFeedback(false)}/>
+
+        <CollapsableQueue/>
+
+        <DownloadResources/>
 
       </div>
     </ThemeProvider>
@@ -256,5 +223,10 @@ const App = observer(() => {
 
 ReactDom.render(<App/>, mainElement);
 
-// @ts-ignore
-window.RendererEventComms = RendererEventComms;
+const loaders = document.getElementById('loaders');
+if (loaders) {
+  loaders.style.opacity = '0';
+  setTimeout(() => {
+    document.body.removeChild(loaders);
+  }, 250);
+}

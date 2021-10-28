@@ -1,3 +1,5 @@
+// DO NOT IMPORT THIS ANYWHERE!
+
 declare module '*.scss' {
   const content: ({ [s: string]: string });
   export = content;

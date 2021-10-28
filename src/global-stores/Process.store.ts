@@ -2,7 +2,7 @@ import {action, computed, makeObservable, observable, reaction} from "mobx";
 import {ErrorLike} from "../../electron/protocols/base-protocols";
 import {AppState} from "./AppState.store";
 import {RenderStrategy} from "../../electron/types";
-import {dialog, getCurrentWindow} from '@electron/remote';
+import {getCurrentWindow} from '@electron/remote';
 import {RendererFileHelpers} from "../helpers/file";
 import {eventList} from "../helpers/events";
 import {clip} from "../helpers/math";
@@ -12,38 +12,40 @@ import {FFprobe, FFprobeData} from "../../common/ff/ffprobe";
 import {ProcessBaseGeneric, ProcessBaseGenericSettings} from "./process-codec-stores/ProcessBaseGeneric";
 import {Processors} from "./process-codec-stores";
 import {FFmpeg} from "../../common/ff/ffmpeg";
+import {IProcessContext} from "./contexts/Process.context";
 
 
 /**
  Copyright Findie 2021
  */
 
-class ProcessStoreClass {
+export class ProcessStoreClass implements IProcessContext {
   @observable error: Error | ErrorLike | null = null;
   @action setError = (e: ProcessStoreClass['error']) => this.error = e;
 
   @observable.ref videoDetails: null | FFprobeData = null;
   @action setVideoDetails = (d: ProcessStoreClass['videoDetails']) => this.videoDetails = d;
 
+  // fixme this looks like it's not observable :(
   @observable.ref
-  processor: ProcessBaseGeneric<string, ProcessBaseGenericSettings<string>>
+  processor: ProcessBaseGeneric<string, ProcessBaseGenericSettings<string>>;
   @action setProcessor = (processor: keyof typeof Processors) => this.processor = new Processors[processor]();
 
   @observable processing: FFmpeg.FFmpegProcess | null = null;
   @action setProcessing = (p: ProcessStoreClass['processing']) => this.processing = p;
 
   @computed get strategyType() {
-    return RendererSettings.settings.processingParams.strategyType
+    return RendererSettings.settings.processingStrategy.type;
   }
 
   @computed get strategyTune() {
-    return RendererSettings.settings.processingParams.strategyTune
+    return RendererSettings.settings.processingStrategy.tune;
   }
 
   @action setStrategyType = (t: ProcessStoreClass['strategyType']) =>
-    RendererSettings.settings.processingParams.strategyType = t;
+    RendererSettings.settings.processingStrategy.type = t;
   @action setStrategyTune = (t: ProcessStoreClass['strategyTune']) =>
-    RendererSettings.settings.processingParams.strategyTune = t;
+    RendererSettings.settings.processingStrategy.tune = t;
 
   @computed get strategy(): RenderStrategy {
     return {
@@ -60,16 +62,16 @@ class ProcessStoreClass {
     RendererSettings.settings.processingVideoSettings[key] = val;
   }
 
-  @observable fileOut: string = '';
-  @action setFileOut = (f: string) => this.fileOut = f;
-
-  // todo move this into an AudioSettings
-  @observable volume: number = 1;
-  @action setVolume = (v: number) => {
-    v = clip(0, v, 2);
-    PlaybackStore.setVolume(v);
-    return this.volume = v;
+  // todo move this into an AudioSettings in RendererSettings
+  @observable audioSettings = {
+    volume: 1
   }
+  @action setAudioSettings = <K extends keyof ProcessStoreClass['audioSettings']>(key: K, val: ProcessStoreClass['audioSettings'][K]) => {
+    this.audioSettings[key] = val;
+  }
+
+  @observable fileOut: string | null = null;
+  @action setFileOut = (f: ProcessStoreClass['fileOut']) => this.fileOut = f;
 
   constructor() {
     makeObservable(this);
@@ -92,8 +94,22 @@ class ProcessStoreClass {
       }
     });
 
-    this.processor = new Processors[RendererSettings.settings.processor]();
-    reaction(() => RendererSettings.settings.processor, this.setProcessor);
+    this.processor = new (
+      Processors[RendererSettings.settings.processor] ||
+      Processors['libx264']
+    )();
+    reaction(() => RendererSettings.settings.processor, (p) => {
+      this.setProcessor(p);
+
+      if (RendererSettings.settings.processingStrategy.type === 'constant-quality') {
+        const defaultCRF = this.processor.qualityOptions.find(x => x.default)?.value;
+        RendererSettings.settings.processingStrategy.tune = clip(
+          this.processor.qualityOptions[0].value,
+          defaultCRF ?? RendererSettings.settings.processingStrategy.tune,
+          this.processor.qualityOptions[this.processor.qualityOptions.length - 1].value,
+        );
+      }
+    });
 
     reaction(() => this.processing?.error, (e) => {
       if (e) {
@@ -122,7 +138,7 @@ class ProcessStoreClass {
       if (!p) {
         getCurrentWindow().setProgressBar(0, { mode: "none" });
       }
-    })
+    });
   }
 
   startProcessing = async () => {
@@ -136,15 +152,9 @@ class ProcessStoreClass {
     const strategy = ProcessStore.strategy;
     PlaybackStore.pause();
 
-    const { canceled, filePath: fout } = await dialog.showSaveDialog(
-      getCurrentWindow(),
-      {
-        title: 'Output location',
-        defaultPath: RendererFileHelpers.generateFileOutName(AppState.file, AppState.trimRange, strategy, ProcessStore.videoSettings),
-        buttonLabel: 'Save & Start',
-        filters: [{ name: 'Video', extensions: ['mp4'] }],
-        properties: ['createDirectory', 'showOverwriteConfirmation']
-      });
+    const { canceled, filePath: fout } = await RendererFileHelpers.requestFileSaveDialog(
+      RendererFileHelpers.generateFileOutName(AppState.file, AppState.trimRange, strategy, ProcessStore.videoSettings)
+    );
 
     if (!fout || canceled) {
       return console.warn('refusing to start process with empty output location');
@@ -156,7 +166,13 @@ class ProcessStoreClass {
     const args = this.processor.generateFFmpegArgs(
       AppState.file,
       fixedRange,
-      fout
+      fout,
+      this.videoDetails,
+      {
+        video: this.videoSettings,
+        audio: this.audioSettings,
+        strategy: RendererSettings.settings.processingStrategy
+      }
     );
 
     try {
@@ -177,7 +193,7 @@ class ProcessStoreClass {
         fps: this.videoSettings.fps === 'original' ? this.videoDetails!.fps : this.videoSettings.fps,
         isFPSChanged: this.videoSettings.fps !== 'original',
         encoderSettings: this.processor.settings,
-        volume: this.volume,
+        volume: this.audioSettings.volume,
       });
 
       this.setFileOut(fout);

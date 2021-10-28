@@ -1,0 +1,102 @@
+.encoder-list {
+  width: 100%;
+
+  > svg {
+    display: none;
+  }
+}
+
+.encoder-menu-item {
+  width: 100%;
+}
+
+.encoder {
+  border-radius: 8px;
+  margin: 4px;
+  position: relative;
+  max-width: 600px;
+  width: 100%;
+
+  .content {
+    padding: 16px;
+    width: 100%;
+  }
+
+  &.disabled {
+
+    &:after {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      //background: rgba(0, 0, 0, 0.5);
+      text-shadow: 0 0 15px black, 0 0 15px black, 0 0 15px black, 0 0 15px black, 0 0 15px black;
+
+      padding: 8px;
+
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+
+      font-size: 1.5rem;
+      text-align: center;
+      font-family: "Roboto", "Helvetica", "Arial", sans-serif;
+      transition-property: color;
+      transition-duration: 0.2s;
+    }
+
+    &.not-implemented {
+      &:after {
+        content: 'Not implemented yet!';
+      }
+    }
+
+    &.not-supported {
+      &:after {
+        content: 'Not supported!';
+      }
+    }
+
+    &.no-compatible-gpu {
+      &:after {
+        content: 'No compattible GPU found!';
+      }
+    }
+  }
+
+  .action-area {
+    display: flex;
+  }
+
+  .banner {
+    display: flex;
+
+    position: absolute;
+    top: 0;
+    right: 0;
+
+    > * {
+      color: white;
+      padding: 8px;
+    }
+
+    > *:first-child {
+      border-bottom-left-radius: 8px;
+    }
+
+    > *:last-child {
+      border-top-right-radius: 8px;
+    }
+
+    .gpu {
+      background: forestgreen;
+    }
+
+    .experimental {
+      background: darkorange;
+    }
+  }
+
+}

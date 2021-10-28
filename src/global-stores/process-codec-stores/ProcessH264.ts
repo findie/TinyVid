@@ -1,17 +1,20 @@
 /**
  Copyright Findie 2021
  */
-import {ProcessBaseGeneric, ProcessBaseGenericSettings} from "./ProcessBaseGeneric";
-import {AudioSettings, VideoSettings} from "../../../electron/types";
+import {ProcessBaseGeneric, ProcessBaseGenericSettings, RenderingSettings} from "./ProcessBaseGeneric";
+import {VideoSettings} from "../../../electron/types";
 import {RendererSettings} from "../../helpers/settings";
 import {ProcessStore} from "../Process.store";
 import {FFprobeData} from "../../../common/ff/ffprobe";
+import {range} from "../../helpers/math";
+import {makeObservable, observable, override} from "mobx";
 
-type H264Settings = ProcessBaseGenericSettings<'libx264'> & {
-  preset: EncodingSpeedPresetsType
+export type H264Settings = ProcessBaseGenericSettings<'libx264'> & {
+  preset: H264EncodingSpeedPresetsType
+  tune: 'film' | 'animation' | 'grain' | 'stillimage' | 'none'
 }
 
-export type EncodingSpeedPresetsType =
+export type H264EncodingSpeedPresetsType =
   'ultrafast'
   | 'superfast'
   | 'veryfast'
@@ -24,25 +27,61 @@ export type EncodingSpeedPresetsType =
 
 export class ProcessH264 extends ProcessBaseGeneric<'libx264', H264Settings> {
 
+  readonly qualityUnit = 'crf';
+  readonly qualityOptions = range(18, 44, 2).map(q => {
+    let q_percentage = 100 - ((q - 18) / 2 * 5);
+
+    let text = `${q_percentage}%`
+    if (q === 18) {
+      text += ' (crisp picture)';
+    }
+
+    if (q === 22) {
+      text += ' (can\'t really tell the difference)';
+    }
+
+    if (q === 28) {
+      text += ' (starting to lose some quality)'
+    }
+
+    if (q === 32) {
+      text += ' (your usual twitter video)';
+    }
+
+    if (q === 40) {
+      text += ' (potato quality 🥔)';
+    }
+
+    return { text, value: q, default: q === 20 };
+  });
+
   constructor() {
     super('libx264', {
       processorName: 'libx264',
       version: 1,
-      preset: 'medium'
+      preset: 'medium',
+      tune: 'none',
     });
+    makeObservable(this);
   }
 
-  private strategy2params = (details: FFprobeData, durationOrTrimmedDuration: number) => {
+  protected paramsFromStrategy(details: FFprobeData, durationOrTrimmedDuration: number, settings: RenderingSettings): string[] {
 
-    const strategyType = RendererSettings.settings.processingParams.strategyType;
-    const strategyTune = RendererSettings.settings.processingParams.strategyTune;
-    const hasAudio = !!details.audioStream && ProcessStore.volume > 0;
+    const strategyType = settings.strategy.type;
+    const strategyTune = settings.strategy.tune;
+    const hasAudio = !!details.audioStream && settings.audio.volume > 0;
+
+    const commonParams: string[] = [];
+    if (this.settings.tune !== 'none') {
+      commonParams.push(...['-tune', this.settings.tune]);
+    }
 
     switch (strategyType) {
       case "constant-quality":
         return [
           '-crf', strategyTune.toString(),
-          '-preset', this.settings.preset
+          '-preset', this.settings.preset,
+          ...commonParams
         ];
 
       case "max-file-size":
@@ -60,92 +99,13 @@ export class ProcessH264 extends ProcessBaseGeneric<'libx264', H264Settings> {
           '-b:a', Math.floor(audioBitrateInKb) + 'k',
           '-bufsize:v', Math.floor(videoBitrateInKb) + 'k',
           '-preset:v', this.settings.preset,
-          '-x264-params', "nal-hrd=cbr"
+          '-x264-params', "nal-hrd=cbr",
+          ...commonParams
         ];
 
       default:
         throw new Error('unknown strategy ' + strategyType);
     }
-  }
-
-  settings2filters = () => {
-    const settings = ProcessStore.videoSettings;
-    const filters = [];
-
-    if (settings.fps !== "original") {
-      filters.push(`fps=${settings.fps}`);
-    }
-    if (settings.height !== "original") {
-      filters.push(`scale=-2:${settings.height}`);
-    }
-
-    if (filters.length === 0) {
-      filters.push('null')
-    }
-    return filters;
-  }
-
-  audio2filters = () => {
-    const audio: AudioSettings = { volume: ProcessStore.volume };
-    const filters = [];
-    if (audio.volume !== 1) {
-      filters.push(`volume=${audio.volume ?? 1}`);
-    }
-
-    if (filters.length === 0) {
-      filters.push('anull');
-    }
-    return filters;
-  }
-
-  filterComplex = (mediaDetails: FFprobeData) => {
-    const steps: string[] = [];
-    const mappings = new Set<string>();
-
-    steps.push(`[0:v]${this.settings2filters().join(',')}[v]`);
-    mappings.add('[v]')
-
-    if (mediaDetails.audioTrackIndexes.length > 0 && ProcessStore.volume > 0) {
-      const audioFilters = this.audio2filters();
-
-      const header = mediaDetails.audioTrackIndexes.map((i) => `[0:${i}]`).join('');
-
-      if (mediaDetails.audioTrackIndexes.length > 1) {
-        audioFilters.unshift(`amix=${mediaDetails.audioTrackIndexes.length}`);
-      }
-
-      steps.push(`${header}${audioFilters.join(',')}[a]`)
-      mappings.add('[a]');
-    }
-
-    return {
-      filter_complex: steps,
-      mappings: [...mappings]
-    };
-  }
-
-  generateFFmpegArgs(fileIn: string, range: { begin: number, end: number }, fileOut: string): string[] {
-    if (!ProcessStore.videoDetails) {
-      throw new Error('Cannot continue without video details');
-    }
-
-    const fc = this.filterComplex(ProcessStore.videoDetails);
-    console.log('filter_complex', fc.filter_complex);
-    console.log('filter_complex mappings', fc.mappings);
-
-    return [
-      '-ss', range.begin.toFixed(6),
-      '-to', range.end.toFixed(6),
-      '-i', fileIn,
-
-      ...(fc.filter_complex.length > 0 ? ['-filter_complex', fc.filter_complex.join(';')] : []),
-      ...(fc.mappings.length > 0 ? fc.mappings.map(x => ['-map', x]).flat() : []),
-
-      ...this.strategy2params(ProcessStore.videoDetails, range.end - range.begin),
-      ...(ProcessStore.volume > 0 ? [] : ['-an']),
-      '-c:v', this.processorName,
-      fileOut, '-y'
-    ];
   }
 
   optimalBitrateCalculator(videoDetails: { width: number, height: number, fps: number }, outputSettings: VideoSettings) {
@@ -167,7 +127,7 @@ export class ProcessH264 extends ProcessBaseGeneric<'libx264', H264Settings> {
   }
 
   // https://write.corbpie.com/ffmpeg-preset-comparison-x264-2019-encode-speed-and-file-size/
-  static readonly benchmarksH264: ({ [s in EncodingSpeedPresetsType]: { fps: number, kbit: number } }) = {
+  static readonly benchmarksH264: ({ [s in H264EncodingSpeedPresetsType]: { fps: number, kbit: number } }) = {
     veryslow: {
       fps: 19,
       kbit: 2970
@@ -206,7 +166,7 @@ export class ProcessH264 extends ProcessBaseGeneric<'libx264', H264Settings> {
     }
   }
 
-  static readonly encodingSpeedPresets: EncodingSpeedPresetsType[] = [
+  static readonly encodingSpeedPresets: H264EncodingSpeedPresetsType[] = [
     'ultrafast',
     'superfast',
     'veryfast',

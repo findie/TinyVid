@@ -1,0 +1,41 @@
+.root {
+  height: 600px;
+  max-height: 90vh;
+  border-radius: 8px;
+
+  display: flex;
+  flex-flow: row;
+
+
+  .tabs {
+    flex-grow: 0;
+    flex-shrink: 0;
+    border-right: 1px solid gray;
+  }
+
+  .content {
+    width: 600px;
+    max-width: 600px;
+    height: 100%;
+    overflow-y: auto;
+    background: rgba(0, 0, 0, 0.1);
+
+    header {
+      margin-top: -16px;
+      margin-bottom: -26px;
+    }
+    section {
+        margin-top: 32px;
+
+      > h6:first-child {
+        margin: 0;
+        opacity: 0.5;
+        font-weight: bold;
+        text-transform: uppercase;
+        font-size: 1.25em;
+      }
+    }
+  }
+
+}
+
