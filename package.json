@@ -8,7 +8,6 @@
     "dev:electron": "NODE_ENV=development webpack --config webpack.electron.config.js --mode development --watch",
     "dev:prod:electron": "NODE_ENV=production webpack --config webpack.electron.config.js --mode production --watch",
     "dev:react": "NODE_ENV=development webpack-dev-server --config webpack.react.config.js --mode development",
-    "ffbin": "ffbinaries ffprobe ffmpeg -p linux-64 -o bin/linux-64 && ffbinaries ffprobe ffmpeg -p windows-64 -o bin/windows-64 && ffbinaries ffprobe ffmpeg -p osx-64 -o bin/osx-64",
     "build:js-win": "yarn install && set NODE_ENV=production && webpack --config webpack.electron.config.js --mode production && set NODE_ENV=production && webpack --config webpack.react.config.js --mode production",
     "build:js": "yarn install && NODE_ENV=production webpack --config webpack.electron.config.js --mode production && NODE_ENV=production webpack --config webpack.react.config.js --mode production",
     "build:win": "yarn build:js && electron-builder --win -p never",
@@ -123,9 +122,6 @@
       ],
       "icon": "icon.icns",
       "darkModeSupport": true,
-      "extraFiles": [
-        "bin/osx-64"
-      ],
       "hardenedRuntime": true,
       "entitlements": "build/entitlements.mac.plist",
       "entitlementsInherit": "build/entitlements.mac.plist"
@@ -138,9 +134,6 @@
       ],
       "sign": "build/scripts/eSigner.js",
       "icon": "icon.ico",
-      "extraFiles": [
-        "bin/windows-64"
-      ],
       "certificateSubjectName": "Findie Development Limited"
     },
     "nsis": {
@@ -154,9 +147,6 @@
         "dir",
         "appImage",
         "zip"
-      ],
-      "extraFiles": [
-        "bin/linux-64"
       ],
       "executableName": "TinyVid",
       "icon": "icon.png"
