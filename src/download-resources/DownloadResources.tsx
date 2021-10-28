@@ -1,11 +1,12 @@
 import React from 'react'
 import {FFFiles} from "../../common/ff/files";
 import {Modal} from "../components/modal";
-import {Button, Divider, LinearProgress, Typography} from "@material-ui/core";
+import {Button, Divider, LinearProgress, Link, Typography} from "@material-ui/core";
 import {observer} from "mobx-react";
-import {app} from "@electron/remote";
+import {app, shell} from "@electron/remote";
 import classes from './DownloadResources.module.scss';
 import CheckCircle from "@material-ui/icons/CheckCircle";
+import {CodeDisplay} from "../components/code";
 
 function restart() {
   app.relaunch();
@@ -32,13 +33,19 @@ export const DownloadResources = observer(function DownloadResources() {
           <>
             {!FFFiles.downloading && !FFFiles.downloadError && (
               <>
-                <Typography variant="h6" align="center">Some assets are required before running {app.name}</Typography>
+                <Typography variant="h6" align="center">To complete setup, we will download additional software called FFmpeg.</Typography>
+                <CodeDisplay wrap>
+                  This software uses a compiled version of <Link onClick={() => shell.openExternal("http://ffmpeg.org")}><b>FFmpeg</b></Link>{' '}
+                  licensed under the <Link onClick={() => shell.openExternal("https://www.gnu.org/licenses/gpl-3.0.html")}><b>GPLv3</b></Link>.{' '}<br/>
+                  FFmpeg's source can be downloaded <Link onClick={() => shell.openExternal("https://github.com/ffmpeg/FFmpeg/")}><b>here</b></Link>{' '}
+                  and binaries can be downloaded <Link onClick={() => shell.openExternal("https://ffbinaries.com/downloads")}><b>here</b></Link>
+                </CodeDisplay>
                 <Button
                   variant="contained"
                   color="primary"
                   onClick={FFFiles.downloadBins}
                 >
-                  Start Download
+                  I Agree - Download
                 </Button>
               </>
             )}
