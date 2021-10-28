@@ -1,6 +1,6 @@
 {
   "name": "TinyVid",
-  "version": "0.18.0-preview.8",
+  "version": "1.0.0",
   "main": "./dist/main.js",
   "author": "Kamua<hello@kamua.com>",
   "description": "Simple to use video trimmer & compressor",
@@ -34,6 +34,7 @@
     "@sentry/integrations": "^6.2.5",
     "@types/classnames": "^2.2.11",
     "@types/color": "^3.0.1",
+    "@types/ffbinaries": "^1.1.2",
     "@types/is-running": "^2.1.0",
     "@types/mixpanel-browser": "^2.35.6",
     "@types/node": "^14.0.13",
@@ -87,8 +88,7 @@
     "uuid": "^8.1.0",
     "webpack": "^4.43.0",
     "webpack-cli": "^3.3.11",
-    "webpack-dev-server": "^3.11.0",
-    "@types/ffbinaries": "^1.1.2"
+    "webpack-dev-server": "^3.11.0"
   },
   "dependencies": {
     "@electron/remote": "^2.0.1"
