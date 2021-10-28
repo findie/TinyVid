@@ -5,3 +5,5 @@ dist/
 out/
 renderer_settings.json
 .env
+bin-old
+bin

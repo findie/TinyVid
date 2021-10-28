@@ -53,6 +53,8 @@ export class FFFilesClass {
   protected switchToBackup() {
     this.ffmpeg = userData_dir('bins', FFMPEG_BIN_FILE);
     this.ffprobe = userData_dir('bins', FFPROBE_BIN_FILE);
+    console.log('switched ffmpeg to', this.ffmpeg);
+    console.log('switched ffprobe to', this.ffprobe);
   }
 
   downloadBin = async (which: 'ffmpeg' | 'ffprobe', progress: (p: number) => void) => {
