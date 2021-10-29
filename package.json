@@ -90,7 +90,8 @@
     "webpack-dev-server": "^3.11.0"
   },
   "dependencies": {
-    "@electron/remote": "^2.0.1"
+    "@electron/remote": "^2.0.1",
+    "nlf": "^2.1.1"
   },
   "build": {
     "appId": "com.kamua.tinyvid",

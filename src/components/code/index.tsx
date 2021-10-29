@@ -8,7 +8,8 @@ export interface CodeDisplayProps {
   children?: React.ReactNode
   className?: string
   mono?: boolean
-  wrap?: boolean
+  wrap?: boolean,
+  style?: React.CSSProperties
 }
 
 const styles = makeStyles(theme => ({
@@ -30,7 +31,9 @@ export function CodeDisplay(props: CodeDisplayProps) {
     <Box
       border={1}
       padding={1}
-      className={(props.className || '') + ' ' + classes.root + ' ' + css.preContainer}>
+      className={(props.className || '') + ' ' + classes.root + ' ' + css.preContainer}
+      style={props.style}
+    >
       <pre className={css.pre + ' ' + (props.mono ?? true ? '' : classes.niceText) + (props.wrap ? classes.wrap : '')}>
         {props.children}
       </pre>

@@ -7,11 +7,13 @@ import {ThemeSection} from "./display/ThemeSection";
 import {Encoders} from "./encoding/Encoders";
 import {EncoderSettings} from "./encoding/encoder-settings/EncoderSettings";
 import {AdvancedSettingsFlags} from "./advanced/AdvancedFlags";
+import {Licenses} from "./licenses/Licenses";
 
 enum TabValues {
   customization = 'customization',
   encoding = 'encoding',
-  advanced = 'advanced'
+  advanced = 'advanced',
+  licenses = 'licenses'
 }
 
 export const Settings = observer(function Settings() {
@@ -32,7 +34,7 @@ export const Settings = observer(function Settings() {
         <Tab label="Display" value={TabValues.customization}/>
         <Tab label="Encoding" value={TabValues.encoding}/>
         <Tab label="Advanced" value={TabValues.advanced}/>
-
+        <Tab label="Licenses" value={TabValues.licenses}/>
       </Tabs>
 
 
@@ -74,6 +76,17 @@ export const Settings = observer(function Settings() {
 
             <section>
               <AdvancedSettingsFlags/>
+            </section>
+          </TabPanel>
+
+          <TabPanel value={TabValues.licenses}>
+
+            <header>
+              <Typography variant="h4">Licenses</Typography>
+            </header>
+
+            <section>
+              <Licenses/>
             </section>
           </TabPanel>
         </TabContext>
