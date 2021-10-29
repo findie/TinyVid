@@ -1,3 +1,4 @@
+#!/usr/bin/env node
 const nlf = require('nlf');
 const util = require('util');
 const nlf_find = util.promisify(nlf.find);
@@ -77,5 +78,12 @@ async function fetchExternalFile (location) {
 // ANY MODIFICATIONS WILL BE REMOVED
 export const licenses = ${util.inspect(licenses, { depth: Infinity, breakLength: 120 })};
 `;
+  // if code > 200k
+  if(code.length > 200 * 2**10){
+    console.warn('License file is', code.length / 2**10, 'KB! consider having a look at it')
+  }
   fs.writeFileSync(file, code);
-})();
+})().catch(e => {
+  console.error(e);
+  process.exit(1);
+});

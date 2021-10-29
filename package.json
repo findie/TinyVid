@@ -15,7 +15,8 @@
     "build:mac": "yarn build:js && electron-builder --mac -p never",
     "deploy:win": "yarn build:js && electron-builder --win -p always",
     "deploy:linux": "yarn build:js && electron-builder --linux -p always",
-    "deploy:mac": "yarn build:js && electron-builder --mac -p always"
+    "deploy:mac": "yarn build:js && electron-builder --mac -p always",
+    "licenses": "./dump-licenses.js"
   },
   "private": true,
   "devDependencies": {
