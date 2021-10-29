@@ -1,5 +1,5 @@
 import React, {useState} from 'react'
-import {licenses} from "./licenses";
+import {licenses} from "./licenses-data";
 import {Collapse, IconButton, Link, Typography} from "@material-ui/core";
 import {shell} from "@electron/remote";
 import {CodeDisplay} from "../../components/code";
