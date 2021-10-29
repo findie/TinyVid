@@ -15,32 +15,56 @@ function License(props: { license: typeof licenses[number] }) {
 
   return (
     <Collapse in={collapsed} collapsedHeight={48}>
-      <Typography variant="h6" style={{whiteSpace: 'nowrap'}}>
+      <Typography variant="h6" style={{ whiteSpace: 'nowrap' }}>
         <IconButton
           onClick={() => setCollapsed(c => !c)}
           disabled={!collapsable}
-          style={{opacity: collapsable ? 1 : 0}}
+          style={{ opacity: collapsable ? 1 : 0 }}
         >
           {!collapsed ? <Add/> : <Remove/>}
         </IconButton>
-        <Link onClick={() => shell.openExternal(license.repo)}>{license.name}</Link>{' '}
-        v{license.version} : {license.license}
+        <Link
+          style={{ textDecorationLine: 'underline' }}
+          onClick={() => shell.openExternal(license.repo)}>
+          {license.name}
+        </Link>{' '}
+        v{license.version} : {license.license}{' '}
+        {license.external && (
+          <>
+            {' | '}
+            <Link
+              style={{ textDecorationLine: 'underline' }}
+              onClick={() => shell.openExternal(license.binaries)}
+            >
+              Binaries here
+            </Link>
+          </>
+        )}
       </Typography>
 
-      <CodeDisplay style={{marginLeft: -24, marginRight: -24}}>
+      <CodeDisplay style={{ marginLeft: -24, marginRight: -24 }}>
         {license.fileLicense}
       </CodeDisplay>
     </Collapse>
   )
 }
 
-export function Licenses() {
+export function Licenses(props: { type: 'external' | 'bundled', title: string }) {
+
+  const l = licenses.filter(x => {
+    if (props.type === 'external') {
+      return !!x.external;
+    }
+    if (props.type === 'bundled') {
+      return !x.external;
+    }
+  });
 
   return (
     <>
-      <Typography variant="h6">3rd party licenses</Typography>
+      <Typography variant="h6">{props.title}</Typography>
 
-      {licenses.map((license, i) => <License key={i} license={license}/>)}
+      {l.map((license, i) => <License key={i} license={license}/>)}
     </>
   )
 }

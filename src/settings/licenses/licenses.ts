@@ -2319,7 +2319,9 @@ export const licenses = [
     name: 'FFmpeg',
     version: '4.2.1',
     repo: 'https://github.com/ffmpeg/FFmpeg/',
+    binaries: 'https://ffbinaries.com/downloads',
     license: 'GPL-v3',
+    external: true,
     fileLicense: '# License\n' +
       '\n' +
       'Most files in FFmpeg are under the GNU Lesser General Public License version 2.1\n' +

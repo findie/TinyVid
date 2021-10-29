@@ -86,7 +86,17 @@ export const Settings = observer(function Settings() {
             </header>
 
             <section>
-              <Licenses/>
+              <Licenses
+                title="Bundled 3rd party licenses"
+                type="bundled"
+              />
+            </section>
+
+            <section>
+              <Licenses
+                title="External 3rd party licenses"
+                type="external"
+              />
             </section>
           </TabPanel>
         </TabContext>

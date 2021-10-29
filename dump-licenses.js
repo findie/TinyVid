@@ -68,7 +68,9 @@ async function fetchExternalFile (location) {
     name: "FFmpeg",
     version: '4.2.1',
     repo: 'https://github.com/ffmpeg/FFmpeg/',
+    binaries: 'https://ffbinaries.com/downloads',
     license: 'GPL-v3',
+    external: true,
     fileLicense: await fetchExternalFile('https://raw.githubusercontent.com/FFmpeg/FFmpeg/release/4.2/LICENSE.md')
   })
 
@@ -80,8 +82,9 @@ export const licenses = ${util.inspect(licenses, { depth: Infinity, breakLength:
 `;
   // if code > 200k
   if(code.length > 200 * 2**10){
-    console.warn('License file is', code.length / 2**10, 'KB! consider having a look at it')
+    console.warn('License file is', (code.length / 2**10).toFixed(1), 'KB! consider having a look at it')
   }
+  console.log(`Finished dumping licenses (${(code.length / 2**10).toFixed(1)}KB)`)
   fs.writeFileSync(file, code);
 })().catch(e => {
   console.error(e);
