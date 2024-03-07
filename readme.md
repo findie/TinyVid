@@ -1,4 +1,4 @@
-# Quick Trim
+# [TinyVid](https://tinyvid.io/)
 _Trim & compress video footage_
 
 ![image](https://raw.githubusercontent.com/legraphista/QuickTrim/master/docs/splash.png)
@@ -13,11 +13,11 @@ _Trim & compress video footage_
 
 ## Roadmap
 
-- add settings page with various options
-- add support for H265 encoder
-- add support for AV1 encoder
-- add support for NVidia h264/h265 encoders on windows
-- add a queue for batching file processing
+- ~add settings page with various options~
+- ~add support for H265 encoder~
+- ~add support for AV1 encoder~
+- ~add support for NVidia h264/h265 encoders on windows~
+- ~add a queue for batching file processing~
 
 ## Known Limitations
 
