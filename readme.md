@@ -1,7 +1,7 @@
 # [TinyVid](https://tinyvid.io/)
 _Trim & compress video footage_
 
-![image](https://raw.githubusercontent.com/legraphista/QuickTrim/master/docs/splash.png)
+![TinyVid](https://github.com/findie/TinyVid/assets/962643/bd43474a-4165-4705-9fb8-7554ac0b2ac5)
 
 ## How to!
 
